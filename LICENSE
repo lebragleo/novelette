@@ -1,0 +1,14 @@
+Novelette document class for LuaLaTex, with font support.
+
+Copyright 2026, Terry Lebragleo.
+
+Mixed free licenses:
+
+TeX code, supporting documentation, images, and shell scripts are released under terms of the MIT License.
+A copy of the MIT license is at opensource.org.
+
+OpenTypeFonts are released under terms of the SIL Open Font License, version 1.1.
+A copy of this license, with FAQs, is at openfontlicense.org.
+
+
+
