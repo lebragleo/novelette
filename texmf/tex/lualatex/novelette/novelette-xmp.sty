@@ -1,0 +1,90 @@
+%% This is file novelette-xmp.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-xmp}[2026-04-25 Novelette XMP Packet]
+
+%% This file is only loaded when \pdfx{xmp}. Loaded AtBeginDocument.
+
+
+%% OVERVIEW:
+%%   PDF/X-1a:2001 was specified in an era when metadata was written into an Info dictionary. 
+%% That is all that you need for print-only, since the PDF is not searched by the public.
+%% But Info is insufficiently flexible for modern Ebooks and database searches.
+%%   Although it is unnecessary and irrelevant, some print services may request XMP metadata,
+%% because they are in the habit of also doing Ebooks. Use \pdfx{xmp} to get it.
+%% When a print service requests 'without metadata' they mean 'without XMP', which is normal
+%% in this context.
+%%   With or without XMP, the Info dictionary is written, because it is part of the
+%% specification for PDF/X-1a:2001. XMP metadata is XML, so it must conform to the usual
+%% XML requirements: some characters are replaced by their Entities.
+%%   Your metadata is pre-processed by Lua, called from another page. This page merely
+%% inserts that metadata into a template, with some catcode changes for compatibility.
+
+
+%% NO COMMENTS AFTER THIS! The percent character is re-defined. Until \endgroup.
+\begingroup
+\catcode`\#=12
+\catcode`\_=12
+\catcode`\~=12
+\catcode`\$=12
+\catcode`\%=12
+\catcode`\&=12
+\edef\@pctchar{\expandafter\@gobble\string\%}
+\let\%\@pctchar
+\edef\@hashchar{\expandafter\@gobble\string\#}
+\let\#\@hashchar
+\edef\@ampchar{\expandafter\@gobble\string\&amp;}
+\let\&\@ampchar
+\edef\@dollarchar{\expandafter\@gobble\string\$}
+\let\$\@dollarchar
+\edef\@underchar{\expandafter\@gobble\string\_}
+\let\_\@underchar
+\edef\@tildechar{\expandafter\@gobble\string\~}
+\let\~\@tildechar
+\def\nvt@xmptk{x:xmptk="Adobe XMP Core 4.2.1-c043 52.372728, 2009/01/18-15:08:04"}
+
+\xdef\nvt@xpacket{<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>^^J
+<x:xmpmeta xmlns:x="adobe:ns:meta/" \nvt@xmptk>^^J
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">^^J
+<rdf:Description rdf:about="" xmlns:xmp="http://ns.adobe.com/xap/1.0/">^^J
+<xmp:ModifyDate>\nvt@xmpmodifydate</xmp:ModifyDate>^^J
+<xmp:CreateDate>\nvt@xmpcreatedate</xmp:CreateDate>^^J
+<xmp:CreatorTool>Chestnut Chickadee Literary Typesetter</xmp:CreatorTool>^^J
+<xmp:MetadataDate>\nvt@xmpmetadatadate</xmp:MetadataDate>^^J
+</rdf:Description>^^J
+<rdf:Description rdf:about="" xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:prism="http://prismstandard.org">^^J
+<dc:format>application/pdf</dc:format>^^J
+<dc:title><rdf:Alt><rdf:li xml:lang="x-default">\nvt@xmptitle</rdf:li></rdf:Alt></dc:title>^^J
+\nvt@xmpsubtitlestring
+<dc:creator><rdf:Seq><rdf:li>\nvt@xmpauthor</rdf:li></rdf:Seq></dc:creator>^^J
+</rdf:Description>^^J
+<rdf:Description rdf:about="" xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/">^^J
+<xmpMM:DocumentID>\nvt@xmpdocid</xmpMM:DocumentID>^^J
+<xmpMM:InstanceID>\nvt@xmpnowid</xmpMM:InstanceID>^^J
+<xmpMM:RenditionClass>default</xmpMM:RenditionClass>^^J
+<xmpMM:VersionID>1</xmpMM:VersionID>^^J
+</rdf:Description>^^J
+<rdf:Description rdf:about="" xmlns:pdf="http://ns.adobe.com/pdf/1.3">^^J
+<pdf:Producer>Steller Jay PDF Producer</pdf:Producer>^^J
+<pdf:Trapped>False</pdf:Trapped>^^J
+</rdf:Description>^^J
+<rdf:Description rdf:about="" xmlns:pdfx="http://ns.adobe.com/pdfx/1.3">^^J
+<pdfx:GTS_PDFXVersion>PDF/X-1</pdfx:GTS_PDFXVersion>^^J
+<pdfx:GTS_PDFXConformance>PDF/X-1a:2001</pdfx:GTS_PDFXConformance>^^J
+</rdf:Description>^^J
+<rdf:Description rdf:about="" xmlns:pdfxid="http://www.npes.org/pdfx/ns/id/">^^J
+<pdfxid:GTS_PDFXVersion>PDF/X-1a:2001</pdfxid:GTS_PDFXVersion>^^J
+</rdf:Description>^^J
+</rdf:RDF>^^J
+</x:xmpmeta>^^J
+<?xpacket end="w"?>}
+
+\endgroup
+
+
+%% OK to use comments now.
+\endinput
+%% End of file 'novelette-xmp.sty'.
+

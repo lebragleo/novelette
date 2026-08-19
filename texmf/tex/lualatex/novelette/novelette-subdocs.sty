@@ -1,0 +1,163 @@
+%% This is file novelette-subdocs.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-subdocs}[2026-04-25 subdoc files]
+
+
+%% OVERVIEW:
+%%   Standard LaTeX class use commands such as \include, \import, or the more basic \input,
+%% to insert files into a document. There is not much restriction on what such files may contain,
+%% and they cannot be compiled alone. Some packages, such as 'standalone' and 'subfiles',
+%% allow you to format the files in a way that allows you to compile them alone, if you wish.
+%%   None of that is available in Novelette. Instead, you may (and should) decompose your
+%% document into a main document file (which contains the Preamble), and several subdoc files.
+%% The main document, and all subdoc, must have '.tex' file extension.
+%%   Each subdoc usually represents a chapter (or something similar). Or a subdoc may
+%% contain several chapters. Or a subdoc may be as short as one page, such as the title page.
+%% In all cases, the subdoc begins a new page, and whatever follows the subdoc will begin
+%% a new page. A subdoc may include other subdocs, according to certain rules.
+%%   You may compile just one subdoc, which obtains its settings from the main document, and
+%% disregards anything preceding or following the subdoc. Preamble \mode will be ignored,
+%% and the mode will be 'draft'.
+%%   The typesetting will have the same paragraph linebreaks, and same page breaks, as will appear
+%% in the whole document. But since page numbers are unknown, they print as zzz or 000. And since
+%% verso/recto is unknown, the glue-strip margin is equally split to both sides.
+
+
+%% WHERE TO PLACE SUBDOC FILES:
+%%   If you use subdocs, best practice is to create a folder (such as 'subdocs') relative to the
+%% main document. Place all subdoc files in there. You may use subfolders,  to a maximum
+%% of 5 levels from the main document.
+%%   Paths are relative to the main document, even when one subdoc calls another subdoc. If any
+%% path does not obey proper syntax, and error results.
+%%   Good: chapters/chapter-1.tex
+%%   Good: subdocs/chapters/chapter-1.tex
+%%   Bad:  chapters/../chapter-1.tex (cannot use ../ to rise out of folder)
+%%   Bad:  /home/username/mybook/chapters/chapter-1.tex (cannot use absolute path)
+%% Paths and filenames may contain hyphen or underscore, but may not contain spaces. You may not
+%% use symlinks (softlinks).
+
+
+%% CONTENT OF SUBDOC FILE:
+%%   You may write comments at the top of a subdoc file. In particular, if compiling with GUI
+%% such as TeXworks, best practice is to write the two 'magic comments':
+%%     %!TeX program = lualatex
+%%     %!TeX encoding = UTF-8
+%% After comments, the following two lines are required: 
+%%     \def\thisdoc{M:PathFromMainDocumentTo/SubdocFilename.tex}
+%%     \input{PathFromSubdocTo/MainDocumentFilename.tex}
+%%   M is one of frontmatter, mainmatter, backmatter. This tells the compiler where the subdoc
+%% sits within the main document. If actual placement of the subdoc disagrees with M, then error.
+%% However,if M is image, that tells the compiler that this file is being used for creating
+%% an image with custom fonts, and that this file cannot be included elsewhere.
+%%   The PathFromSubdocTo must contain as many '../' as the number of folder levels shown in
+%% PathFromMainDocumentTo. If not, error.
+%%   After the required lines, use the component environment for prinatable material,
+%% same rules as for main document. A subdoc may contain several components. However, you cannot
+%% place a subdoc inside a component.
+
+
+%% SANITY CHECK:
+%%   If the document class detects that it has been called by a subdoc, this checks for
+%% correct syntax of the required \def\thisdoc and \input lines. Then it checks for the correct
+%% filenames and path relationships. Finally, it corrects the file path for calling images
+%% or other subdocs.
+\newif\ifnvt@imagedoc %% True when compiling only subdoc to be converted to image.
+\newif\ifnvt@insubdoc %% True when compiling only subdocs.
+\ifdefined\thisdoc %% At time when \documentclass loads.
+  \global\nvt@insubdoctrue
+  \directlua{nvt.parsethisdoc('\luaescapestring{\thisdoc}')}
+  \ifnum\tmpreturn=1\relax
+    \xdef\nvt@thisdoc{\tmpthisdoc}
+    \xdef\nvt@thisdocpath{\tmpthisdocpath}
+    \xdef\nvt@filepath{\tmpmaindocpath}
+    \xdef\nvt@submatter{\csname\tmpmatter\endcsname}
+    \def\tmptest{image}\ifx\tmpmatter\tmptest\global\nvt@imagedoctrue\fi
+  \else
+    \nvt@fatal{Unable to parse \string\def\string\thisdoc, in file \jobname.tex.^^J%%
+      \spii Be sure to read Novelette rules regarding allowable paths.}%%
+  \fi
+  \IfFileExists{\nvt@filepath/\nvt@thisdocpath/\nvt@thisdoc}{}{%%
+    \nvt@fatal{Cannot find \nvt@thisdoc, relative to main document.^^J%%
+      \spii Be sure that \string\def\string\thisdoc\space has correct path and filename.tex.}%%
+  }%%
+  \nvt@test{\nvt@thisdoc}{\jobname.tex}{}{%%
+    \nvt@fatal{Filename in \string\def\string\thisdoc\space does not match^^J%%
+      \spii its actual filename. Novelette saw \nvt@thisdoc, expected file \jobname.tex.}%%
+  }%%
+\fi
+\def\thisdoc{}
+%%
+
+
+%% CALL SUBDOC FILE INTO ANOTHER DOCUMENT: \subdoc{PathFromMainDocumentTo/SubdocFilename.tex}
+%%   The \include command is not used. Instead, \subdoc{filename.tex} includes the
+%% subdoc into the main document, or into another subdoc.
+%%   To prevent infinite recursion caused by subdoc calling itself (directly or indirectly),
+%% each subdoc path/filename.tex may only be used once. If you wish to repeat a subdoc,
+%% then make a copy with different path/filename.tex.
+%%   When a subdoc loads, it neutralizes further instances of \def\thisdoc and \input commands.
+%% That prevents confusion when there are multiple subdocs.
+\DeclareDocumentCommand\subdoc{m}{%%
+  \clearpage
+  \directlua{nvt.norepeatsubdoc('\luaescapestring{#1}')}%%
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@fatal{Repeated subdoc \tmpt\space.^^J%%
+      \spii If you wish to repeat something, use a copy with different path/filename.}%%
+  \fi%%
+  \nvt@insubdoctrue\xdef\nvt@nowcompiling{#1}\gdef\thisdoc{}%%
+  \nvt@input{\nvt@filepath/#1}%%
+  \ifx\thisdoc\@empty%%
+    \nvt@err{\string\def\string\thisdoc\space missing in file #1.}%%
+  \else%%
+    \directlua{nvt.parsethisdoc('\luaescapestring{#1}')}%%
+    \ifnum\tmpreturn=1\relax%%
+%%%%%
+    \else%%
+      \nvt@err{Unable to parse \string\def\string\thisdoc, at top of file #1.}%%
+    \fi%%
+    \directlua{%%
+      nvt.comparematter('\luaescapestring{\thisdoc}','\luaescapestring{\nvt@currentmatter}')
+    }%%
+    \ifnum\tmpreturn=0\relax%%
+      \nvt@err{Now in \nvt@currentmatter, but \string\def\string\thisdoc, in file^^J%%
+        \spii #1 claims that it should be in \tmpm.}%%
+    \fi%%
+  \fi%%
+  \gdef\thisdoc{}\gdef\nvt@nowcompiling{}\nvt@insubdocfalse%%
+  \clearpage
+}%%
+\def\subfile{\nvt@fatal{Novelette has no \string\subfile. Did you mean \string\subdoc\space?}}
+%%
+
+
+%% Novelette is self-contained. You cannot customize by added packages or non-subdoc files:
+\let\nvt@RequirePackage\RequirePackage\relax
+\def\nvt@noRequirePackage{%%
+  \nvt@fatal{No \string\RequirePackage\space allowed. You cannot add packages to Novelette.}
+}%%
+\let\RequirePackage\nvt@noRequirePackage\relax
+\def\nvt@nousepackage{%%
+  \nvt@fatal{No \string\usepackage\space allowed. You cannot add packages to Novelette.}
+}%%
+\let\usepackage\nvt@nousepackage\relax
+\def\nvt@noinclude{%%
+  \nvt@fatal{No \string\include\space allowed. Perhaps \string\subdoc\space is what you need?}
+}%%
+\let\include\nvt@noinclude\relax
+\def\nvt@noincludeonly{%%
+  \nvt@fatal{No \string\includeonly. Perhaps \string\subdoc\space is what you need?}
+}%%
+\let\includeonly\nvt@noincludeonly\relax
+\def\nvt@noinput#1{%%
+  \ifdefined\nvt@thisdoc\else
+    \nvt@fatal{No \string\input\space allowed, except near top of a subdoc file.}
+  \fi
+}%%
+%%
+
+
+%%
+\endinput
+%% End of file novelette-subdocs.sty.

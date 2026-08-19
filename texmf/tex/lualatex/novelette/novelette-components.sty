@@ -1,0 +1,234 @@
+%% This is file novelette-components.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-components}[2026-04-26 Component Environment]
+
+
+%% OVERVIEW:
+%%   Other document classes use commands such as \part, \chapter, \section, \subsection, and
+%% many others, to divide the document into logically related content areas. This is especially
+%% useful in academic works, where these contents areas form a hierarchy and are automatically
+%% numbered and indexed.
+%%   Novelette does none of that. If you attempt to use any of those commands, they will fail
+%% with an error message. Intead, use Novelette's own 'component' environment.
+
+
+%% COMPONENT ENVIRONMENT: \begin{component}[option] ... \end{component}
+%%   The component environment divides your book into areas of logically-related content. That may
+%% be as short as a single page, or as long as a chapter. But you cannot splice components
+%% mid-page; each component begins and ends with a new page.
+%%   You cannot nest one component within another; there are no sub-components. Any subdoc must
+%% contain one or more components, but a component may not contain a subdoc.
+%%   All printable material must be contained within a component. That includes \null and
+%% \blankline, but not \clearpage, \frontmatter, \mainmatter, or \backmatter.
+%%   When a component begins, it creates a "display zone". In this zone, you may use a variety of
+%% styling commands that are unavailable elsewhere. You may use \image, but it cannot float.
+%% You may use \footnote, but it will not create a marker. You may not use some commands that
+%% are specific to main text.
+%%   Within the display zone, scaled text may be off-grid. This is not a problem, because
+%% displays are decorative in nature.
+%%   The optional \maintext command closes the display zone, adds one or two blank lines, and
+%% restores the text grid. Commands specific to display zones are disabled, and commands specific
+%% to main text are enabled.
+%%   Some special pages, such as the title page, are simply display zones without \maintext.
+%% Chapters, and similar components, will use \maintext to separate the decorative opening from
+%% ordinary, flowing text.
+%%   If an image exceeds 20 lines height, it must be in a component with [single] option.
+\newif\ifnvt@indisplay %% Locally true at \begin{component}, until \maintext or \end{component}.
+\newif\ifnvt@compsingle %% If locally true, warns when component exceeds one page.
+\newif\ifnvt@hasfakefooter %% True when first page of component has fake footer for drop folio.
+\newif\ifnvt@didcomponent %% Becomes true upon first use of component environment.
+\DeclareDocumentEnvironment{component}{O{}}{%%
+  \ifnvt@setmatter\else%%
+    \nvt@fatal{One of \string\frontmatter, \string\mainmatter, or \string\backmatter^^J%%
+     \spii must appear prior to first \string\begin{component}, or first \string\subdoc.}%%
+  \fi%%
+  \ifnvt@incomponent\nvt@fatal{Cannot nest a component within another, page \thepage.}\fi%%
+  \clearpage%%
+  \vspace*{-2\nvt@bls}\null%% %%%%%
+  \edef\nvt@compstart{\the\c@page}\edef\tmpexpect{\arabic{nvt@expectpage}}%%
+  \edef\tmppp{\fpeval{\nvt@compstart=\tmpexpect}}%% Sometimes we expect too much!
+  \ifnum\tmppp=1\relax\else%%
+    \nvt@warn{No printable material may be placed outside of a component environment.}%%
+  \fi%%
+  \nvt@didcomponenttrue%%
+  \suppressfloats[t]%%
+  \begingroup%%
+  \nvt@indisplaytrue\nvt@didmaintextfalse\setcounter{footnote}{0}%%
+  \def\tmplegal{0}\def\tmpsingle{0}\def\tmprecto{0}\def\tmpguide{-1}%%
+  \ifnvt@inmainmatter%%
+    \ifnvt@hasfooter\def\tmptps{plain}\else\def\tmptps{empty}\fi%%
+  \fi%%
+  \ifnvt@infrontmatter\def\tmptps{empty}\fi%%
+  \ifnvt@inbackmatter\def\tmptps{empty}\fi%%
+  \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\the\c@page}')}%% %%%%%
+  \nvt@test{\tmptps}{max}{}{\@specialpagetrue}%%
+  \nvt@test{\tmptps}{empty}{\nvt@thispagestyle{empty}}{}%%
+  \nvt@test{\tmptps}{plain}{%%
+    \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
+  }{}%%
+  \nvt@test{\tmptps}{fakeplain}{%%
+    \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
+  }{%%
+    \blankline%%
+  }%%
+  \ifnum\tmpsingle=1\relax\nvt@compsingletrue\fi%%
+  \ifnum\tmprecto=1\relax\ifodd\c@page\else\nvt@blankverso\fi\fi%%
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@err{Bad component [option]. Format: [thispagestyle=P,guide=G,keywords]^^J%%
+    \spii Normally, first page of component does not print page header,^^J%%
+    \spii but may print page footer if normal pagestyle is plain or split.^^J%%
+    \spii [thispagestyle=P] over-rides for first component page. Choices for P:^^J%%
+    \spiv empty -> Does not print header or footer.^^J%%
+    \spiv plain -> Prints footer, only if normal pagestyle is plain or split.^^J%%
+    \spix Default empty in frontmatter and backmatter, plain in mainmatter.^^J%%
+    \spiv fakeplain -> Same as plain, if normal pagestyle is plain or split.^^J%%
+    \spix Otherwise, reduces text height, and creates fake footer beneath.^^J%%
+    \spiv max -> Prints header and/or footer, according to normal pagestyle.^^J%%
+    \spix Note that max is unusual, not normal, for first component page.^^J%%
+    \spii [guide=G] over-rides global guide setting.^^J%%
+    \spiv G -> Integer 0 to lines per page. If 0, no guide.^^J%%
+    \spii Comma-separated keywords:^^J%%
+    \spiv single -> Warns if component does not fit on a single page.^^J%%
+    \spiv recto -> If necessary, inserts preceding blank verso, to make this recto.^^J%%
+    \spiv legal -> Single verso page, with special formats.^^J%%
+    \spix When legal, all other options are silently ignored.}%%
+  \fi%%
+  \ifnum\tmplegal=1\relax%%
+    \def\init##1{##1}\def\maintext{}\setlength\parindent{0pt}%%
+    \setlength\parskip{\nvt@bls}\nvt@aff{RawFeature={+ss19}}%%
+    \hyphenpenalty=10000\relax\exhyphenpenalty=10000\relax%%
+    \char"0020\char"00A0\par\vfil%% Some machine-readers like to know space advance width.
+  \else%%
+    \ifnvt@preview\def\tmpok{0}\else\def\tmpok{1}\fi%%
+    \ifnvt@final\def\tmpok{0}\fi%%
+    \ifnum\tmpguide=-1\relax%%
+      \xdef\tmpthisguide{\nvt@guideline}%%
+    \else%%
+      \xdef\tmpthisguide{\tmpguide}%%
+    \fi%%
+    \ifnvt@hasguide\else\def\tmpok{0}\fi%%
+    \ifnum\tmpthisguide=0\relax\else%%
+      \AddToHookNext{shipout/background}{%% Print guide marker.
+        \xdef\tmpgput{\fpeval{1in+\topmargin+\headheight+\headsep+(\tmpthisguide*\nvt@bls)}pt}%%
+        \ifodd\c@page%%
+          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\nvt@aff{RawFeature={+cv07}}\char"2023}%%
+        }%%
+        \else%%
+          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\nvt@aff{RawFeature={+cv07}}\char"2023}%%
+          }%%
+        \fi%%
+      }%%
+    \fi%%
+  \fi%%
+}{%%
+  \par%%
+  \clearpage%%
+  \setcounter{nvt@expectpage}{\the\c@page}%%
+  \ifnvt@compsingle%% End page, check fit.
+    \edef\tmppg{\the\c@page}%%
+    \edef\tmpn{\fpeval{\tmppg = (\nvt@compstart+1)}}%%
+    \ifnum\tmpn=0\relax%%
+      \nvt@warn{Content of component [single] or [legal] exceeds one page.}%%
+    \fi%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% TRANSITION FROM DISPLAY TO ORDINARY MAIN TEXT: \maintext
+%%   This command may be used once within a component, on its first page. Prior to \maintext,
+%% the \name, and \subname, commands are available, and the block environment allows small text
+%% or normal text.
+%%   After \maintext, \name and \subname are disallowed, and the block environment only allows
+%% normal text.
+%%   The first paragraph after \maintext is not indented, then normal indent resumes.
+%% The \init or \dropcap command may be used at the start of the first paragraph. Footnotes
+%% will have markers.
+%%   Warning if duplicate \maintext within a component.
+\newif\ifnvt@didmaintext %% True when \maintext appears, until next component.
+\def\nvt@initscale{1} %% \init is ineffective, except when following \maintext.
+\def\maintext{%%
+  \par%%
+  \ifnvt@didmaintext%%
+    \nvt@warn{Duplicate \string\maintext\space in same component. Ignored.}%%
+  \else%%
+    \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
+    \ifnvt@infootnote\def\tmpok{0}\fi%%
+    \ifnvt@inblock\def\tmpok{0}\fi%%
+%%%%% in page header?
+    \ifnvt@indisplay\else\def\tmpok{0}\fi%%
+    \ifnum\tmpok=1\relax%%
+      \setlength\parindent{\nvt@parindent}%%
+      \ifnvt@indisplay%%
+        \null\vspace*{-\nvt@bls}%%
+        \edef\tmpa{\fpeval{round(\pagetotal/\nvt@bls,4)}}%%
+        \edef\tmpb{\fpeval{ceil(\tmpa - 1)- \tmpa +1}}%%
+        \edef\tmpc{\fpeval{\tmpb*\nvt@bls}pt}%%
+        \vspace{\tmpc}%% Restores text to line grid.
+        \ifnvt@dev%%
+          \noindent\strut\hspace{-\nvt@em}%%
+            \smash{\raisebox{-\nvt@bls}{{\nvt@aff{RawFeature={+cv13}}\char"2023}}}\par%%
+        \fi%%
+        \@afterindentfalse\@nobreaktrue\gdef\nvt@initscale{2}%%
+        \everypar{%%
+          \if@nobreak%%
+            \@nobreakfalse\clubpenalty\@M%%
+            \if@afterindent\else{\setbox\z@\lastbox}\fi%%
+          \else%%
+            \clubpenalty\@clubpenalty\everypar{}%%
+          \fi%%
+          \gdef\nvt@initscale{1}%%
+        }%%
+      \fi%%
+    \else%%
+      \nvt@err{\string\maintext\space appears in bad location.^^J%%
+         \spii Must be within a component, but not within \string\name, \string\subname,^^J%%
+         \spii \string\footnote, page header, or block environment.}%%
+    \fi%%
+  \fi%%
+  \global\nvt@indisplayfalse\nvt@didmaintexttrue%%
+}%%
+%%
+
+
+%% FAKE FOOTER: via component option [thispagestyle=fakeplain].
+%%   The word "folio" has several meanings. In this context it is the page number. A "drop folio"
+%% is page number in or just above the bottom margin. Pagestyles plain and both use drop folio.
+%% Other pagestyles do not.
+%%   The first page of a component normally does not show header. If normal pagestyle is not plain
+%% or both, then no page number prints there. But fakeplain allows plain, temporarily converts
+%% split to plain, and fakes it for other pagestyles, so that a page number prints at bottom.
+%%   The fake method shortens the textheight by one line. Where the last line would have been,
+%% a centered page number prints at reduced size, dropped slightly so it is as low as possible.
+%% Depending on the font, it may be surrounded by em dashes.
+%%   If you already had page breaks that you like, you can retain them by remmoving a blank line
+%% from the display area. Almost all displays have at least one of them, just above \maintext.
+%%   Large commercial books, such as textbooks, have wide bottom margins. For those, there is
+%% no need to fake it; the folio can be printed within the margin. But you don't have that.
+\def\nvt@fakefooter{%%
+  \enlargethispage{-\nvt@bls}%%
+  \AddToHookNext{shipout/foreground}{%%
+    \sbox0{%%
+      {\nvt@headfont\nvt@aff{RawFeature={-onum,-smcp,+titl},Scale=.88}--\nvt@compstart--}%%
+    }%%
+    \xdef\tmpva{\fpeval{1in+\pageheight-\topmargin-\headheight-\headsep+2*\nvt@bls}pt}%%
+    \ifodd\c@page%%
+      \xdef\tmphw{\fpeval{1in+.5*\pagewidth+.5*\nvt@glue-.5\wd0}pt}%%
+    \else%%
+      \xdef\tmphw{\fpeval{1in+.5*\pagewidth-.5*\nvt@glue-.5\wd0}pt}%%
+    \fi%%
+   \put(\tmphw,-\tmpva){\usebox0}%% %%%%%
+  }%%
+}%%
+%%
+
+
+
+%%
+\endinput
+%% End of file novelette-xomponents.sty.

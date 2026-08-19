@@ -1,0 +1,1080 @@
+%% This is file novelette-fontloader.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+%%
+%% This code is derived from code in the 'fontspec' package, part of TeXlive.
+%% It has been customized for use in Novelette. Rationale: Novelette includes its own fonts,
+%% which have known properties. Most of the original 'fontspec' code is superfluous.
+%%
+%% Copyright notice for the original 'fontspec' code:
+%% ------------------------------------------------
+%% Copyright  2022-2025  The LaTeX project,  LPPL "maintainer"
+%% Copyright  2004-2022  Will Robertson
+%% Copyright  2009-2013  Khaled Hosny
+%% ------------------------------------------------
+%% This package is free software and may be redistributed and/or modified under
+%% the conditions of the LaTeX Project Public License, version 1.3c or higher
+%% (your choice): <http://www.latex-project.org/lppl/>.
+%% ------------------------------------------------
+%%
+%% The above 'fontspec' license allows re-licensing under certain conditions.
+%% The code below is hereby re-licensed. See 'novelette.cls'.
+%% Note that The LaTeX Project is not the maintainer for this file, or its code.
+%%
+
+\ProvidesExplPackage{novelette-fontloader}{2026/06/04}{0.1}{Font loader for Novelette}
+
+\bool_new:N \l__nvt_firsttime_bool
+\bool_new:N \l__nvt_noit_bool %% NoveletteSerif has Italic, but none have Bold or BoldItalic.
+\bool_new:N \l__nvt_tmpa_bool
+\bool_new:N \l__nvt_disable_defaults_bool
+\bool_new:N \l__nvt_external_bool
+\bool_new:N \l__nvt_scriptlang_done_bool
+\int_new:N \l__nvt_script_int
+\int_new:N \l__nvt_language_int
+\int_new:N \l__nvt_strnum_int
+\fp_new:N \l__nvt_tmpa_fp
+\fp_new:N \l__nvt_tmpb_fp
+\dim_new:N \l__nvt_tmpa_dim
+\dim_new:N \l__nvt_tmpb_dim
+\dim_new:N \l__nvt_tmpc_dim
+\clist_new:N \g__nvt_default_fontopts_clist
+\clist_new:N \g__nvt_all_keyval_modules_clist
+\clist_new:N \l__nvt_sizefeat_clist
+\clist_set:Nn \l__nvt_sizefeat_clist {Size={-}}
+\clist_new:N \l__nvt_extensions_clist
+  \clist_set:Nn \l__nvt_extensions_clist { .otf }
+\clist_new:N \l__nvt_fontopts_clist
+\clist_new:N \l__nvt_family_fontopts_clist
+\clist_new:N \l__nvt_all_features_clist
+\clist_new:N \l__nvt_leftover_clist
+\clist_new:N \l__nvt_keys_leftover_clist
+\clist_new:N \l__nvt_sizing_leftover_clist
+\clist_new:N \l__nvt_fontfeat_clist
+\clist_new:N \l__nvt_fontfeat_curr_clist
+\clist_new:N \l__nvt_this_feat_clist
+\prop_new:N \g__nvt_fontopts_prop
+\prop_new:N \l__nvt_nfss_prop
+\prop_new:N \l__nvt_nfssfont_prop
+\prop_new:N \g__nvt_OT_features_prop
+\prop_new:N \g__nvt_fontid_family_prop
+\prop_new:N \g__nvt_family_int_prop
+\tl_new:N \l_nvt_family_tl
+\tl_new:N \l_nvt_fontname_tl
+\tl_clear_new:N \UTFencname
+\tl_clear_new:N \cyrillicencoding
+\tl_clear_new:N \latinencoding
+\tl_new:N \l__nvt_renderer_tl
+\tl_new:N \l__nvt_mode_tl
+  \tl_set:Nn \l__nvt_mode_tl {node}
+\tl_new:N \l__nvt_shaper_tl
+  \tl_set:Nn \l__nvt_shaper_tl {}
+\tl_new:N \g__nvt_defined_shapes_tl
+\tl_new:N \g__nvt_single_feat_tl
+\tl_new:N \l__nvt_basename_tl
+\tl_new:N \g__nvt_curr_series_tl
+\tl_new:N \l__nvt_curr_fontname_tl
+\tl_new:N \l__nvt_extension_tl
+\tl_new:N \l__nvt_font_path_tl
+\tl_new:N \l__nvt_fontid_tl
+\tl_new:N \l__nvt_fontname_tl
+\tl_new:N \l__nvt_options_tl
+\tl_new:N \l__nvt_saved_fontname_tl
+\tl_new:N \g__nvt_nfss_enc_tl %% Will always be TU.
+\tl_new:N \g__nvt_nfss_family_tl
+\tl_new:N \l__nvt_nfss_tl
+\tl_new:N \l__nvt_nfss_fam_tl
+\tl_new:N \l__nvt_size_tl
+\tl_new:N \l__nvt_sizedfont_tl
+\tl_new:N \l__nvt_this_font_tl
+\tl_new:N \l__nvt_tmp_tl
+\tl_new:N \l__nvt_tmpa_tl
+\tl_new:N \l__nvt_tmpb_tl
+\tl_new:N \l__nvt_family_label_tl
+\tl_new:N \l__nvt_fontname_up_tl
+\tl_new:N \l__nvt_fontname_bf_tl
+\tl_new:N \l__nvt_fontname_it_tl
+\tl_new:N \l__nvt_fontname_bfit_tl
+\tl_new:N  \l__nvt_script_tl
+\tl_new:N  \l__nvt_script_name_tl
+  \tl_set:Nn \l__nvt_script_name_tl {CustomDefault}
+\tl_new:N  \l__nvt_lang_tl
+\tl_new:N  \l__nvt_lang_name_tl
+  \tl_set:Nn \l__nvt_lang_name_tl {Default}
+\tl_new:N \l__nvt_scale_tl
+\tl_new:N \g__nvt_rawfeatures_sclist
+\tl_new:N \l__nvt_pre_feat_sclist
+\tl_new:N \l__nvt_rmfamily_family_tl
+\tl_new:N \l__nvt_sffamily_family_tl
+\tl_new:N \l__nvt_ttfamily_family_tl
+
+\cs_new:Npn \__nvt_error:n     { \msg_error:nn     {Novelette} }
+\cs_new:Npn \__nvt_error:nn    { \msg_error:nnn    {Novelette} }
+\cs_new:Npn \__nvt_error:nx    { \msg_error:nnx    {Novelette} }
+\cs_new:Npn \__nvt_error:nxx   { \msg_error:nnxx   {Novelette} }
+\cs_new:Npn \__nvt_warning:n   { \msg_warning:nn   {Novelette} }
+\cs_new:Npn \__nvt_warning:nx  { \msg_warning:nnx  {Novelette} }
+\cs_new:Npn \__nvt_warning:nxx { \msg_warning:nnxx {Novelette} }
+\cs_new:Npn \__nvt_info:n      { \msg_info:nn      {Novelette} }
+\cs_new:Npn \__nvt_info:nx     { \msg_info:nnx     {Novelette} }
+\cs_new:Npn \__nvt_info:nxx    { \msg_info:nnxx    {Novelette} }
+\cs_new:Nn \__nvt_msg_new:nn
+  {\msg_new:nnx {Novelette} {#1} { ^^J \tl_trim_spaces:n {#2} } }
+\cs_new:Nn \__nvt_msg_new:nnn
+  {\msg_new:nnxx {Novelette} {#1} { ^^J \tl_trim_spaces:n {#2} } {     \tl_trim_spaces:n {#3} } }
+
+\char_set_catcode_space:n {32}
+\__nvt_msg_new:nn {font-not-found}
+  {The font "#1" cannot be found. Is it installed correctly?\\
+   Required fonts are included with Novelette.\\
+   If any are missing, perhaps re-install Novelette.}
+\__nvt_msg_new:nn {defining-font}
+  {
+   Font family '\g__nvt_nfss_family_tl' created for font '#2'
+   with options [\l__nvt_all_features_clist].\\
+   This font family consists of the following NFSS series/shapes:\\
+   \g__nvt_defined_shapes_tl
+  }
+\__nvt_msg_new:nn {set-scale}
+  {\l_nvt_fontname_tl\space scale = \l__nvt_scale_tl.}
+\char_set_catcode_ignore:n {32}
+
+\tl_set:Nn \UTFencname {TU}
+\tl_if_in:NnT \@filelist {.cls} { \normalsize }
+\tl_set:Nn \cyrillicencoding {TU}
+\tl_set:Nn \latinencoding {TU}
+\AtBeginDocument
+  { \tl_set:Nn \cyrillicencoding {TU} \tl_set:Nn \latinencoding {TU} }
+
+\cs_new:Nn \__nvt_keys_set_known:nnN
+  { \keys_set_known:nnN {#1} {#2} #3 }
+\cs_generate_variant:Nn \__nvt_keys_set_known:nnN {nx}
+\cs_new:Nn \__nvt_int_mult_truncate:Nn
+  { \int_set:Nn #1 { \__dim_eval:w #2 #1 \__dim_eval_end: } }
+\cs_generate_variant:Nn \int_set:Nn {Nv}
+\cs_generate_variant:Nn \prop_gput_if_not_in:Nnn {NeV}
+\cs_generate_variant:Nn \prop_gput:Nnn  {Nxn}
+\cs_generate_variant:Nn \tl_if_empty:nF {f}
+\cs_generate_variant:Nn \tl_if_eq:nnT {oe}
+\cs_generate_variant:Nn \msg_new:nnn  {nnx}
+\cs_generate_variant:Nn \msg_new:nnnn {nnxx}
+
+\cs_set:Npn \__nvt_primitive_font_set:Nnn #1#2#3
+  {\font #1 = #2 ~at~ \dim_eval:n {#3} \scan_stop:}
+\cs_set:Npn \__nvt_primitive_font_gset:Nnn #1#2#3
+  {\global \font #1 = #2 ~at~ \dim_eval:n {#3} \scan_stop:}
+\cs_set:Npn \__nvt_font_suppress_not_found_error:
+  {\int_set:Nn \suppressfontnotfounderror {1}}
+\prg_new_conditional:Nnn \__nvt_primitive_font_if_null:N {p,TF,T,F}
+  { \ifx #1 \nullfont \prg_return_true: \else \prg_return_false: \fi }
+\prg_new_conditional:Nnn \__nvt_primitive_font_set:Nnn {TF,T,F}
+  {
+    \__nvt_primitive_font_set:Nnn #1 {#2} {#3}
+    \__nvt_primitive_font_if_null:NTF #1 {\prg_return_false:} {\prg_return_true:}
+  }
+\prg_new_conditional:Nnn \__nvt_primitive_font_gset:Nnn {TF,T,F}
+  {
+    \__nvt_primitive_font_gset:Nnn #1 {#2} {#3}
+    \__nvt_primitive_font_if_null:NTF #1 {\prg_return_false:} {\prg_return_true:}
+  }
+\cs_set:Npn \__nvt_primitive_font_set:Onn
+  { \exp_last_unbraced:No \__nvt_primitive_font_set:Nnn }
+\cs_set:Npn \__nvt_primitive_font_set:OnnF 
+  { \exp_last_unbraced:No \__nvt_primitive_font_set:NnnF }
+\cs_set:Npn \__nvt_primitive_font_gset:Onn
+  { \exp_last_unbraced:No \__nvt_primitive_font_gset:Nnn }
+\cs_set:Npn \__nvt_primitive_font_gset:OnnF
+  { \exp_last_unbraced:No \__nvt_primitive_font_gset:NnnF }
+\prg_new_conditional:Nnn \__nvt_primitive_font_if_exist:n {TF,T,F}
+  {
+    \group_begin:
+      \__nvt_font_suppress_not_found_error:
+      \__nvt_primitive_font_set:Nnn \l__nvt_primitive_font {#1} { \f@size pt - 1sp }
+      \__nvt_primitive_font_if_null:NTF \l__nvt_primitive_font
+        { \group_end: \prg_return_false: }
+        { \group_end: \prg_return_true:  }
+  }
+\cs_new_eq:NN \__nvt_primitive_font_get_name:N \fontname
+\cs_new:Npn \__nvt_primitive_font_current_name:
+  { \__nvt_primitive_font_get_name:N \tex_font:D }
+
+%% Commands such as \setmainfont and \addfontfeature are not available in Novelette.
+%% The fonts are pre-set, with specific default features.
+%% User-available features are manipulated by commands such as \smcp{text} for small caps.
+%% Internal commands such as \nvt@setmainfont and \nvt@aff do the work.
+%% This forces the user to do it "the Novelette way" instead of "the LaTeX way".
+\NewDocumentCommand \nvt@setmainfont { O{} m O{} }
+  { \__nvt_main_setmainfont:nn {#1,#3} {#2} \ignorespaces }
+\NewDocumentCommand \nvt@setsansfont { O{} m O{} }
+  { \__nvt_main_setsansfont:nn {#1,#3} {#2} \ignorespaces }
+\NewDocumentCommand \nvt@setmonofont { O{} m O{} }
+  { \__nvt_main_setmonofont:nn {#1,#3} {#2} \ignorespaces }
+\NewDocumentCommand \nvt@newfontfamily { m O{} m O{} }
+  { \__nvt_main_newfontfamily:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
+\NewDocumentCommand \nvt@newfontface { m O{} m O{} }
+  { \__nvt_main_newfontface:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
+\ifnvt@imagedoc
+  \NewDocumentCommand \nvt@newfontfamily { m O{} m O{} }
+    { \__nvt_main_newfontfamily:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
+  \NewDocumentCommand \nvt@newfontface { m O{} m O{} }
+    { \__nvt_main_newfontface:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
+\fi
+\NewDocumentCommand \nvt@defaultfontfeatures { t+ o m }
+  {
+    \IfNoValueTF {#2}
+      { \__nvt_set_default_features:nn {#1} {#3} }
+      { \__nvt_set_font_default_features:nnn {#1} {#2} {#3} }
+    \ignorespaces
+  }
+\NewDocumentCommand \nvt@aff {m}
+  { \__nvt_main_addfontfeatures:n {#1} }
+\ifnvt@imagedoc
+  \NewDocumentCommand \addfontfeature {m}
+  { \__nvt_main_addfontfeatures:n {#1} }
+  \NewDocumentCommand \addfontfeatures {m}
+  { \__nvt_main_addfontfeatures:n {#1} }
+\fi
+\NewDocumentCommand \IfFontFeatureActiveTF {mmm}
+  { \__nvt_main_IfFontFeatureActiveTF:nnn {#1} {#2} {#3} }
+\long\def\oldstylenums#1{%%
+  \nvt@warn{\string\oldstylenums\space undefined~ in~ Novelette.~ Try~ \string\onum{num}.}%%
+  {#1}%%
+}%%
+\AddToHook{rmfamily}{ \fontencoding {TU} }
+\AddToHook{sffamily}{ \fontencoding {TU} }
+\AddToHook{ttfamily}{ \fontencoding {TU} }
+
+\cs_new:Nn \__nvt_main_setmainfont:nn
+  {
+    \DeclareFontSeriesDefault[rm]{bf}{\bfdefault}
+    \nvt_set_family:Nnn \l__nvt_rmfamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \rmdefault \l__nvt_rmfamily_family_tl
+    \str_if_eq:eeT {\familydefault} {\rmdefault}
+      { \tl_set:Nn \encodingdefault {TU} }
+    \__nvt_setmainfont_hook:nn {#1} {#2}
+    \normalfont
+  }
+\cs_new:Nn \__nvt_main_setsansfont:nn
+  {
+    \DeclareFontSeriesDefault[sf]{bf}{\bfdefault}
+    \nvt_set_family:Nnn \l__nvt_sffamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \sfdefault \l__nvt_sffamily_family_tl
+    \str_if_eq:eeT {\familydefault} {\sfdefault}
+      { \tl_set:Nn \encodingdefault {TU} }
+    \__nvt_setsansfont_hook:nn {#1} {#2}
+    \normalfont
+  }
+\cs_new:Nn \__nvt_main_setmonofont:nn
+  {
+    \DeclareFontSeriesDefault[tt]{bf}{\bfdefault}
+    \nvt_set_family:Nnn \l__nvt_ttfamily_family_tl {#1} {#2}
+    \tl_set_eq:NN \ttdefault \l__nvt_ttfamily_family_tl
+    \str_if_eq:eeT {\familydefault} {\ttdefault}
+      { \tl_set:Nn \encodingdefault {TU} }
+    \__nvt_setmonofont_hook:nn {#1} {#2}
+    \normalfont
+  }
+\cs_set_eq:NN \__nvt_setmainfont_hook:nn   \use_none:nn
+\cs_set_eq:NN \__nvt_setsansfont_hook:nn   \use_none:nn
+\cs_set_eq:NN \__nvt_setmonofont_hook:nn   \use_none:nn
+\cs_new:Nn \__nvt_main_newfontfamily:NnnN
+  {
+    \nvt_set_family:cnn { l__nvt_ \cs_to_str:N #1 _family_tl } {#2} {#3}
+    \use:x
+      {
+        \exp_not:N #4 \exp_not:N #1 {}
+          {
+            \exp_not:N \fontfamily { \use:c { l__nvt_ \cs_to_str:N #1 _family_tl } }
+            \exp_not:N \fontencoding { \g__nvt_nfss_enc_tl }
+            \exp_not:N \selectfont
+          }
+      }
+  }
+\cs_new:Nn \__nvt_main_newfontface:NnnN
+  {
+    \bool_set_true:N \l__nvt_noit_bool
+    \__nvt_main_newfontfamily:NnnN #1 {#2} {#3} #4
+    \bool_set_false:N \l__nvt_noit_bool
+  }
+\cs_new:Nn \__nvt_set_default_features:nn
+  {
+    \IfBooleanTF {#1} \clist_gput_right:Nn \clist_gset:Nn
+      \g__nvt_default_fontopts_clist {#2}
+  }
+\cs_new:Nn \__nvt_set_font_default_features:nnn
+  {
+    \clist_map_inline:nn {#2}
+      {
+        \tl_if_single:nTF {##1}
+          {
+            \tl_set:No \l__nvt_tmp_tl
+              { \cs:w l__nvt_ \cs_to_str:N ##1 _family_tl\cs_end: }
+          }
+          { \__nvt_sanitise_fontname:Nn \l__nvt_tmp_tl {##1} }
+        \IfBooleanTF {#1}
+          {
+            \prop_get:NVNF \g__nvt_fontopts_prop \l__nvt_tmp_tl \l__nvt_tmpb_tl
+              { \tl_clear:N \l__nvt_tmpb_tl }
+            \tl_put_right:Nn \l__nvt_tmpb_tl {#3,}
+            \prop_gput:NVV   \g__nvt_fontopts_prop \l__nvt_tmp_tl \l__nvt_tmpb_tl
+          }
+          {
+            \tl_if_empty:nTF {#3}
+              { \prop_gremove:NV \g__nvt_fontopts_prop \l__nvt_tmp_tl }
+              { \prop_gput:NVn    \g__nvt_fontopts_prop \l__nvt_tmp_tl {#3,} }
+          }
+      }
+  }
+\cs_new:Nn \__nvt_main_addfontfeatures:n
+  {
+    \group_begin:
+      \keys_set_known:nnN {nvt-addfeatures} {#1} \l__nvt_tmp_tl
+      \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {options}  \l__nvt_options_tl
+      \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {fontname} \l__nvt_fontname_tl
+      \bool_set_true:N \l__nvt_disable_defaults_bool
+      \use:x
+        {
+          \__nvt_select_font_family:nn
+            { \l__nvt_options_tl , #1 } {\l__nvt_fontname_tl}
+        }
+    \group_end:
+    \fontfamily \g__nvt_nfss_family_tl \selectfont
+    \ignorespaces
+  }
+\cs_new:Nn \__nvt_strip_plus_minus:n { \__nvt_strip_plus_minus_aux:Nq #1 \q_nil }
+\cs_new:Npn \__nvt_strip_plus_minus_aux:Nq #1#2 \q_nil
+  { \str_case:nnF {#1} { {+} {#2} {-} {#2} } {#1#2} }
+\cs_new:Nn \__nvt_main_IfFontFeatureActiveTF:nnn
+  { \__nvt_if_font_feature:nTF {#1} {#2} {#3} }
+\prg_new_conditional:Nnn \__nvt_if_font_feature:n {TF}
+  {
+    \tl_gclear:N \g__nvt_single_feat_tl
+    \group_begin:
+      \__nvt_font_suppress_not_found_error:
+      \__nvt_init:
+      \bool_set_false:N \l__nvt_firsttime_bool
+      \clist_clear:N \l__nvt_fontfeat_clist
+      \__nvt_get_features:n {#1}
+    \group_end:
+    \tl_if_empty:NTF \g__nvt_single_feat_tl { \prg_return_false: }
+      {
+        \exp_args:NV \nvt_if_current_feature:nTF \g__nvt_single_feat_tl
+          { \prg_return_true: } { \prg_return_false: }
+      }
+  }
+\prg_new_conditional:Nnn \nvt_if_nvt_font: {TF,T,F}
+  { \cs_if_exist:cTF {g__nvt_fontinfo_ \f@family _prop} \prg_return_true: \prg_return_false: }
+\prg_new_conditional:Nnn \nvt_if_opentype: {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      { \prg_return_true: } { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_feature:n {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {script-num} \l__nvt_tmp_tl
+        \int_set:Nn \l__nvt_script_int {\l__nvt_tmp_tl}
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {lang-num} \l__nvt_tmp_tl
+        \int_set:Nn \l__nvt_language_int {\l__nvt_tmp_tl}
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {script-tag}
+        \l__nvt_script_tl
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {lang-tag}
+        \l__nvt_lang_tl
+        \__nvt_check_ot_feat:NnnnTF \font {#1} {\l__nvt_lang_tl}
+          {\l__nvt_script_tl} {\prg_return_true:} {\prg_return_false:}
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_feature:nnn {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \__nvt_check_ot_feat:NnnnTF \font {#3} {#2} {#1} \prg_return_true: \prg_return_false:
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_script:n {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \__nvt_check_script:NnTF \font {#1} \prg_return_true: \prg_return_false:
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_language:n {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {script-num}
+        \l__nvt_tmp_tl
+        \int_set:Nn \l__nvt_script_int {\l__nvt_tmp_tl}
+        \prop_get:cnN {g__nvt_fontinfo_\f@family _prop} {script-tag}
+        \l__nvt_script_tl
+        \__nvt_check_lang:NnTF \font {#1} \prg_return_true: \prg_return_false:
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_language:nn {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \__nvt_check_lang:NnnTF \font {#2} {#1} \prg_return_true: \prg_return_false:
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_current_script:n {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {script-tag}  \l__nvt_tmp_tl
+        \str_if_eq:nVTF {#1}  \l__nvt_tmp_tl
+          {\prg_return_true:} {\prg_return_false:}
+      }
+      { \prg_return_false: }
+  }
+\prg_new_conditional:Nnn \nvt_if_current_language:n {TF,T,F}
+  {
+    \nvt_if_nvt_font:TF
+      {
+        \prop_get:cnN {g__nvt_fontinfo_ \f@family _prop} {lang-tag}  \l__nvt_tmp_tl
+        \str_if_eq:nVTF {#1} \l__nvt_tmp_tl
+          {\prg_return_true:} {\prg_return_false:}
+      }
+      { \prg_return_false: }
+  }
+\cs_new:Nn \__nvt_tl_new_if_free:N { \tl_if_exist:NF #1 { \tl_new:N #1 } }
+\cs_new:Nn \__nvt_set_family:NnnN
+  {
+    \tl_set:Nn \l__nvt_fontface_cs_tl {\l_nvt_font}
+    \tl_set:Nn \l__nvt_family_label_tl {#1}
+    \__nvt_select_font_family:nn {#2} {#3}
+    \__nvt_tl_new_if_free:N #1
+    #4 #1 \l_nvt_family_tl
+    \tl_set:Nn \l__nvt_fontface_cs_tl {\l_nvt_font}
+  }
+\cs_new:Nn \nvt_gset_family:Nnn { \__nvt_set_family:NnnN #1 {#2} {#3} \tl_gset_eq:NN }
+\cs_new:Nn \nvt_set_family:Nnn  { \__nvt_set_family:NnnN #1 {#2} {#3} \tl_set_eq:NN  }
+\cs_generate_variant:Nn \nvt_set_family:Nnn {c}
+\tl_new:N \l__nvt_fontface_cs_tl
+\tl_set:Nn \l__nvt_fontface_cs_tl {\l_nvt_font}
+\cs_new:Nn \__nvt_set_fontface:NNnnN
+  {
+    \tl_set:Nn \l__nvt_fontface_cs_tl {#1}
+    \tl_set:Nn \l__nvt_family_label_tl {#2}
+    \__nvt_select_font_family:nn {#3} {#4}
+    #5 #2 \l_nvt_family_tl
+    \tl_set:Nn \l__nvt_fontface_cs_tl {\l_nvt_font}
+  }
+\cs_new:Nn \nvt_gset_fontface:NNnn
+  { \__nvt_set_fontface:NNnnN #1 #2 {#3} {#4} \tl_gset_eq:NN }
+\cs_new:Nn \nvt_set_fontface:NNnn
+  { \__nvt_set_fontface:NNnnN #1 #2 {#3} {#4} \tl_set_eq:NN  }
+\prg_new_conditional:Nnn \nvt_font_if_exist:n {TF,T,F}
+  {
+    \group_begin:
+      \__nvt_init:
+      \__nvt_if_detect_external:nT {#1} { \__nvt_font_is_file: }
+      \__nvt_primitive_font_if_exist:nTF { \__nvt_construct_font_call:nn {#1} {} }
+        { \group_end: \prg_return_true: }
+        { \group_end: \prg_return_false:  }
+  }
+\cs_set_eq:NN \IfFontExistsTF \nvt_font_if_exist:nTF
+\prg_new_conditional:Nnn \nvt_if_current_feature:n {TF,T,F}
+  {
+    \exp_args:Nxx \tl_if_in:nnTF
+      { \__nvt_primitive_font_current_name: } { \tl_to_str:n {#1} }
+      { \prg_return_true: } { \prg_return_false: }
+  }
+\cs_new_protected:Nn \__nvt_select_font_family:nn
+  {
+    \group_begin:
+    \__nvt_font_suppress_not_found_error:
+    \__nvt_init:
+    \__nvt_sanitise_fontname:Nn \l_nvt_fontname_tl {#2}
+    \tl_set_eq:NN \l__nvt_fontname_up_tl \l_nvt_fontname_tl
+    \tl_set_eq:NN \l__nvt_basename_tl    \l_nvt_fontname_tl
+    \__nvt_if_detect_external:nT {#2}
+      { \keys_set:nn {nvt-preparse-external} {Path} }
+    \__nvt_extract_all_features:n {#1}
+    \tl_set:Nx \l__nvt_fontid_tl
+      { \tl_to_str:N \l_nvt_fontname_tl-:-\tl_to_str:N \l__nvt_all_features_clist }
+    \__nvt_preparse_features:
+    \__nvt_load_font:
+    \__nvt_set_scriptlang:
+    \__nvt_get_features:n {}
+    \bool_set_false:N \l__nvt_firsttime_bool
+    \__nvt_save_family_needed:nTF {#2}
+      { \__nvt_save_family:nn {#1} {#2} } {}
+    \group_end:
+    \tl_set_eq:NN \l_nvt_family_tl \g__nvt_nfss_family_tl
+  }
+\cs_set_eq:NN \nvt_select:nn \__nvt_select_font_family:nn
+\cs_new:Nn \__nvt_sanitise_fontname:Nn
+  {
+    \tl_set:Nx #1 {#2}
+    \tl_trim_spaces:N #1
+    \__nvt_process_ext:N #1
+  }
+\cs_new:Nn \__nvt_process_ext:N
+  {
+    \clist_map_inline:Nn \l__nvt_extensions_clist
+      {
+        \tl_if_in:NnT #1 {##1}
+          {
+            \tl_remove_once:Nn #1 {##1}
+            \tl_set:Nn \l__nvt_extension_tl {##1}
+            \__nvt_font_is_file:
+            \clist_map_break:
+          }
+      }
+  }
+\prg_new_conditional:Nnn \__nvt_if_detect_external:n {T}
+  {
+    \clist_map_inline:Nn \l__nvt_extensions_clist
+      {
+        \bool_set_false:N \l__nvt_tmpa_bool
+        \exp_args:Nx
+        \tl_if_in:nnT {#1 <= end_of_string} {##1 <= end_of_string}
+          { \bool_set_true:N \l__nvt_tmpa_bool \clist_map_break: }
+      }
+    \bool_if:NTF \l__nvt_tmpa_bool \prg_return_true: \prg_return_false:
+  }
+\cs_new:Nn \__nvt_extract_all_features:n
+  {
+    \bool_if:NTF \l__nvt_disable_defaults_bool
+      { \clist_set:Nx \l__nvt_all_features_clist {#1} }
+      {
+        \prop_get:NVNF \g__nvt_fontopts_prop
+          \l_nvt_fontname_tl \l__nvt_fontopts_clist
+          { \clist_clear:N \l__nvt_fontopts_clist }
+        \prop_get:NVNF \g__nvt_fontopts_prop
+          \l__nvt_family_label_tl \l__nvt_family_fontopts_clist
+          { \clist_clear:N \l__nvt_family_fontopts_clist }
+        \tl_clear:N \l__nvt_family_label_tl
+        \clist_set:Nx \l__nvt_all_features_clist
+          {
+            \g__nvt_default_fontopts_clist,
+            \l__nvt_family_fontopts_clist,
+            \l__nvt_fontopts_clist,
+            #1
+          }
+      }
+  }
+\cs_new:Nn \__nvt_preparse_features:
+  {
+    \__nvt_keys_set_known:nxN {nvt-preparse-external}
+      { \l__nvt_all_features_clist }
+      \l__nvt_keys_leftover_clist
+    \tl_set_eq:NN \l_nvt_fontname_tl \l__nvt_fontname_up_tl
+    \__nvt_keys_set_known:nxN {nvt-renderer} {\l__nvt_keys_leftover_clist}
+      \l__nvt_keys_leftover_clist
+    \__nvt_keys_set_known:nxN {nvt-preparse} {\l__nvt_keys_leftover_clist}
+      \l__nvt_fontfeat_clist
+  }
+\cs_new:Nn \__nvt_load_font:
+  {
+    \__nvt_sanitise_fontname:Nn \l__nvt_fontname_up_tl { \l__nvt_fontname_up_tl }
+    \__nvt_primitive_font_set:NnnF \l__nvt_test_font
+      { \__nvt_construct_font_call:nn { \l__nvt_fontname_up_tl }
+        { \l__nvt_pre_feat_sclist } }
+      { \f@size pt - 2sp }
+      { \__nvt_error:nx {font-not-found} {\l__nvt_fontname_up_tl} }
+    \__nvt_primitive_font_gset:Onn \l__nvt_fontface_cs_tl
+      { \__nvt_construct_font_call:nn { \l__nvt_fontname_up_tl }
+        { \l__nvt_pre_feat_sclist } }
+      { \f@size pt + 2sp }
+    \l__nvt_fontface_cs_tl
+  }
+\cs_new:Nn \__nvt_construct_font_call:nnnnnn
+  { " \__nvt_fontname_wrap:n { #1 #2 } #3 #4 #5 \str_if_eq:eeF {#6}{} {:#6} " }
+\cs_new:Nn \__nvt_construct_font_call:nn
+  {
+    \__nvt_construct_font_call:nnnnnn
+      {#1} \l__nvt_extension_tl {} \l__nvt_renderer_tl {} {#2}
+  }
+\cs_new:Nn \__nvt_font_is_name:
+  { \cs_set:Npn \__nvt_fontname_wrap:n ##1 { name: ##1 } }
+\cs_new:Nn \__nvt_font_is_file:
+  {
+    \bool_set_true:N \l__nvt_external_bool
+    \cs_set:Npn \__nvt_fontname_wrap:n ##1 { [ \l__nvt_font_path_tl ##1 ] }
+  }
+\cs_new:Nn \__nvt_set_scriptlang:
+  {
+    \bool_if:NT \l__nvt_firsttime_bool
+      {
+        \tl_if_empty:NF \l__nvt_script_name_tl
+          {
+            \keys_set:ne {nvt-opentype} {Script=\l__nvt_script_name_tl}
+            \keys_set:ne {nvt-opentype} {Language=\l__nvt_lang_name_tl}
+          }
+      }
+  }
+\cs_new:Nn \__nvt_get_features:n
+  {
+    \__nvt_init_fontface:
+    \__nvt_keys_set_known:nxN {nvt-renderer} {\l__nvt_fontfeat_clist,#1}
+      \l__nvt_keys_leftover_clist
+    \__nvt_keys_set_known:nxN {nvt}
+      {\l__nvt_keys_leftover_clist} \l__nvt_keys_leftover_clist
+    \keys_set_known:nV {nvt-opentype} \l__nvt_keys_leftover_clist
+  }
+\prg_new_conditional:Nnn \__nvt_save_family_needed:n { TF }
+  {
+    \tl_if_empty:NTF \l__nvt_nfss_fam_tl
+      {
+        \prop_get:NVNTF \g__nvt_fontid_family_prop \l__nvt_fontid_tl \l__nvt_tmp_tl
+          {
+            \tl_gset_eq:NN \g__nvt_nfss_family_tl \l__nvt_tmp_tl
+            \prg_return_false:
+          }
+          {
+            \tl_set:Nx \l__nvt_tmp_tl {#1}
+            \tl_remove_all:Nn \l__nvt_tmp_tl { ~ }
+            \__nvt_save_fontid_family:VV \l__nvt_fontid_tl \l__nvt_tmp_tl
+            \prg_return_true:
+          }
+      }
+      {
+        \tl_gset_eq:NN \g__nvt_nfss_family_tl \l__nvt_nfss_fam_tl
+        \cs_undefine:c { g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop }
+        \prg_return_true:
+      }
+  }
+\cs_new:Nn \__nvt_save_fontid_family:nn
+  {
+    \prop_get:NnNTF \g__nvt_family_int_prop {#2} \l__nvt_tmp_tl
+      { \tl_set:Nx \l__nvt_tmp_tl { \int_eval:n { \l__nvt_tmp_tl + 1 } } }
+      { \tl_set:Nn \l__nvt_tmp_tl { 0 } }
+    \prop_gput:NnV \g__nvt_family_int_prop {#2} \l__nvt_tmp_tl
+    \tl_gset:Nx \g__nvt_nfss_family_tl { #2 ( \l__nvt_tmp_tl ) }
+    \prop_gput:NnV \g__nvt_fontid_family_prop {#1} \g__nvt_nfss_family_tl
+  }
+\cs_generate_variant:Nn \__nvt_save_fontid_family:nn { VV }
+\cs_new:Nn \__nvt_save_family:nn
+  {
+    \__nvt_save_fontinfo:n {#2}
+    \__nvt_find_autofonts:
+    \DeclareFontFamily{\g__nvt_nfss_enc_tl}{\g__nvt_nfss_family_tl}{}
+    \__nvt_set_faces:
+    \__nvt_info:nxx {defining-font} {#1} {#2}
+  }
+\cs_new:Nn \__nvt_save_fontinfo:n
+  {
+    \prop_new:c {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop}
+    \prop_gput:cnx {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {fontname} { #1 }
+    \prop_gput:cnx {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {options}
+      { \l__nvt_all_features_clist }
+    \prop_gput:cnx {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {fontdef}
+      {
+        \__nvt_construct_font_call:nn {\l_nvt_fontname_tl}
+          { \l__nvt_pre_feat_sclist \g__nvt_rawfeatures_sclist }
+      }
+    \prop_gput:cnV {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {script-num}
+      \l__nvt_script_int
+    \prop_gput:cnV {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {lang-num}
+      \l__nvt_language_int
+    \prop_gput:cnV {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {script-tag}
+      \l__nvt_script_tl
+    \prop_gput:cnV {g__nvt_fontinfo_ \g__nvt_nfss_family_tl _prop} {lang-tag}
+      \l__nvt_lang_tl
+  }
+\cs_new:Nn \__nvt_find_autofonts:
+  {
+    \bool_if:NT {\l__nvt_noit_bool}
+      {
+        \__nvt_set_autofont:Nnn
+          \l__nvt_fontname_bfit_tl {\l__nvt_fontname_it_tl} {/B}
+        \__nvt_set_autofont:Nnn
+          \l__nvt_fontname_bfit_tl {\l__nvt_fontname_bf_tl} {/I}
+        \__nvt_set_autofont:Nnn
+          \l__nvt_fontname_bfit_tl {\l_nvt_fontname_tl} {/BI}
+      }
+    \bool_if:NF \l__nvt_noit_bool
+      { \__nvt_set_autofont:Nnn \l__nvt_fontname_it_tl {\l_nvt_fontname_tl} {/I} }
+  }
+\cs_new:Nn \__nvt_set_faces:
+  {
+    \__nvt_add_nfssfont:nnnn \mddefault \shapedefault
+      \l_nvt_fontname_tl {}
+    \__nvt_add_nfssfont:nnnn \bfdefault \shapedefault
+      \l__nvt_fontname_bf_tl {}
+    \__nvt_add_nfssfont:nnnn \mddefault \itdefault
+      \l__nvt_fontname_it_tl {}
+    \__nvt_add_nfssfont:nnnn \bfdefault \itdefault
+      \l__nvt_fontname_bfit_tl {}
+    \prop_map_inline:Nn \l__nvt_nfssfont_prop { \__nvt_set_faces_aux:nnnnn ##2 }
+  }
+\cs_new:Nn \__nvt_set_faces_aux:nnnnn
+  {
+    \nvt_complete_fontname:Nn \l__nvt_curr_fontname_tl {#3}
+    \__nvt_make_font_shapes:Nnnnn \l__nvt_curr_fontname_tl {#1} {#2} {#4} {#5}
+  }
+\cs_new:Nn \nvt_complete_fontname:Nn
+  {
+    \tl_set:Nx #1 {#2}
+    \tl_if_in:NnF \l_nvt_fontname_tl {*}
+      { \tl_replace_all:Nne #1 {*} {\l__nvt_basename_tl} }
+  }
+\cs_new:Nn \__nvt_add_nfssfont:nnnn
+  {
+    \tl_set:Nx \l__nvt_this_font_tl {#3}
+    \tl_if_empty:eTF {#4}
+      { \clist_set:Nn \l__nvt_sizefeat_clist {Size={-}} }
+      { \__nvt_keys_set_known:nxN {nvt-preparse-nested} {#4} \l__nvt_tmp_tl }
+    \tl_if_empty:NF \l__nvt_this_font_tl
+      {
+        \prop_put:Nee \l__nvt_nfssfont_prop {#1/#2}
+          { {#1}{#2}{\l__nvt_this_font_tl}{#4}{\l__nvt_sizefeat_clist} }
+      }
+  }
+\cs_new:Nn \__nvt_set_autofont:Nnn
+  {
+    \bool_if:NF \l__nvt_external_bool
+      {
+        \tl_if_empty:eF {#2}
+          { \tl_if_empty:NT #1 { \tl_set:Nx #1 {#2#3} } }
+      }
+  }
+\prg_new_conditional:Nnn \__nvt_if_autofont:nn {T,TF}
+  {
+    \group_begin:
+    \__nvt_primitive_font_set:Nnn \l__nvt_tmpa_font
+      { \__nvt_construct_font_call:nn {#1}
+        { \l__nvt_pre_feat_sclist } } { \f@size pt + 1sp }
+    \__nvt_primitive_font_set:Nnn \l__nvt_tmpb_font
+      { \__nvt_construct_font_call:nn {#1#2}
+      { \l__nvt_pre_feat_sclist } } { \f@size pt + 1sp }
+    \cs_if_eq:NNTF \l__nvt_tmpa_font \l__nvt_tmpb_font
+      { \group_end: \prg_return_false: }
+      { \group_end: \prg_return_true: }
+  }
+\cs_new:Nn \__nvt_make_font_shapes:Nnnnn
+  {
+    \group_begin:
+      \__nvt_keys_set_known:nxN {nvt-preparse-external} { #4 }
+        \l__nvt_leftover_clist
+      \__nvt_load_fontname:Nn \l_nvt_fontname_tl {#1}
+      \__nvt_declare_shape:nnxx {#2} {#3}
+        { \l__nvt_fontopts_clist, \l__nvt_leftover_clist } {#5}
+    \group_end:
+  }
+\cs_new:Nn \__nvt_load_fontname:Nn
+  {
+    \__nvt_sanitise_fontname:Nn #1 {#2}
+    \prop_get:NVNF \g__nvt_fontopts_prop #1 \l__nvt_fontopts_clist
+      { \clist_clear:N \l__nvt_fontopts_clist }
+    \keys_set_groups:nnV {nvt/fontname} {getfontname} \l__nvt_fontopts_clist
+    \__nvt_primitive_font_set:OnnF \l__nvt_fontface_cs_tl
+      { \__nvt_construct_font_call:nn {#1}
+        { \l__nvt_pre_feat_sclist } } { \f@size pt + 2sp }
+      { \__nvt_error:nx {font-not-found} {#2} }
+  }
+\keys_define:nn {nvt/fontname}
+  {
+    Font .tl_set:N = \l_nvt_fontname_tl ,
+    Font .groups:n = {getfontname} ,
+  }
+\cs_new:Nn \__nvt_declare_shape:nnnn
+  {
+    \tl_build_begin:N \l__nvt_nfss_tl
+    \tl_set_eq:NN \l__nvt_saved_fontname_tl \l_nvt_fontname_tl
+    \exp_args:Nx \clist_map_inline:nn {#4} { \__nvt_setup_single_size:nn {#3} {##1} }
+    \tl_build_end:N \l__nvt_nfss_tl
+    \__nvt_declare_shapes_normal:nn {#1} {#2}
+    \__nvt_declare_shapes_bx:nn     {#1} {#2}
+    \__nvt_declare_shape_loginfo:nn {#1} {#2}
+  }
+\cs_generate_variant:Nn \__nvt_declare_shape:nnnn {nnxx}
+\cs_new:Nn \__nvt_setup_single_size:nn
+  {
+    \tl_clear:N \l__nvt_size_tl
+    \tl_set_eq:NN \l__nvt_sizedfont_tl \l__nvt_saved_fontname_tl
+    \keys_set_known:neN {nvt-sizing} { \exp_after:wN \use:n #2 }
+      \l__nvt_sizing_leftover_clist
+    \__nvt_load_fontname:Nn \l_nvt_fontname_tl {\l__nvt_sizedfont_tl}
+    \__nvt_setup_nfss:Nn \l__nvt_nfss_tl { #1 , \l__nvt_sizing_leftover_clist }
+  }
+\cs_new:Nn \__nvt_setup_nfss:Nn
+  {
+    \__nvt_get_features:n { #2 }
+    \tl_if_empty:NF \l__nvt_scale_tl
+      { \tl_set:Nx \l__nvt_scale_tl { s*[\l__nvt_scale_tl] } }
+    \tl_build_put_right:Nx #1
+      {
+        <\l__nvt_size_tl> \l__nvt_scale_tl
+        \__nvt_construct_font_call:nn { \l_nvt_fontname_tl }
+          { \l__nvt_pre_feat_sclist \g__nvt_rawfeatures_sclist }
+      }
+  }
+\cs_new:Nn \__nvt_declare_shapes_normal:nn
+  {
+    \__nvt_DeclareFontShape:xxxxxx {\g__nvt_nfss_enc_tl} {\g__nvt_nfss_family_tl}
+      {#1} {#2} {\l__nvt_nfss_tl}{}
+  }
+\cs_new:Nn \__nvt_DeclareFontShape:nnnnnn
+  {
+    \group_begin:
+    \normalsize
+    \cs_undefine:c {#1/#2/#3/#4/\f@size}
+    \group_end:
+    \DeclareFontShape{#1}{#2}{#3}{#4}{#5}{#6}
+  }
+\cs_generate_variant:Nn \__nvt_DeclareFontShape:nnnnnn {xxxxxx}
+\cs_new:Nn \__nvt_declare_shapes_bx:nn
+  {
+    \bool_if:nT
+      {
+        \str_if_eq_p:ee {#1} {\bfdefault}  && !(\str_if_eq_p:ee {\bfdefault} {bx})
+      }
+      {
+        \__nvt_DeclareFontShape:xxxxxx
+          {\g__nvt_nfss_enc_tl} {\g__nvt_nfss_family_tl}
+          {bx} {#2}
+          { <->ssub*\g__nvt_nfss_family_tl/\bfdefault/#2 }
+          {}
+      }
+  }
+\cs_new:Nn \__nvt_declare_shape_loginfo:nn
+  {
+    \tl_gput_right:Nx \g__nvt_defined_shapes_tl
+      {
+        \exp_not:n { \\ }
+        -~ \exp_not:N \str_case:nn {#1/#2}
+        {
+          {\mddefault/\shapedefault} {'normal'~}
+          {\bfdefault/\shapedefault} {'bold'~}
+          {\mddefault/\itdefault} {'italic'~}
+          {\bfdefault/\itdefault} {'bold~ italic'~}
+        }
+        (#1/#2)~ with~ NFSS~ spec.:~ \l__nvt_nfss_tl
+      }
+  }
+\tl_set:Nn \l__nvt_pre_feat_sclist
+  {
+    mode = \l__nvt_mode_tl   ;
+    \tl_if_empty:NF \l__nvt_shaper_tl { shaper = \l__nvt_shaper_tl   ; }
+    \tl_if_empty:NF \l__nvt_script_tl { script   = \l__nvt_script_tl ; }
+    \tl_if_empty:NF \l__nvt_lang_tl   { language = \l__nvt_lang_tl   ; }
+  }
+\cs_new:Nn \__nvt_update_featstr:n
+  {
+    \bool_if:NF \l__nvt_firsttime_bool
+      {
+        \tl_gset:Nx \g__nvt_single_feat_tl { #1 }
+        \tl_gput_right:Nx  \g__nvt_rawfeatures_sclist {#1;}
+      }
+  }
+\cs_new:Nn \__nvt_remove_clashing_featstr:n
+  {
+    \clist_map_inline:nn {#1}
+      { \tl_gremove_all:Nn \g__nvt_rawfeatures_sclist {##1;} }
+  }
+\cs_generate_variant:Nn \__nvt_remove_clashing_featstr:n {x}
+\cs_set:Npn \__nvt_init:
+  {
+    \bool_set_true:N \l__nvt_firsttime_bool
+    \__nvt_font_is_name:
+    \tl_clear:N \l__nvt_font_path_tl
+    \tl_clear:N \l__nvt_renderer_tl
+    \tl_gclear:N \g__nvt_defined_shapes_tl
+    \tl_gclear:N \g__nvt_curr_series_tl
+    \tl_gset:Nn \g__nvt_nfss_enc_tl {TU}
+    \tl_set:Nn \l__nvt_mode_tl {node}
+  }
+\cs_new:Nn \__nvt_init_fontface:
+  {
+    \tl_gclear:N \g__nvt_rawfeatures_sclist
+    \tl_clear:N \l__nvt_scale_tl
+  }
+\cs_new:Nn \__nvt_feat_prop_add:nn
+  {
+    \tl_if_empty:nF {#1}
+     {
+      \prop_if_in:NnF \g__nvt_OT_features_prop {#1}
+        { \prop_gput:Nnn \g__nvt_OT_features_prop {#1} {#2} }
+     }
+  }
+\cs_new:Nn \__nvt_swap_plus_minus:n { \__nvt_swap_plus_minus_aux:Nq #1 \q_nil }
+\cs_new:Npn \__nvt_swap_plus_minus_aux:Nq #1#2 \q_nil
+  { \str_case:nn {#1} { {+} {-#2} {-} {+#2} } }
+\prg_new_conditional:Nnn \__nvt_check_script:Nn {TF,T,F}
+  { \prg_return_true: }
+\prg_new_conditional:Nnn \__nvt_check_lang:Nn {TF,F}
+  { \prg_return_true: }
+\prg_new_conditional:Nnn \__nvt_check_lang:Nnn {TF}
+  { \prg_return_true: }
+\prg_new_conditional:Nnn \__nvt_check_ot_feat:Nnnn {TF,T,F}
+  { \prg_return_true: }
+\clist_gset:Nn \g__nvt_all_keyval_modules_clist
+  {
+    nvt, nvt-opentype, nvt-renderer,
+    nvt-preparse, nvt-preparse-external, nvt-preparse-nested
+  }
+\cs_new:Nn \__nvt_keys_define_code:nnn
+  { \keys_define:nn {#1} { #2 .code:n = {#3} } }
+\__nvt_keys_define_code:nnn {nvt} {Path} {}
+\tl_clear:N \l__nvt_extension_tl
+\__nvt_keys_define_code:nnn {nvt} {Extension} {}
+\__nvt_keys_define_code:nnn {nvt-sizing} {Size}
+  { \tl_set:Nn \l__nvt_size_tl {#1} }
+\__nvt_keys_define_code:nnn {nvt-sizing} {Font}
+  { \nvt_complete_fontname:Nn \l__nvt_sizedfont_tl {#1} }
+\__nvt_keys_define_code:nnn {nvt} {Scale}
+  {
+    \str_case:nnF {#1}
+      {
+        {MatchLowercase} { \__nvt_calc_scale:n {5} }
+        {MatchUppercase} { \__nvt_calc_scale:n {8} }
+        {MatchAveragecase} { \__nvt_calc_scale:nn {5} {8} }
+      }
+      { \tl_set:Nx \l__nvt_scale_tl {#1} }
+      \__nvt_info:n {set-scale}
+  }
+\__nvt_keys_define_code:nnn {nvt} {ScaleAgain}
+  {
+    \tl_if_empty:NT \l__nvt_scale_tl { \tl_set:Nn \l__nvt_scale_tl {1} }
+    \tl_set:Nx \l__nvt_scale_tl { \fp_eval:n { #1 * \l__nvt_scale_tl } }
+    \__nvt_info:n {set-scale}
+  }
+\cs_new:Nn \__nvt_calc_scale:n
+  {
+    \group_begin:
+      \fontencoding { \encodingdefault }
+      \fontfamily { \familydefault }
+      \selectfont
+      \__nvt_set_font_dimen:NnN \l__nvt_tmpa_dim {#1} \font
+      \__nvt_set_font_dimen:NnN \l__nvt_tmpb_dim {#1} \l__nvt_fontface_cs_tl
+      \tl_set:Nx \l__nvt_scale_tl
+        {
+          \fp_eval:n { \dim_to_fp:n {\l__nvt_tmpa_dim} /
+            \dim_to_fp:n {\l__nvt_tmpb_dim}   }
+        }
+      \exp_args:NNNx
+    \group_end:
+    \tl_set:Nx \l__nvt_scale_tl { \l__nvt_scale_tl }
+  }
+\cs_new:Nn \__nvt_calc_scale:nn
+{
+    \group_begin:
+      \__nvt_calc_scale:n {#1}
+      \tl_set_eq:NN \l__nvt_tmp_tl \l__nvt_scale_tl
+      \__nvt_calc_scale:n {#2}
+      \tl_set:Nx \l__nvt_scale_tl
+        { \fp_eval:n { (\l__nvt_tmp_tl + \l__nvt_scale_tl)/2 } }
+      \exp_args:NNNx
+    \group_end:
+    \tl_set:Nx \l__nvt_scale_tl { \l__nvt_scale_tl }
+  }
+\cs_new:Nn \__nvt_set_font_dimen:NnN
+  {
+    \dim_set:Nn #1 { \fontdimen #2 #3 }
+    \dim_compare:nNnT #1 = {0pt}
+      {
+        \settoheight #1
+          {
+            \str_if_eq:nnTF {#3} {\font} \rmfamily #3
+            \int_case:nnF #2
+              {
+                {5} {x}
+                {8} {X}
+              } {?}
+          }
+      }
+  }
+\__nvt_keys_define_code:nnn {nvt} {LetterSpace}
+  { \__nvt_update_featstr:n {letterspace=#1} }
+\keys_define:nn {nvt}
+  {
+    FakeStretch .code:n =
+      { \__nvt_update_featstr:n {extend=#1} },
+    FakeStretch .default:n = {1.2}
+  }
+\__nvt_keys_define_code:nnn {nvt-opentype} {RawFeature}
+  { \__nvt_update_featstr:n {#1} }
+\__nvt_feat_prop_add:nn {cvNN} { CharacterVariant\,=\,$N$:$M$ }
+\__nvt_feat_prop_add:nn {ssNN} { StylisticSet\,=\,$N$ }
+\keys_define:nn {nvt-opentype}
+  {
+    Script .choice: ,
+    Script .groups:n = {opentype} ,
+  }
+\cs_new:Nn \nvt_new_script:nn
+  {
+    \keys_define:nn {nvt-opentype} { Script / #1 .code:n =
+      {
+        \bool_set_false:N \l__nvt_scriptlang_done_bool
+        \clist_map_inline:nn {#2}
+          {
+            \exp_args:No \__nvt_check_script:NnT \l__nvt_fontface_cs_tl {####1}
+              {
+                \tl_set:Nn \l__nvt_script_name_tl {#1}
+                \tl_set:Nn \l__nvt_script_tl {####1}
+                \int_set:Nn \l__nvt_script_int {\l__nvt_strnum_int}
+                \bool_set_true:N \l__nvt_scriptlang_done_bool
+                \tl_gset:Nx \g__nvt_single_feat_tl { script=####1 }
+                \clist_map_break:
+              }
+          }
+      }
+    }
+  }
+\clist_new:N \g__nvt_default_scripts_clist
+\cs_new:Nn \nvt_default_script:n
+  { \clist_gset:Nn \g__nvt_default_scripts_clist {#1} }
+\nvt_default_script:n {latn,DFLT}
+\keys_define:nn {nvt-opentype} { Script / CustomDefault .code:n =
+  {
+    \bool_set_false:N \l__nvt_scriptlang_done_bool
+    \clist_map_inline:Nn \g__nvt_default_scripts_clist
+      {
+        \exp_args:No \__nvt_check_script:NnT \l__nvt_fontface_cs_tl {##1}
+          {
+            \tl_set:Nn \l__nvt_script_name_tl {Default (##1)}
+            \tl_set:Nn \l__nvt_script_tl {##1}
+            \int_set:Nn \l__nvt_script_int {\l__nvt_strnum_int}
+            \bool_set_true:N \l__nvt_scriptlang_done_bool
+            \tl_gset:Nx \g__nvt_single_feat_tl { script=##1 }
+            \clist_map_break:
+          }
+      }
+    \bool_if:NF \l__nvt_scriptlang_done_bool
+      { \tl_clear:N \l__nvt_script_name_tl }
+  }
+}
+\keys_define:nn {nvt-opentype}
+  {
+    Language .choice: ,
+    Language .groups:n = {opentype} ,
+  }
+\clist_new:N \g__nvt_default_langs_clist
+\cs_new:Nn \nvt_default_lang:n
+  { \clist_gset:Nn \g__nvt_default_langs_clist {#1} }
+\nvt_default_lang:n {dflt}
+\__nvt_keys_define_code:nnn {nvt-opentype} { Language / Default }
+  {
+    \tl_set:Nn \l__nvt_lang_tl {dflt}
+    \int_zero:N \l__nvt_language_int
+    \tl_gset:Nn \g__nvt_single_feat_tl { language=dflt }
+  }
+\NewDocumentCommand \newfontscript {mm}
+  { \nvt_new_script:nn {#1} {#2} }
+\newfontscript{Default}{DFLT}
+\newfontscript{Latin}{latn}
+\RenewDocumentCommand \newfontscript {mm} {}
+\cs_set_protected:Npn \reset@font {\normalfont}
+
+\def\addfontfeature#1{%%
+  \nvt@err{\string\addfontfeature\space not allowed.^^J%%
+    \spii Use Novelette-specific commands for changing font features.^^J%%
+    \spiv For example, \string\smcp{small caps text} if font has small caps.^^J%%
+    \spii Possible commands (see Novelette docs for explanation and usage):^^J%%
+    \spiv \string\smcp, \string\SMCP, \string\case, \string\up, \string\onum.}%%
+    {#1}%%
+}%%
+\let\addfontfeature\addfontfeatures\relax
+
+
+%%
+\endinput
+%% End of file 'novelette-fontloader.sty'

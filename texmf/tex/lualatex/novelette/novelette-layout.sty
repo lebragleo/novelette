@@ -1,0 +1,427 @@
+%% This is file novelette-layout.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-layout}[2026-04-25 Page Layout]
+
+
+%% OVERVIEW:
+%%   Unlike standard LaTeX document classes, Novelette does not use class options to set the
+%% page size, margins, font size, or anything else. You may change any or all of the built-in
+%% defaults via settings in Preamble. Each setting is parsed for sanity at the time if is written.
+%% Insane values throw errors. Sane values do not take effect until AtBeginDocument.
+%%   There are no settings for margins, fonts, font sizes, or baselineskip. Margins are calculated
+%% according to print-on-demand expectations. Novelette's own fonts are the only ones allowed.
+%% Font size and baselineskip are calculated for readability.
+
+
+%% CALCULATE LAYOUT (performed automatically):
+%%   This routine is called at hook 'begindocument/before'. Based on various settings or defaults,
+%% it sets the page size, calculates margins, calculates font size and baselineskip, and performs
+%% some other adjustments.
+\newlength\nvt@minmargin %% Smallest allowable margin (not including glue).
+\newlength\nvt@glue %% Binding glue strip. Larger if \enable{moreglue}.
+\newlength\nvt@minspinemargin %% = minmargin plus glue.
+\newlength\nvt@parindent %% Becomes normal 1em.
+\newlength\nvt@pnindent %% Becomes normal 2em. Used for page number deco.
+\newlength\nvt@em %% Normal em size. Set by calculation.
+\newlength\nvt@bls %% Normal baselinekip. Set by calculation.
+\newlength\nvt@linegap %% Normal gap between lowest descender and highest following ascender.
+\newif\ifnvt@hasheader \newif\ifnvt@hasfooter
+\def\nvt@processlayout{%%
+  \ifnvt@duplicatesetting
+    \nvt@err{Duplicate setting in Preamble. Each setting may be used at most once.}
+  \fi
+  \ifnvt@usl %% Developer use only.
+    \def\nvt@pagestyle{empty}\let\thispagestyle\nvt@thispagestyle
+    \def\tmpmm{.75in}\def\tmpglue{0pt}
+    \setlength\nvt@trimwidth{8.5in}\setlength\nvt@trimheight{11in}
+    \setlength\nvt@em{12pt}\setlength\nvt@bls{14.4pt}\def\nvt@lines{44}
+    \setlength\topmargin{.75in}\setlength\textwidth{7in}
+    \setlength\oddsidemargin{.75in}\setlength\evensidemargin{.75in}
+    \setlength\nvt@glue{0pt}
+    \def\nvt@TrimBox{}
+  \else %% ordinary users
+    \directlua{nvt.calculatehorizontal() ; nvt.calculatevertical()}
+    \edef\tmprtw{\fpeval{round(72*\nvt@trimwidth/72.27,3)}}
+    \edef\tmprth{\fpeval{round(72*\nvt@trimheight/72.27,3)}}
+    \setlength\nvt@trimwidth{\tmprtw bp}\setlength\nvt@trimheight{\tmprth bp}
+    \edef\nvt@TrimBox{/TrimBox [ 0 0 \tmprtw\space\tmprth\space]}
+    \setlength\nvt@minmargin{\tmpmm}\setlength\nvt@glue{\tmpglue}
+    \setlength\nvt@minspinemargin{\nvt@minmargin}\addtolength\nvt@minspinemargin{\nvt@glue}
+    \setlength\nvt@em{\tmpfontem}\setlength\nvt@bls{\tmpbls}
+    \setlength\oddsidemargin{\tmposm}\setlength\evensidemargin{\tmpesm}
+    \setlength\textwidth{\tmptextwd}
+    \setlength\topmargin{\tmptopm}
+  \fi
+  \def\tmptest{split}\ifx\nvt@pagestyle\tmptest
+    \nvt@hasheadertrue\nvt@hasfootertrue\let\ps@normal\ps@split
+  \fi
+  \def\tmptest{margin}\ifx\nvt@pagestyle\tmptest%% Default.
+    \nvt@hasheadertrue\nvt@hasfooterfalse\let\ps@normal\ps@margin
+  \fi
+  \def\tmptest{center}\ifx\nvt@pagestyle\tmptest
+    \nvt@hasheadertrue\nvt@hasfooterfalse\let\ps@normal\ps@center
+  \fi
+  \def\tmptest{marcen}\ifx\nvt@pagestyle\tmptest
+    \nvt@hasheadertrue\nvt@hasfooterfalse\let\ps@normal\ps@marcen
+  \fi
+  \def\tmptest{plain}\ifx\nvt@pagestyle\tmptest
+    \nvt@hasheaderfalse\nvt@hasfootertrue\let\ps@normal\ps@plain
+  \fi
+  \def\tmptest{none}\ifx\nvt@pagestyle\tmptest
+    \nvt@hasheaderfalse\nvt@hasfooterfalse\let\ps@normal\ps@none
+  \fi
+  \def\ps@normal{\csname ps@\nvt@pagestyle\endcsname}
+  \def\ps@fancy{\csname ps@\nvt@pagestyle\endcsname}
+  \def\tmpl{center}\ifx\nvt@pagestyle\tmpl\def\tmpd{}
+    \ifx\tmpdeco\tmpd\gdef\nvt@pndeco{/}\fi
+  \fi
+  \edef\nvt@scenescale{\fpeval{round(12.6/\nvt@em,3)}}
+  \setlength\nvt@linegap{\tmplinegap}
+  \setlength\topskip{\nvt@bls}
+  \edef\tmptextht{\fpeval{(\nvt@lines-1)*\nvt@bls+\topskip+.00004}pt}
+  \setlength\textheight{\tmptextht}
+  \edef\nvt@textheight{\tmptextht}
+  \edef\nvt@blh{\fpeval{.7*\nvt@bls}pt}\edef\nvt@bld{\fpeval{.3*\nvt@bls}pt} %% ht, dp of \nvt@bls.
+  \ifnvt@hasheader
+    \setlength\headheight{.84\nvt@em}\setlength\headsep{\nvt@bls}
+  \else
+    \setlength\headheight{0pt}\setlength\headsep{0pt}
+  \fi
+  \ifnvt@hasfooter
+    \setlength\footskip{2\nvt@bls}
+  \else
+\setlength\footskip{0pt}
+  \fi
+  \edef\tmpa{\fpeval{\nvt@bls}pt plus \fpeval{.5\nvt@bls}pt minus \fpeval{.5\nvt@bls}pt}
+  \skip\footins=\tmpa\relax%% This is for footnotes, not footer.
+  \def\nvt@strut{\rule[-.3\nvt@bls]{0pt}{\nvt@bls}} %% Same size, even in scaled text.
+}%%
+%%
+
+
+%% Ensure that header texts will fit:
+\def\nvt@checkversohead#1{%%
+  \sbox0{{\nvt@headfont\nvt@headfeat{#1}}}
+  \edef\tmphw{\fpeval{\wd0>(\textwidth-8*\nvt@em)}}
+  \ifnum\tmphw=1\relax
+    \gdef\nvt@versohead{HEADER TEXT TOO LONG}
+    \nvt@warn{Verso header text is too long to fit.}
+  \fi
+}%%
+\def\nvt@checkrectohead#1{%%
+  \sbox0{{\nvt@headfont\nvt@headfeat{#1}}}
+  \edef\tmphw{\fpeval{\wd0>(\textwidth-8*\nvt@em)}}
+  \ifnum\tmphw=1\relax
+    \gdef\nvt@rectohead{HEADER TEXT TOO LONG}
+    \nvt@warn{Recto header text is too long to fit.}
+  \fi
+}%%
+%%
+
+
+%% FRONT/MAIN/BACKMATTER:
+%%   To allow for the multiple use of \frontmatter, \mainmatter, and \backmatter commands
+%% in main document and subdocs, Novelette uses its own definitions.
+%%   No printable material may precede the first use of \frontmatter. In frontmatter, page headers
+%% and footers do not print. Their (invisible) values are lowercase roman numerals, unless you
+%% \disable{pagereset} in Preamble, in which case their (invisible) values are arabic.
+%%   The first use of \mainmatter ends the previous page. What happens next, depends on
+%% several whether the just-ended page was recto or verso: If recto, a blank verso is added.
+%% If verso, then a recto decoration page, followed by blank verso, are added.
+%%   The above behavior ensures that the first page of mainmatter will be recto, and will face
+%% a blank verso. Unless uou \disable{pagerecount}, the bookpage number is reset to arabic 1.
+%% PDFpage number always continues without reset.
+%%   The \backmatter command is not needed, unless you actually have backmatter. It performs like
+%% \mainmatter in terms of recto/verso decision. You may \disable{autodeco}, but only do that
+%% if you designed your own decorative page there, and you know the page count. In all cases,
+%% both bookpage and PDFpage numbers continue without reset.
+\def\nvt@currentmatter{mainmatter} %% Default.
+\newif\ifnvt@setmatter %% True if any of front/main/backmatter is currently known.
+\newif\ifnvt@infrontmatter %% True within frontmatter.
+\DeclareDocumentCommand\frontmatter{s}{%%
+  \global\nvt@setmattertrue%%
+  \gdef\nvt@currentmatter{frontmatter}%%
+  \IfBooleanTF{#1}{%%
+    \nvt@err{\string\frontmatter* (with asterisk) not used in Novelette.^^J%%
+      \spii Perhaps Preamble \string\disable{renumber} does what you intended.}%%
+  }{}%%
+  \clearpage%%
+  \@nameuse{ps@empty}%%
+  \ifnum\c@page>1\relax%%
+    \ifnvt@infrontmatter\else%%
+      \nvt@err{Printable material preceding \string\frontmatter.}%5
+    \fi%%
+  \fi%%
+  \global\nvt@infrontmattertrue\global\nvt@inmainmatterfalse%%
+  \let\frontmatter\relax%%
+}%%
+\newif\ifnvt@inmainmatter\nvt@inmainmattertrue %% True within mainmatter. Default true.
+\DeclareDocumentCommand\mainmatter{s}{%%
+  \clearpage%%
+  \global\nvt@setmattertrue%%
+  \global\nvt@inmainmattertrue\global\nvt@infrontmatterfalse%%
+  \gdef\nvt@currentmatter{mainmatter}%%
+  \IfBooleanTF{#1}{%%
+    \nvt@err{\string\mainmatter* (with asterisk) not used in Novelette.^^J%%
+      \spii Perhaps Preamble \string\disable{renumber} does what you intended.}%%
+  }{}%%
+  \ifodd\c@page%%
+    \edef\tmpexpect{\arabic{nvt@expectpage}}\ifnum\tmpexpect>1\relax%%
+      \begin{component}[single,noguide,empty]\vfil\strut\hfill%%
+        {\normalfont\upshape\nvt@aff{Scale=4}\char"254D}%%
+      \hfill\strut\par\null\end{component}%%
+    \fi%%
+  \fi%%
+  \nvt@blankverso%%
+  \@nameuse{ps@\nvt@pagestyle}%%
+  \ifnvt@norenumber\else%%
+    \setcounter{nvt@pageoffset}{-\c@page}%%
+    \addtocounter{nvt@pageoffset}{1}%% %%%%% but component moves to new page?
+  \fi%%
+  \let\mainmatter\relax%%
+}%%
+\newif\ifnvt@inbackmatter %% True within backmatter.
+\DeclareDocumentCommand\backmatter{s}{%%
+  \global\nvt@setmattertrue%%
+  \global\nvt@inmainmattertrue\global\nvt@inbackmattertrue\global\nvt@infrontmatterfalse%%
+  \gdef\nvt@currentmatter{backmatter}%%
+  \IfBooleanTF{#1}{%%
+    \typeout{Alert: \string\backmatter* not used in Novelette. Used without asterisk.}
+  }{}%%
+  \clearpage%%
+  \@nameuse{ps@empty}%%
+  \let\mainmatter\relax%%
+  \let\backmatter\relax%%
+  \nvt@blankverso%%
+  \ifodd\c@page%%
+    \ifnvt@noautodeco\else%%
+      \begin{component}[single,noguide,empty]\vfil\strut\hfill%%
+        {\normalfont\upshape\nvt@aff{Scale=4}\char"254D}%%
+      \hfill\strut\par\null\end{component}%%
+      \nvt@blankverso%%
+    \fi%%
+  \fi%%
+}%%
+
+
+%%
+\def\nvt@thispagestyle#1{\@specialpagetrue\def\@specialstyle{#1}}
+\def\pagestyle#1{%%
+  \nvt@warn{Ignored \string\pagestyle. Cannot be changed mid-document.}%%
+}%%
+\def\thispagestyle#1{%%
+  \nvt@warn{Ignored \string\thispagestyle. Only use as option to component environment.}%%
+}%%
+%%
+
+
+%% PARAGRAPH INDENT:
+%%   Normally 1em, but can be 1.5em. Also sets indent for page number deco, if used.
+\def\nvt@defineindent{%%
+  \setlength\nvt@parindent{\nvt@em}%%
+  \setlength\nvt@pnindent{2\nvt@em}%%
+  \setlength\parindent{\nvt@parindent}%%
+}%%
+%%
+
+
+%% PRINTABLE PAGE NUMBER:
+%%   The built-in 'page' counter is never reset. It is the PDFpage number. Novelette's own
+%% 'bookpage' counter is printable. It may or may not reset at frontmatter/mainmatter transition.
+\def\nvt@getbookpage{%%
+  \let\@mkboth\@gobbletwo%%
+  \setcounter{nvt@bookpage}{\c@page}\addtocounter{nvt@bookpage}{\value{nvt@pageoffset}}%%
+  \ifnvt@infrontmatter%%
+    \ifdefined\nvt@thisdoc%%
+      \def\nvt@thispage{{\nvt@aff{RawFeature={+ornm}}zzz}}%%
+    \else%%
+      \def\nvt@thispage{\roman{nvt@bookpage}}%%
+    \fi%%
+  \else%%
+    \ifdefined\nvt@thisdoc%%
+      \def\nvt@thispage{{\nvt@aff{RawFeature={+ornm}}000}}%%
+    \else%%
+      \def\nvt@thispage{\arabic{nvt@bookpage}}%%
+    \fi%%
+  \fi%%
+}%%
+%%
+
+
+%% PAGE STYLES: split margin center marcen plain.
+%%   Novelette does not use the 'fancyhdr' package for arbitrary header/footer design. Instead,
+%% a limited choice of pre-composed designs is offered. They are all you need for fiction books.
+\def\nvt@@versohead{%%
+  \def\tmptest{dflt}\ifx\nvt@headcn\tmptest%%
+    \MakeLowercase{\nvt@versohead}%%
+  \else%%
+    \nvt@versohead%%
+  \fi%%
+}%%
+\def\nvt@@rectohead{%%
+  \def\tmptest{dflt}\ifx\nvt@headcn\tmptest%%
+    \MakeLowercase{\nvt@rectohead}%%
+  \else%%
+    \nvt@rectohead%%
+  \fi%%
+}%%
+\newif\ifnvt@inheader %% True inside any header text.
+\def\nvt@definepagestyles{%%
+  \def\ps@split{%% Header and footer, both centered.
+    \nvt@getbookpage%%
+    \def\@oddfoot{%%
+      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+    }%%
+    \def\@evenfoot{%%
+      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+    }%%
+    \def\@oddhead{{\nvt@inheadertrue\nvt@headfont\nvt@headfeat\hfil\nvt@@rectohead\hfil}}%%
+    \def\@evenhead{{\nvt@inheadertrue\nvt@headfont\nvt@headfeat\hfil\nvt@@versohead\hfil}}%%
+  }%%
+  \def\ps@margin{%% Only header. Page number at outside margin. Text nearby.
+    \nvt@getbookpage%%
+    \let\@oddfoot\@empty\let\@evenfoot\@empty%%
+    \def\@oddhead{%%
+      \bgroup\nvt@inheadertrue%%
+      {\nvt@headfont\nvt@headfeat\hfil\nvt@@rectohead}%%
+      \hspace{\nvt@parindent}%%
+      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      \egroup%%
+    }%%
+    \def\@evenhead{%%
+      \bgroup\nvt@inheadertrue%%
+      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      \hspace{\nvt@parindent}%%
+      {\nvt@headfont\nvt@headfeat\nvt@@versohead\hfil}%%
+      \egroup%%
+    }%%
+  }%%
+  \def\ps@center{%% Only header. Page number and text centered. Number closer to outside margin.
+    \nvt@getbookpage%%
+    \let\@oddfoot\@empty\let\@evenfoot\@empty%%
+    \def\@oddhead{%%
+      \bgroup\nvt@inheadertrue%%
+      {\nvt@headfont\nvt@pnfeat\hfil\phantom{\space\nvt@pndeco\space\nvt@thispage}}%%
+      {\nvt@headfont\nvt@headfeat\nvt@@rectohead}
+      {\nvt@headfont\nvt@pnfeat\space\nvt@pndeco\space\nvt@thispage\hfil}%%
+      \egroup%%
+    }%%
+    \def\@evenhead{%%
+      \bgroup\nvt@inheadertrue%%
+      {\nvt@headfont\nvt@pnfeat\hfil\nvt@thispage\space\nvt@pndeco\space}%%
+      {\nvt@headfont\nvt@headfeat\nvt@@versohead}%%
+      {\nvt@headfont\nvt@pnfeat\phantom{\space\nvt@pndeco\space\nvt@thispage}\hfil}%%
+      \egroup%%
+    }%%
+  }%%
+  \def\ps@marcen{%% Only header. Page number at outside margin. Text centered.
+    \nvt@getbookpage%%
+    \let\@oddfoot\@empty\let\@evenfoot\@empty%%
+    \def\@oddhead{%%
+      \bgroup\nvt@inheadertrue%%
+      \phantom{\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      {\nvt@headfont\nvt@headfeat\hfill\nvt@@rectohead\hfill}%%
+      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      \egroup%%
+    }%%
+    \def\@evenhead{%%
+      \bgroup\nvt@inheadertrue%%
+      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      {\hfill\nvt@headfont\nvt@headfeat\nvt@@versohead\hfill}%%
+      \phantom{\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      \egroup%%
+    }%%
+  }%%
+  \def\ps@plain{%% Only footer. Page number centered. No text.
+    \nvt@getbookpage%%
+    \let\@oddhead\@empty\let\@evenhead\@empty%%
+    \def\@oddfoot{%%
+      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+    }%%
+    \def\@evenfoot{%%
+      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+    }%%
+  }%%
+  \def\ps@none{%% For text extraction. No header or footer, thus no page numbers.
+    \nvt@getbookpage%%
+    \let\@oddfoot\@empty\let\@evenfoot\@empty%%
+    \let\@oddhead\@empty\let\@evenhead\@empty%%
+  }%%
+}%%
+%%
+
+
+%% FOOTNOTES:
+%%   Fiction rarely uses footnotes, with the exception of artsy-type novels that use them
+%% as a special effect. Popular (non-artsy) fiction almost never uses footnotes.
+%%   Novelette provides minimal support for footnotes. Perhaps your book is a historical romance,
+%% with a scene involving a volcanic eruption. Then, a brief footnote, which is a comment by the
+%% author to the reader, might indicate that the eruption really did occur at that time and place;
+%% it is not imaginary. Or if your story is a "discovered manuscript", footnotes might indicate
+%% where certain passages were "unreadable in the original" text.
+%%   Terminology: "Markers" are located at the \footnote commands. "Labels" are at the start of
+%% the printed footnote text, at page bottom.
+%%   Novelette markers and labels are literary, not numerical. Characters * † ‡ § are designed for
+%% these purposes. After § the markers/labels are doubled, ** †† ‡‡ §§. After that, the cycle
+%% resets to *, even if in the same component. Advice: If your book needs more footnotes, or if
+%% they must be numbered, then you should use a different document class.
+%%   You cannot write a footnote in frontmatter or backmatter. If you write a footnote within
+%% a display zone, no marker or label appears; this is standard book design, because the footnote
+%% is supposed to apply to a whole chapter, not just a sentence or paragraph. At \maintext the
+%% footnote count is set to 1, corresponding to * marker/label.
+%%   You cannot place an image within footnotes. You cannot place footnotes in a component
+%% that uses the [single] or [legal] options.
+%%   There is no provision for endnotes. If you need them, write brief footnotes that direct
+%% the reader to something in backmatter, then manually create the endnotes to your own style.
+%% A better idea is to have footnotes direct the reader to backmatter, but not any particular
+%% place there; then merge all notes into a general discussion, written as ordinary text.
+%%   Default footnote style prints label at left margin, then a big space to the footnote text,
+%% at normal indent. You may globally change this in Preamble: \footnotestyle{indent=both} indents
+%% prior to the label, then ordinary space to text. \footnotestyle{indent=none} does not indent
+%% the first line of a footnote; the label is at left margin, then ordinary space, then text.
+%% \footnotestyle{indent=near} looks nice; text at indent, marker/space just before it.
+%%   In all cases, when a footnote has extra paragraphs, they are indented.
+\setcounter{footnote}{0}%% Resets to 0 at each \begin{component}.
+\newif\ifnvt@infootnote %% True within footnote.
+\dimen\footins=3in %% Maximum height per page, for all footnotes on that page.
+%% Some printers recommend line widths at least 0.75pt:
+\def\footnoterule{\kern-3\p@ \hrule \@width 1.5in \@height .75pt \kern 5.25\p@}
+\DeclareDocumentCommand\footnote{O{}+m}{%% Ignore optional argument.
+  \unskip\nvt@infootnotetrue%%
+  \ifnvt@indisplay\else\stepcounter{footnote}\fi%%
+  \let\nvt@tmpnum\c@footnote\relax%%
+  \ifnum\nvt@tmpnum=0\relax\def\tmpmarker{}\fi%%
+  \ifnum\nvt@tmpnum=1\relax\def\tmpmarker{*}\fi%%
+  \ifnum\nvt@tmpnum=2\relax\def\tmpmarker{†}\fi%%
+  \ifnum\nvt@tmpnum=3\relax\def\tmpmarker{‡}\fi%%
+  \ifnum\nvt@tmpnum=4\relax\def\tmpmarker{§}\fi%%
+  \ifnum\nvt@tmpnum=5\relax\def\tmpmarker{**}\fi%%
+  \ifnum\nvt@tmpnum=6\relax\def\tmpmarker{††}\fi%%
+  \ifnum\nvt@tmpnum=7\relax\def\tmpmarker{‡‡}\fi%%
+  \ifnum\nvt@tmpnum=8\relax\def\tmpmarker{§§}\fi%%
+  \leavevmode\char"2060{\upshape\normalfont\nvt@aff{RawFeature={+ss01}}\tmpmarker}%% Marker.
+  \insert\footins{%%
+    \interlinepenalty\interfootnotelinepenalty%%
+    \splittopskip\footnotesep%%
+    \splitmaxdepth\dp\strutbox%%
+    \floatingpenalty\@MM%%
+    \noindent\upshape\nvt@small%%
+    \rule[-.3\baselineskip]{0pt}{\baselineskip}%%
+    \ifnum\nvt@fnind=0\relax\makebox[\nvt@parindent]{\hfill\tmpmarker\space}\fi%% near
+    \ifnum\nvt@fnind=1\relax\makebox[\nvt@parindent]{\tmpmarker\hfill}\fi%% away
+    \ifnum\nvt@fnind=2\relax\makebox[\nvt@parindent]{}\tmpmarker\space\fi%% both
+    \ifnum\nvt@fnind=3\relax\strut\tmpmarker\space\fi%% none
+    {#2}\rule[-.3\baselineskip]{0pt}{\baselineskip}\par%%
+  }%%
+  \ifnum\c@footnote=8\relax\setcounter{footnote}{0}\fi%%
+  \nvt@infootnotefalse%%
+}%%
+%%
+
+
+
+%%
+\endinput
+%% End of file novelette-layout.sty.

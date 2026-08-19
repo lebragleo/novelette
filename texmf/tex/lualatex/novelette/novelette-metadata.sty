@@ -1,0 +1,165 @@
+%% This is file novelette-metadata.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-metadata}[2026-04-25 Novelette Metadata Processing]
+
+%% This file is not loaded until AtBeginDocument, after Preamble has been processed.
+
+
+%% OVERVIEW:
+%%   This code processes your metadata, adds some PDF internal metadata, and writes them into
+%% the PDF. Due to different character encodings, different string formats, and different
+%% escape characters, much wrangling is involved. Lua to the rescue! The information is sent
+%% to Lua, wrangled there, and returned to LaTeX in docile form.
+%%   Novelette always provides the PDF Info dictionary, as required by PDF/X-1a:2001. This format
+%% does not use XMP metadata. But you may add XMP using \pdfx{xmp} in Preamble. Do not do that
+%% unless your print service specifically asks for it. If they say "without metadata" they mean
+%% "without XMP".
+
+
+%% DATES:
+%%   The Creation Date is, in principle, a fixed moment in time. It might be date at which you
+%% started work on the document, or the date at which the finished work was first released.
+%%   The Modification Date is, in principle, the moving date at which the current (modified) work
+%% is released. It might be the same as the Creation Date, or it might be later.
+%%   Most LaTeX classes set both dates to the moment when the PDF is compiled, whether or not any
+%% changes were made. Novelette allows you to fix the Creation Date, using \docdate{yyyy/mm/dd}.
+%% The Modification Date is still the moment when compiled, even if there were no edits.
+%%   The PDF Trailer contains a two-entry ID, each of which is hex string of fixed length.
+%% Instead of random generation, Novelette hashes your own metadata with the dates and other data.
+%% One ID will remain fixed, if your Creation Date and other metadata are fixed.
+%%   If you use XMP, these dates will also appear there, but in a different string format.
+\let\nvt@infodoc\nvt@now\relax
+\long\def\nvt@allmeta{Novelette \thetitle \theauthor \thesubtitle \theversion \thedocdate}
+\def\nvt@mdfiveinfo#1{\directlua{nvt.mdfiveinfo('\luaescapestring{#1}')}}
+\edef\nvt@infotrailer{\nvt@mdfiveinfo{\nvt@allmeta}\nvt@mdfiveinfo{Novelette\nvt@now}}
+\pdfextension trailer {/ID [ \nvt@infotrailer ]}
+%%
+
+
+%% PDF INFO DICTIONARY:
+%%   Sadly, the Info dictionary cannot use utf-8 encoding. So Novelette uses Lua to convert your
+%% metadata to octal codes. If Novelette allowed more world languages, that would not suffice.
+\def\nvt@pdfxvercon{/GTS_PDFXVersion (PDF/X-1a:2001) /GTS_PDFXConformance (PDF/X-1a:2001)}
+\ifnvt@pdfx\else\def\nvt@pdfxvercon{}\fi
+\def\nvt@writepdfinfo{%%
+  \directlua{nvt.octify('\luaescapestring{\thetitle}')}\edef\nvt@octotitle{\tmps}
+  \directlua{nvt.octify('\luaescapestring{\theauthor}')}\edef\nvt@octoauthor{\tmps}
+  \ifx\thesubtitle\@empty
+    \pdfextension info{%% Following lines have intentional space at end:
+      /Title (\nvt@titleprefix\nvt@octotitle) %%
+      /Author (\nvt@octoauthor) %%
+      /Creator (Chestnut Chickadee Literary Typesetter) %% A neighborhood bird.
+      /CreationDate (\nvt@infodoc) %%
+      /ModDate (\nvt@now) %%
+      /Producer (Steller Jay PDF Producer) %% A neighborhood bird.
+      /Trapped/False %%
+      \nvt@pdfxvercon %%
+    }%%
+  \else
+    \directlua{nvt.octify('\luaescapestring{\thesubtitle}')}\edef\nvt@octosubtitle{\tmps}
+    \pdfextension info{%% Following lines have intentional space at end:
+      /Title (\nvt@titleprefix\nvt@octotitle) %%
+      /Subtitle (\nvt@octosubtitle) %%
+      /Author (\nvt@octoauthor) %%
+      /Creator (Chestnut Chickadee Literary Typesetter) %% A neighborhood bird.
+      /CreationDate (\nvt@infodoc) %%
+      /ModDate (\nvt@now) %%
+      /Producer (Steller Jay PDF Producer) %% A neighborhood bird.
+      /Trapped/False %%
+      \nvt@pdfxvercon %%
+    }%%
+  \fi
+}%%
+%%
+
+
+%% OUTPUT INTENT:
+%%   PDF/X-1a:2001 requires a CMYK-colorspace 'Output Intent', which declares that the colors in
+%% the PDF were prepared for that print technology. As long as your Output Intent is one of the
+%% registered CMYK standards (Novelette always does that), and you do not attach an *.icc color
+%% profile (Novelette never does that), your Output Intent will be ignored by print-on-demand.
+%% Nevertheless, the Output Intent must be provided, because it is part of the specification.
+%%   Why CMYK when your PDF only uses black ink? Reason: black is C=0, M=0, Y=0, K=0-100%.
+\def\nvt@declareoutputintent{%%
+  \def\tmptest{swop}\ifx\nvt@oi\tmptest%%
+    \pdfextension catalog{%% Following lines have intentional space at end:
+      /OutputIntents [ << %%
+      /Type/OutputIntent %%
+      /S/GTS_PDFX %%
+      /OutputConditionIdentifier (CGATS TR 001) %%
+      /OutputCondition (SWOP (Publication) printing in USA %%
+        (Printing process definition: ANSI CGATS.6).) %%
+      /Info (U.S. Web Coated (SWOP) v2) %%
+      /RegistryName (http://www.color.org) %%
+      >> ] %%
+    }%%
+  \fi
+  \def\tmptest{fogra}\ifx\nvt@oi\tmptest%%
+    \pdfextension catalog{%% Following lines have intentional space at end:
+      /OutputIntents [ << %%
+      /Type/OutputIntent %%
+      /S/GTS_PDFX %%
+      /OutputConditionIdentifier (FOGRA39) %%
+      /OutputCondition (Offset commercial and specialty printing according to %%
+        ISO 12647-2:2004 / Amd 1, paper type 1 or 2 (gloss or matte coated offset, 115 g/m2), %%
+        screen frequency 60/cm.) %%
+      /Info (Coated FOGRA39 (ISO 12647-2:2004)) %%
+      /RegistryName (http://www.color.org) %%
+      >> ] %%
+    }%%
+  \fi
+}%%
+%%
+
+
+%% XMP METADATA:
+%%   Unlike the Info dictionary, XMP can directly understand utf-8, so there is no need to change
+%% the metadata encoding.
+%%   Since XMP is a form of XML, some characters must be changed to Entities that will not
+%% confuse the parser.
+%%   The XMP packet template is in another file. Special characters in LaTeX are not special
+%% in PDF, so some detokenization tricks are applied there. 
+\def\nvt@mdfivexmp#1{\directlua{nvt.mdfivexmp('\luaescapestring{#1}')}}
+\edef\nvt@xmpdocid{\nvt@mdfivexmp{\nvt@allmeta}}
+\edef\nvt@xmpnowid{\nvt@mdfivexmp{Novelette\nvt@now}}
+\def\nvt@xmptitle{\directlua{nvt.xmpify('\luaescapestring{\thetitle}')}}
+\def\nvt@xmpsubtitle{\directlua{nvt.xmpify('\luaescapestring{\thesubtitle}')}}
+\def\nvt@xmpauthor{\directlua{nvt.xmpify('\luaescapestring{\theauthor}')}}
+\def\nvt@xmpsubtitlestring{}
+\ifx\thesubtitle\@empty\else
+  \ifnvt@nometasub\else
+    \def\nvt@xmpsubtitlestring{%%
+      <prism:subtitle><rdf:Alt><rdf:li xml:lang="x-default">%%
+      \nvt@xmpsubtitle</rdf:li></rdf:Alt></prism:subtitle>^^J %% Intentional space at end.
+    }%%
+  \fi
+\fi
+\ifnvt@xmp
+  \ifdefined\nvt@xmpmodifydate\else\def\nvt@xmpmodifydate{}\fi
+  \ifdefined\nvt@xmpcreatedate\else\def\nvt@xmpcreatedate{}\fi
+  \ifdefined\nvt@xmpmetadatadate\else\def\nvt@xmpmetadatadate{}\fi
+  \ifdefined\nvt@xmpdocid\else\def\nvt@xmpdocid{uuid:00000000-0000-0000-0000-000000000000}\fi
+  \ifdefined\nvt@xmpnowid\else\def\nvt@xmpnowid{uuid:00000000-0000-0000-0000-000000000000}\fi
+  \ifdefined\nvt@xmptitle\else\def\nvt@xmptitle{Untitled Document}\fi
+  \ifdefined\nvt@xmpauthor\else\def\nvt@xmpauthor{Anonymous Author}\fi
+  \RequirePackage{novelette-xmp}%% Contains the template.
+\fi
+\def\nvt@addxmp{%%
+  \begingroup\makeatletter
+    \global\let\nvt@xmpdata\nvt@xpacket\relax
+    \begingroup\pdfvariable compresslevel=0
+    \immediate\pdfobj stream attr {/Type /Metadata /Subtype /XML} {\nvt@xmpdata}
+    \pdfextension catalog{/Metadata \the\pdflastobj\space 0 R}
+    \endgroup
+  \endgroup
+}%%
+%%
+
+
+
+%%
+\endinput
+%% End of file 'novelette-metadata.sty'
+

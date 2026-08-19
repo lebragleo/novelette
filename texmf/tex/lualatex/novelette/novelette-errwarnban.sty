@@ -1,0 +1,229 @@
+%% This is file novelette-errwarnban.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-errwarnban}[2026-04-25 Errors, Warnings, banned macros]
+
+
+%% OVERVIEW:
+%%   Novelette has many custom errors and warnings. This is necessary, because the generic
+%% LaTeX messages often refer to situations that are inapplicable to Novelette. Also, Novelette
+%% can detect many common user-caused problems, and provide precisely-defined help messages.
+%%   Numerous standard LaTeX environments and macros cannot be used in Novelette. Almost all
+%% of them pertain to academic documents or math. If a document attempts to use any of these,
+%% an error results. Some of them have useful custom substitutes, which are suggested.
+
+
+%% ERRORS, WARNINGS, PROBLEMS, ALERTS:
+%%   An "error" halts compile, and waits for your response. An error may be thrown driectly by
+%% the compiler, or by Novelette.
+%%   If the error is thrown directly by the compiler, then it may or may not provide useful help.
+%% Sadly, the default response is to continue, which will likely throw more and more errors.
+%% This kind of error is almost always caused by mis-typing. For example, \name[Chapter 4} is
+%% a typographic error (mismatch left bracket to right brace). The only solution is to exit,
+%% fix your typing, then try again.
+%%   If the error is thrown by Novelette, then it will provide specific help. The default response
+%% is to exit. These errors occur when you attempt to use certain LaTeX commands unavailable in
+%% Novelette, or use a location-specific command in the wrong location, or request settings
+%% or options that have no obvious default values. In Preamble, bad settings will always throw an
+%% error, whether or not Novelette can guess your meaning.
+%%   A "warning" does not halt compile. Since Novelette does not load many packages, your are
+%% unlikely to see a package warning. Novelette's own warnings are specific to the situation.
+%%   An "overfull" box occurs when something is wider or taller than the space allowed for it.
+%% The most common overfull box is a line that extends into the right margin, because the
+%% typesetter could not find a suitable line break. The only solution is to edit that text,
+%% by adding or removing words to make the paragraph shorter or longer.
+%%   Novelette treats errors, warnings, and overfull boxes as "problems". They must be fixed,
+%% before you can successfully compile your document in preview or final mode. Often, problems
+%% do not prevent PDF creation. But a PDF with problems will have its internal metadata flagged;
+%% then, the problem PDF can be distinguished from a good PDF.
+%%   Some non-problem situations write "Alerts" to the Terminal and log. These allow preview
+%% and final modes, because they may be perfectly acceptable, even intentional. But Novelette
+%% was not sure, so it calls these situations to your attention. Ignore them, if desired.
+%%   If you use a GUI such as TeXworks, the Novelette methods may cause its console to summarize
+%% errors, warnings and overfull boxes as being errors. This is desirable.
+%%   References to Error Code and Warning Code are in the Novelette documentation.
+\newif\ifnvt@didprint %% Becomes true when all printable material has been printed.
+\def\@ehc{^^JSome situations that throw this error:^^J%% This re-writes a standard LaTeX message.
+  1. Left brace without matching right brace.^^J%%
+  2. Use \string\% to mean percent. Unescaped percent character begins a comment.^^J%%
+  3. In Preamble, all LaTeX special characters must be escaped by backslash,^^J%%
+  \spii\space unless you are actually using them as special characters.^^J%%
+  4. Preamble has text that is not braced within a command.^^J%%
+  5. You wrote a command that is defined in LaTeX, but fails in Novelette.^^J%%
+  \spii\space See Novelette docs for what is allowed and prohibited.%%
+}%%
+\def\YourResponse{}
+\def\MessageBreak{^^J}
+\def\nvt@nowcompiling{} %% Empty for main document, nonempty for subdoc.
+\long\def\nvt@where{%%
+  \ifnvt@didprint\else%%
+    \ifdefined\thepage PDFpage \thepage.\space%%
+      \ifx\nvt@nowcompiling\@empty%%
+        On or before text input line \the\inputlineno.%%
+      \else%%
+        In subdoc file \nvt@nowcompiling.%%
+      \fi%%
+    \else%%
+      In Preamble.%%
+    \fi%%
+  \fi%%
+}%%
+\def\nvt@saywhat{%% Prompts user. Default exit.
+  \typein[\YourResponse]{> Respond c<return> to continue, or just <return> to exit (better).}%%
+  \def\nvt@tmpyr{c}\ifx\YourResponse\nvt@tmpyr%%
+    \typeout{Continuing... Beware!}%%
+    \directlua{nvt.good = false}%%
+  \else%%
+    \typeout{Will exit now ...}%%
+    \batchmode \read-1 to \sorry%%
+  \fi%%
+}%%
+\long\gdef\nvt@err#1{%%
+  \typeout{^^J! Problem. \nvt@where}%%
+  \typeout{\spii #1^^J}\nvt@saywhat%%
+}%%
+%% Novelette treats warnings as errors, except that the compiler is not halted.
+\long\gdef\nvt@warn#1{%%
+  \directlua{nvt.good = false}%%
+  \typeout{^^J! Problem. \nvt@where}%%
+  \def\tmptest{#1}\ifx\tmptest\@empty\else\typeout{\spii #1^^J}\fi%%
+}%%
+\long\gdef\PackageError#1#2#3{%%
+  \typeout{^^J! Package '#1' Error. \nvt@where}%%
+  \typeout{\spii #2^^J#3^^J}\nvt@saywhat%%
+}%%
+\long\gdef\@latex@error#1#2{%%
+  \typeout{^^J! LaTeX Error. \nvt@where}%%
+  \typeout{\spii #1^^J#2^^J}\nvt@saywhat%%
+}%%
+\global\let\@latexerr\@latex@error
+\long\gdef\PackageWarning#1#2{%%
+  \directlua{nvt.good = false}%%
+  \typeout{^^J! Package '#1' Warning. \nvt@where}%%
+  \typeout{\spii #2^^J}%%
+}%%
+\let\PackageWarningNoLine\PackageWarning\relax
+\long\gdef\@latex@warning#1{%%
+  \def\tmpsaysfloats{0}%%
+  \directlua{nvt.saysfloats('\luaescapestring{#1}')}%%
+  \ifnum\tmpsaysfloats=0\relax%%
+    \directlua{nvt.good = false}%%
+    \typeout{^^J! LaTeX Warning. \nvt@where}%%
+    \typeout{\spii #1^^J}%%
+  \fi%%
+}%%
+\global\let\@warning\@latex@warning\relax
+\let\@latex@warning@no@line\@latex@warning\relax
+\gdef\@notprerr#1{\@latex@error{You wrote a Preamble-only command in the document body.}}
+%%
+
+
+%% PROHIBITED COMMANDS AND ENVIRONMENTS:
+%%   Novelette is tightly designed to do one thing well, not many things. A variety of standard
+%% LaTeX environments and commands are prohibited. The number of possibilities is vast,
+%% so this code only deals with common situations that a didn't-read-the-docs user might attempt:
+\def\minipage{%%
+  \nvt@fatal{Novelette does not have '\string\minipage' or '\string\parbox'.^^J%%
+    \spii You cannot do columns. Maybe a 'block' environment will be usedul.}
+}%%
+\let\parbox\minipage\relax
+\def\nvt@nosectioncmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Try the 'display' environment, or 'block' environment.}
+}%%
+\def\book{\nvt@nosectioncmd{book}}
+\def\part{\nvt@nosectioncmd{part}}
+\def\chapter{\nvt@nosectioncmd{chapter}}
+\def\section{\nvt@nosectioncmd{section}}
+\def\subsection{\nvt@nosectioncmd{subsection}}
+\def\subsubsection{\nvt@nosectioncmd{subsubsection}}
+\def\paragraph{\nvt@nosectioncmd{paragraph}}
+\def\subparagraph{\nvt@nosectioncmd{subparagraph}}
+\def\nvt@nojournalcmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette,^^J%%
+    \spii because it is intended for academic usage, rather than original fiction.^^J%%
+    \spii Although you may manually design something comparable to '#1',^^J%%
+    \spii it cannot be automated. Not worth your effort. Try another document class.}
+}%%
+\def\appendix{\nvt@nojournalcmd{appendix}}
+\def\makeindex{\nvt@nojournalcmd{\string\makeindex}}
+\def\theindex{\nvt@nojournalcmd{\string\theindex}}
+\def\abstract{\nvt@nojournalcmnd{abstract}}
+\def\thebibliography{\nvt@nojournalcmd{\string\thebibliography}}
+\def\nvt@notitlecmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii You must design your own title page, within a 'display' environment.}
+}%%
+\def\maketitle{\nvt@notitlecmd{\string\maketitle}}
+\def\titlepage{\nvt@notitlecmd{titlepage}}
+\def\nvt@nocontentscmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Fiction almost never needs a table of contents. But if you need one,^^J%%
+    \spii you must design it yourself, within a 'display' environment.^^J%%
+    \spii The entries cannot be automated, but must be manually edited.}
+}%%
+\def\tableofcontents{\nvt@nocontentscmd{tableofcontents}}
+\def\listoftables{\nvt@nocontentscmd{listoftables}}
+\def\listoffigures{\nvt@nocontentscmd{listoffigures}}
+\def\nvt@notablecmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Novelette cannot create tables. There is no alternative method.^^J%%
+    \spii You may be able to create a table using other software, then reduce it^^J%%
+    \spii to a raster image file.}
+}%%
+\def\tabular{\nvt@notablecmd{tabular}}
+\def\table{\nvt@notablecmd{table}}
+%%
+\def\itemize{\nvt@cannotdo{itemize}}
+\def\enumerate{\nvt@cannotdo{enumerate}}
+\def\description{\nvt@cannotdo{description}}
+\def\labeling{\nvt@cannotdo{labeling}}
+%%
+\def\nvt@nomathcmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Novelette is intended for original fiction, not academic works.^^J%%
+    \spii No math! If your story is something such as a crime novel, in which^^J%%
+    \spii the victim scrawled an equation in blood, then place it as a raster image.}
+}%%
+\def\array{\nvt@nomathcmd{array}}
+\def\equation{\nvt@nomathcmd{equation}}
+\def\eqnarr{\nvt@nomathcmd{eqnarray}}
+\def\math{\nvt@nomathcmd{math}}
+\def\displaymath{\nvt@nomathcmd{displaymath}}
+\def\nvt@noquotecmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Instead, Novelette provides the 'block' environment, which is^^J%%
+    \spii designed for this purpose. Try it!}
+}%%
+%% epigraph? thanks? dedication?
+\def\quote{\nvt@noquotecmd{quote}}
+\def\quotation{\nvt@quotecmd{quotation}}
+\def\verse{\nvt@noquotecmd{verse}}
+\def\nvt@nographicscmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii Novelette has its own method for placing images: the '\string\image' command.^^J%%
+    \spii You cannot 'include' graphics, eps, or pdf. No vector diagrams.^^J%%
+    \spii Images must be raster png format, with additional restrictions.^^J%%
+    \spii Any captions must be designed into their images.^^J%%
+    \spii File path is always relative to the main document file.}
+}%%
+\def\figure{\nvt@nographicscmd{figure}}
+\def\caption{\nvt@nographicscmd{\string\caption}}
+\def\includegraphics{\nvt@nographicscmd{\string\includegraphics}}
+\def\graphicspath#1{\nvt@nographicscmd{\string\graphicspath}}
+\def\epsinclude{\nvt@nographicscmd{\string\epsinclude}}
+\def\pdfinclude{\nvt@nographicscmd{\string\pdfinclude}}
+\def\nvt@nocolorcmd#1{%%
+  \nvt@fatal{You cannot use '#1' command or environment in Novelette.^^J%%
+    \spii All text is black-only, not color or grayscale.^^J%%
+    \spii Images may be monochrome black/white, or single-channel grayscale.}
+}%%
+\let\orig@language\language\relax
+\def\language#1{\nvt@fatal{No \string\language\space setting. Use \string\lang{code} instead.}}
+%%
+
+
+%%
+%% End of file novelette-errwarnban.sty.
+%%

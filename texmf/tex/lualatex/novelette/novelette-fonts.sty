@@ -1,0 +1,481 @@
+%% This is file novelette-settings.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-fonts}[2026-04-25 Novelette Font Loader]
+
+%% This file is not loaded until AtBeginDocument, after Preamble has been processed.
+
+
+%% OVERVIEW:
+%%   Most LuaLaTeX documents load the 'fontspec' package, which is a front-end to 'luaotfload'.
+%% That is a universal solution for describing and customizing any fonts from any compatible
+%% technology, with any font language scripts.
+%%   But Novelette provides its own fonts. No others may be used. These fonts were specifically
+%% designed to work with Novelette. The software understands the fonts, and the fonts understand
+%% how they will be used by the software. So there is no need for all that 'fontspec' offers.
+%% What Novelette does need, has been simplified and written below. If you need decorative text
+%% in another font, create it as a raster image.
+%%   This page also contains some standard LaTeX command re-definitions, so that those commands
+%% do it 'the Novelette way'. New commands are added, for text styles and OpenType features.
+
+
+%% Cleanup:
+\def\process@table{} %% Not needed in Novelette.
+\gdef\encodingdefault{TU} %% UTF-8 Unicode.
+\providecommand\UnicodeEncodingName{TU}
+\long\def\nvt@eeknofont{%%
+  \nvt@fatal{EEEK! Required fonts cannot be found.^^J%%
+    \spii Novelette ships with its own fonts.^^J%%
+    \spii They must be in a subdirectory of fonts/opentype^^J%%
+    \spii in your texmf-dist, texmf-local, or texmf home path.^^J%%
+    \spii If you are sure that they are there, try these shell commands:^^J%%
+    \spiv mktexlsr^^J%%
+    \spiv luaotfload-tool --cache=erase^^J%%
+    \spiv luaotfload-tool -u^^J%%
+    \spii Your last resort is to place the required fonts in the same folder^^J%%
+    \spii as the main document. If that also fails, then nothing else can be done.}
+}%%
+%%
+\RequirePackage{novelette-fontloader} %% Custom substitute for 'fontspec' package.
+\nvt@defaultfontfeatures{RawFeature={-tlig,kern}}
+%%
+
+
+%% REPLACEMENTS FOR 'tlig' FEATURE:
+%%   Unfortunately, the built-in 'tlig' feature always converts " to right curly quotes.
+%% That is, there are no "smart quotes". Although there have been coding attempts, "smart quotes"
+%% are likely to fail, due to language-specific and writer-specific usage. Even word processors
+%% will sometimes get them wrong.
+%%   Novelette does not use the 'tlig' font feature. Its fonts have the 'tlig' substitutions and
+%% ligatures built-in, with the exception of substituting quotedblright for quotedbl.
+%%   After a page is typeset, Lua inspects it for the presence of " characters. If any are seen,
+%% that is a problem. This does not affect code such as \char"2010 because the " is not typeset.
+%%   If you need the actual " character, \real{"} does the job. It typesets a character that
+%% looks and behaves like ordinary ", but is at a Unicode location where the Lua inspection
+%% does not see it as the " character. \real{`} and \real{'} are also available. This behavior
+%% relies on properties of the custom fonts.
+%%   Also, the fonts interpret ``` and ''' as (single nested within double) at both ends,
+%% but \enable{britq} changes the interpretation to (double nested within single). This does not
+%% switch single/double, but only affects how the triple symbols are interpreted.
+%%   Alas, many word processors interpet -- as emdash, instead of --- in TeX. To reduce the
+%% likelihood of error when files are exchanged, (emdash hyphen) is reduced to emdash. 
+
+
+
+%% Define the fonts, with default features:
+%% 'ccmp' breaks single-character IJ and ij into their two characters.
+%% 'ccmp' breaks single-character ff fi fl ffi ffi st into their two characters.
+%% 'liga' corrects possible problems with hyphens/dashes. It does not apply ff-style ligatures.
+%% 'ss03' changes whether ``` and ''' and ,,, are interpreted as American or British outer quotes.
+\adjustspacing=2 \protrudechars=2
+\emergencystretch=.5em
+%% LaTeX protrusion is supposed to make the margins appear straighter, by leaking glyphs into
+%% the margins. Bah! Never seen in popular fiction. Instead, the goal of Novelette is to prevent
+%% glyphs from leaking into the margins. Thus, negative protrusion for a few glyphs.
+\ifnvt@britq
+  \def\tmpfeat{RawFeature={ccmp,rlig,calt,dlig,ss03}}
+\else
+  \def\tmpfeat{RawFeature={ccmp,rlig,calt,dlig}}
+\fi
+\nvt@setmainfont{NoveletteSerif12}[\tmpfeat] %% Regular and Italic.
+  \expandglyphsinfont\the\font 20 20 5\relax %%
+  \rpcode\the\font 102=-40\relax %% f
+  \rpcode\the\font 320=-56\relax %% ldot
+  \rpcode\the\font 383=-40\relax %% longs
+  \rpcode\the\font 64256=-40\relax %% uniFB00=ff
+  \rpcode\the\font 65=-32 %% A
+  \rpcode\the\font 192=-32 %% Agrave
+  \rpcode\the\font 193=-32 %% Aacute
+  \rpcode\the\font 194=-32 %% Acircumflex
+  \rpcode\the\font 195=-32 %% Atilde
+  \rpcode\the\font 196=-32 %% Adieresis
+  \rpcode\the\font 197=-32 %% Aring
+  \rpcode\the\font 256=-32 %% Amacron
+  \lpcode\the\font 65=-32 %% A
+  \lpcode\the\font 192=-32 %% Agrave
+  \lpcode\the\font 193=-32 %% Aacute
+  \lpcode\the\font 194=-32 %% Acircumflex
+  \lpcode\the\font 195=-32 %% Atilde
+  \lpcode\the\font 196=-32 %% Adieresis
+  \lpcode\the\font 197=-32 %% Aring
+  \lpcode\the\font 256=-32 %% Amacron
+  \lpcode\the\font 198=-32 %% AE
+  \lpcode\the\font 74=0\relax %% J
+  \lpcode\the\font 106=0\relax %% j
+  \lpcode\the\font 567=0\relax %% uni0237=dotlessj
+\itshape
+  \expandglyphsinfont\the\font 20 20 5\relax
+  \rpcode\the\font 102=-53\relax %%
+  \rpcode\the\font 320=-48\relax %%
+  \rpcode\the\font 383=-53\relax %%
+  \rpcode\the\font 64256=-53\relax %%
+  \lpcode\the\font 74=-66\relax %%
+  \lpcode\the\font 106=-70\relax %%
+  \lpcode\the\font 567=-70\relax %%
+\upshape
+\def\setmainfont{\nvt@fatal{Sorry, you cannot \string\setmainfont. It is set automatically.}}
+%%
+
+
+%% Main text never uses a sans font. Since LaTeX expects a sans font, Novelette cheats!
+%% The 'sans' font is serif, but for use only where text is scaled small: footnotes and
+%% possibly the block environment (when in display zone). The glyphs are designed for this size.
+\nvt@setsansfont[Scale=.875,\tmpfeat]{NoveletteSerif10} %% Only used within \nvt@small.
+\sffamily
+  \expandglyphsinfont\the\font 20 20 5\relax
+  \rpcode\the\font 102=-40\relax %%
+  \rpcode\the\font 320=-56\relax %%
+  \rpcode\the\font 383=-40\relax %%
+  \rpcode\the\font 64256=-40\relax %%
+  \rpcode\the\font 65=-32 %% A
+  \rpcode\the\font 192=-32 %% Agrave
+  \rpcode\the\font 193=-32 %% Aacute
+  \rpcode\the\font 194=-32 %% Acircumflex
+  \rpcode\the\font 195=-32 %% Atilde
+  \rpcode\the\font 196=-32 %% Adieresis
+  \rpcode\the\font 197=-32 %% Aring
+  \rpcode\the\font 256=-32 %% Amacron
+  \lpcode\the\font 65=-32 %% A
+  \lpcode\the\font 192=-32 %% Agrave
+  \lpcode\the\font 193=-32 %% Aacute
+  \lpcode\the\font 194=-32 %% Acircumflex
+  \lpcode\the\font 195=-32 %% Atilde
+  \lpcode\the\font 196=-32 %% Adieresis
+  \lpcode\the\font 197=-32 %% Aring
+  \lpcode\the\font 256=-32 %% Amacron
+  \lpcode\the\font 198=-32 %% AE
+  \lpcode\the\font 74=0\relax %%
+  \lpcode\the\font 106=0\relax %%
+  \lpcode\the\font 567=0\relax %%
+\itshape
+  \expandglyphsinfont\the\font 20 20 5\relax %%
+  \rpcode\the\font 102=-53\relax %%
+  \rpcode\the\font 320=-48\relax %%
+  \rpcode\the\font 383=-53\relax %%
+  \rpcode\the\font 64256=-53\relax %%
+  \lpcode\the\font 74=-66\relax %%
+  \lpcode\the\font 106=-70\relax %%
+  \lpcode\the\font 567=-70\relax %%
+\upshape
+\def\setsansfont{\nvt@fatal{Sorry, you cannot \string\setsansfont. It is set automatically.}}
+\let\nvt@sffamily\sffamily
+\let\sffamily\relax
+\normalfont
+%%
+
+
+%% Small text, for footnotes and some block environments:
+%%   Novelette does not honor standard LaTeX font size commands, such as \small.
+%% Reduced-size text may only be used in footnotes (required there), and in the block environment
+%% when the block is in a display zone, and the [small] option is set.
+%%   The NoveletteSerif10 fonts are designed to be stylistically compatible with NoveletteSerif12,
+%% at Scale=.875. They are loaded that way. This method ensures that variations in main font size,
+%% due to different layouts, are proportionately followed at small size.
+%%   In usage, vspace and struts are used above and below the small text, to ensure that there
+%% is standard clearance to surrounding normal-size text.
+\def\nvt@small{\nvt@sffamily\setlength\baselineskip{.875\nvt@bls}}
+%%
+
+
+%% Novelette never uses a monospace (tt) font. Since LaTeX expects a mono font, Novelette cheats!
+%% The 'mono' font will be whichever non-mono font was requested for page headers/numbers.
+\nvt@setmonofont[]{NoveletteSerif12}[\tmpfeat]
+\def\setmonofont{\nvt@fatal{Sorry, you cannot \string\setmonofont. It is set automatically.}}
+\let\nvt@ttfamily\ttfamily
+\let\ttfamily\relax
+
+
+%% These fonts are only used in certain locations.
+%% They do not need expansion or protrusion. The macros that use them, kern the text with uni200D.
+\nvt@newfontface\nvt@dark{NoveletteSans-Dark}
+\nvt@newfontface\nvt@thick{NoveletteSans-Thick}
+\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}
+\nvt@newfontface\nvt@black{NoveletteSans-Black}
+\nvt@newfontface\nvt@wide{NoveletteSans-Wide}
+\nvt@newfontface\nvt@thin{NoveletteSans-Thin}
+%%
+\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}
+\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}
+\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}
+\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}
+%%
+\def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
+%%
+
+
+%% HANDLE \char"HHHH CODES:
+%%   Some decorative characters are only in NoveletteSerif12-Regular. When these are requested,
+%% this adapted definition automatically switches the font.
+\let\nvt@tmpchar\char\relax
+\def\char#1#2#3#4#5{%%
+  \begingroup%%
+    \def\tmpcode{#2#3#4#5}%%
+    \def\tmptest{2605}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2606}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2639}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{263A}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2660}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2661}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2662}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2663}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{266A}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{273D}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2740}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{2749}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{274B}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \def\tmptest{FFFC}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
+    \nvt@tmpchar"\tmpcode\relax%%
+  \endgroup\obeyspaces%% %%%%% obeyspaces?
+}%%
+%%
+
+
+%% UNICODE SYMBOLS:
+%%   Since Novelette has no math, and limited choice of language, many standard LaTeX symbols
+%% cannot be used. This code provides human-friendly error messages.
+\def\DeclareUnicodeSymbol#1#2{%%
+  \iffontchar\font #2\relax%%
+    \DeclareTextSymbol{#1}{TU}{#2}%%
+  \else%%
+    \def#1{%%
+      \nvt@warn{\string#1\space not defined in Novelette. Character is not in the fonts.}%%
+      \char"FFFD\relax%%
+    }%%
+  \fi%%
+}%%
+%%
+
+
+%% RE-DEFINE SOME CHARACTER COMMANDS:
+%%   LaTeX defines many commands that print a character. But many of these commands refer to
+%% math or other-language characters that are not in the custom fonts. If such characters are
+%% requested, that is a missing-character problem.
+%%   In a few cases, the characters are in the custom fonts, but Novelette disallows printing
+%% those characters. These commands re-define the commands so that they print the 'null set'
+%% character, which is not in the fonts. That is a problem, and print the missing character glyph.
+\DeclareUnicodeSymbol{\DJ}                  {"2205}
+\DeclareUnicodeSymbol{\dj}                  {"2205}
+\DeclareUnicodeSymbol{\i}                   {"2205}
+\DeclareUnicodeSymbol{\L}                   {"2205}
+\DeclareUnicodeSymbol{\l}                   {"2205}
+\DeclareUnicodeSymbol{\NG}                  {"2205}
+\DeclareUnicodeSymbol{\ng}                  {"2205}
+\DeclareUnicodeSymbol{\j}                   {"2205}
+\DeclareUnicodeSymbol{\textasciicaron}      {"2205}
+\DeclareUnicodeSymbol{\textasciibreve}      {"2205}
+\DeclareUnicodeSymbol{\textacutedbl}        {"2205}
+\DeclareUnicodeSymbol{\textgravedbl}        {"2205}
+\DeclareUnicodeSymbol{\texttildelow}        {"2205}
+\DeclareUnicodeSymbol{\textbaht}            {"2205}
+\DeclareUnicodeSymbol{\textpertenthousand}  {"2205}
+\DeclareUnicodeSymbol{\textreferencemark}   {"2205}
+\DeclareUnicodeSymbol{\textinterrobang}     {"2205}
+\DeclareUnicodeSymbol{\textfractionsolidus} {"2205}
+\DeclareUnicodeSymbol{\textlquill}          {"2205}
+\DeclareUnicodeSymbol{\textrquill}          {"2205}
+\DeclareUnicodeSymbol{\textdiscount}        {"2205}
+\DeclareUnicodeSymbol{\textcolonmonetary}   {"2205}
+\DeclareUnicodeSymbol{\textlira}            {"2205}
+\DeclareUnicodeSymbol{\textnaira}           {"2205}
+\DeclareUnicodeSymbol{\textwon}             {"2205}
+\DeclareUnicodeSymbol{\textdong}            {"2205}
+\DeclareUnicodeSymbol{\textpeso}            {"2205}
+\DeclareUnicodeSymbol{\textcelsius}         {"2205}
+\DeclareUnicodeSymbol{\textcircledP}        {"2205}
+\DeclareUnicodeSymbol{\textohm}             {"2205}
+\DeclareUnicodeSymbol{\textmho}             {"2205}
+\DeclareUnicodeSymbol{\textestimated}       {"2205}
+\DeclareUnicodeSymbol{\textleftarrow}       {"2205}
+\DeclareUnicodeSymbol{\textuparrow}         {"2205}
+\DeclareUnicodeSymbol{\textrightarrow}      {"2205}
+\DeclareUnicodeSymbol{\textdownarrow}       {"2205}
+\DeclareUnicodeSymbol{\Hwithstroke}         {"2205}
+\DeclareUnicodeSymbol{\hwithstroke}         {"2205}
+\DeclareUnicodeSymbol{\textsurd}            {"2205}
+\DeclareUnicodeSymbol{\textlangle}          {"2205}
+\DeclareUnicodeSymbol{\textrangle}          {"2205}
+\DeclareUnicodeSymbol{\textvisiblespace}    {"2205}
+\DeclareUnicodeSymbol{\textbigcircle}       {"2205}
+\DeclareUnicodeSymbol{\textmarried}         {"2205}
+\DeclareUnicodeSymbol{\textdivorced}        {"2205}
+\DeclareUnicodeSymbol{\textinterrobangdown} {"2205}
+%%
+\DeclareUnicodeSymbol{\figuredash}          {"2012}
+\DeclareUnicodeSymbol{\endash}              {"2013}
+\DeclareUnicodeSymbol{\emdash}              {"2014}
+\DeclareUnicodeSymbol{\okina}               {"02BB}
+%%
+
+
+%% Dutch (applies in any language):
+%%   IJ and ij are split to their two letters, directly by the fonts (ccmp feature).
+%% In print, \IJacute and \ijacute place acute (not dot) over both letters. Also smcp.
+\def\IJacute{{\nvt@aff{RawFeature={+ss16}}IJ}}
+\def\ijacute{{\nvt@aff{RawFeature={+ss16}}ij}}
+\def\j{\nvt@warn{\string\j\space is undefined in Novelette. Did you need \string\ijacute\space?}j}
+%%
+
+
+%% Catalan ele geminada (works in any language):
+%%   Note that this uses middot (periodcentered), not ordinary period.
+%% The elevation and spacing is set by font 'calt' feature.
+\def\Lgem{L·L}\def\lgem{l·l}
+%%
+
+
+%% Detect if accent is allowed or disallowed:
+\let\nvt@addunicodeaccent\add@unicode@accent\relax
+\def\add@unicode@accent#1#2{%%
+  \directlua{nvt.getcharaccent('\luaescapestring{#1}','\luaescapestring{#2}')}%%
+  \ifnum\tmpnum=1\relax\nvt@addunicodeaccent{#1}{#2}\fi%%
+  \ifx\emtwo\@empty\else\nvt@warn{\emtwo}\fi%%
+}%%
+%%
+
+
+%% Other corrections:
+\def\@enc@info#1{} %% Silence unnecessary info.
+\DeclareUnicodeCommand\textquotesingle{{\nvt@aff{RawFeature={+ss19}}'}}
+\DeclareUnicodeCommand\textasciigrave{{\nvt@aff{RawFeature={+ss19}}`}}
+\DeclareUnicodeCommand\textquotedbl{{\nvt@aff{RawFEature={+ss19}}"}}
+\DeclareUnicodeCommand{\textnonbreakinghyphen}{\char"2011}
+\DeclareUnicodeCommand{\textfiguredash}{\char"2012}
+\DeclareUnicodeCommand{\texthorizontalbar}{\char"2015}
+\DeclareUnicodeCommand{\textasteriskcentered}{\char"2217}
+\DeclareUnicodeCommand\textcommabelow[1]{%%
+  \nvtwarn{\string\textcommabelow\space is undefined in Novelette, page \thepage}\char"FFFD%%
+}%%
+%%
+
+
+%% Only NoveletteSerif12-Regular and NoveletteSerif10-Regular have small caps. Numerals default
+%% to lining, but these fonts (also Italic) have oldstyle feature.
+%%   Setting \disable{oldstyle} neutralizes \onum (its text is printed, but not oldstyle).
+%% Then, if you use \onum repeatedly, but change your mind, you do not have to edit-out
+%% all of the \onum commands.
+\long\def\onum#1{\ifnvt@nooldstyle{#1}\else{\nvt@aff{RawFeature={+onum}}#1}\fi}
+%% \SMCP converts uppercase and lowercase to small caps. May also use \onum.
+\long\def\SMCP#1{{\nvt@aff{RawFeature={+c2sc,+smcp}}#1}}%%
+\let\Smcp\SMCP %% Convenience.
+%% \smcp converts only lowercase to small caps. Also numerals to oldstyle (even if disabled).
+\long\def\smcp#1{{\nvt@aff{RawFeature={+smcp}}#1}}
+%% Some combinations, such as 3-7 or M-H, automatically raise the hyphen to uppercase height.
+%% This also applies to dashes and some symbols. But if the automatic change is wrong,
+%% you may manually fix it, using \up{char} or \dn{char}, like this: P\up{-}Q, 2\dn{+}2.
+\long\def\up#1{{\nvt@aff{RawFeature={+case}}#1}}
+\let\case\up %% Alias.
+\long\def\dn#1{{\nvt@aff{RawFeature={-case}}#1}}
+\let\down\dn %% Alias.
+\newif\ifnvt@initalic %% True within \textit. %%%%%
+\let\nvt@origtextit\textit
+\long\def\textit#1{\nvt@origtextit{#1\nvt@initalictrue}}
+\let\it\textit %% Alias.
+\def\em{\nvt@warn{Novelette does not use \string\em. Maybe try \string\it{text in Italics}.}}
+\def\strong{\nvt@warn{Novelette does not use \string\strong. No bold!}} %% No bold.
+%%
+
+
+%% Novelette re-defines some spacing macros, so that the actual character is inserted.
+%% This allows fonts to internally kern against these characters. They are still glue,
+%% but only stretch as characters stretch, not as spaces stretch.
+\protected\def~{%%
+  \ifincsname%%
+    \expandafter~%%
+  \else%%
+    \ifnvt@real%%
+      \detokenize{~}%%
+    \else%%
+      \leavevmode\nobreak\hspace{.12em plus .06em minus .1em}%%
+    \fi%%
+  \fi%%
+}%%
+\def\,{\leavevmode\nobreak\hspace{.12em plus .06em minus .1em}}
+\def\:{\leavevmode\nobreak\hspace{.12em plus .06em minus .1em}}
+\def\;{\leavevmode\nobreak\hspace{.12em plus .06em minus .1em}}
+\def\numero{\char"2116}
+\def\agus{\char"204A} %% Tironian et
+\def\onequarter{\char"00BC}
+\def\onehalf{\char"00BD}
+\def\threequarters{\char"00BE}
+\def\bullet{\char"2022}
+\def\|{\char"2016} %% double vertical bar
+\def\brokenbar{\char"00A6}
+\def\deg{\char"00B0}\let\degree\deg
+\def\min{\char"2032}\let\minute\min\let\prime\min
+\def\sec{\char"2033}\let\second\sec
+\let\bracketleft\textbracketleft
+\let\leftbracket\textbracketleft
+\let\bracketright\textbracketright
+\let\rightbracket\textbracketright
+\let\braceleft\textbraceleft
+\let\leftbrace\textbraceleft
+\let\braceright\textbraceright
+\let\rightbrace\textbraceright
+\let\tilde\textasciitilde
+\let\circumflex\textasciicircumflex
+\def\grave{\real{`}}
+\def\acute{\real{´}}
+%% Novelette does not need math mode for degree, minute, second.
+%% If {\deg} is immediately followed by C or F, a ligature results, with C or F scaled to lining.
+\def\deg{\char"00B0}
+\def\min{\char"2032}
+\def\sec{\char"2033}
+%% Normally, ` `` ' '' become curly, " is a problem, and ~ is non-breaking space.
+%% \real first applies the ligatures, then straightens the quotes to ' or ", grave to `.
+%% Combinations ``` and ''' become "' '" or reversed when \enable{britq}.
+%% \real{~} is equivalent to \textasciitilde.
+\newif\ifnvt@real
+\def\real#1{{\nvt@realtrue\nvt@aff{RawFeature={+ss19}}#1}}
+%% \TODO{memo} prints a placeholder glyph, with non-printing memo:
+\def\TODO#1{\char"FFFC}
+\let\ToDo\TODO\relax\let\todo\TODO\relax\let\Todo\TODO\relax
+\def\text{\nvt@err{There is no \string\text\space command. %%
+  Did you mean \string\next\space or \string\maintext\space?}}
+%% The \kern macro is hard to read, and unfortunately allows absolute lengths.
+%% Typical vertical stem width is about .08em. \sk{number} kerns that number of typical stems.
+%% Value of the number is likely to be in the range -.5 to .5 without units.
+\DeclareDocumentCommand\sk{m}{%%
+  \begingroup%%
+  \directlua{nvt.parsesk('\luaescapestring{#1}')}%% also do the math
+  \ifnum\tmpreturn=1\relax%%
+    \kern\tmpkern em%%
+  \else%%
+    \nvt@warn{Bad value for \string\sk{value}. Must be number, without units.^^J%%
+      \spii Braces are required. See Novelette docs.}%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% Ain't got no stinking bold, slant, swash. No \sf or \tt except where controlled internally:
+\let\rm\relax
+\let\sf\relax
+\let\tt\relax
+\let\bf\relax
+\let\sl\relax
+\def\sc{\nvt@warn{\string\sc\space not available. See \string\smcp\space and related macros.}}
+\let\bfseries\relax
+\let\mdseries\relax
+\let\slshape\relax
+\let\scshape\relax
+\let\ulcshape\relax
+\let\swshape\relax
+\let\sscshape\relax
+\let\textrm\relax
+\let\textsf\relax
+\let\texttt\relax
+\let\textbf\relax
+\let\textmd\relax
+\let\textsl\relax
+\let\textsc\relax
+\let\textulc\relax
+\let\textsw\relax
+\let\textssc\relax
+%%
+
+
+%%
+\endinput
+%% End of file 'novelette-fonts.sty'.

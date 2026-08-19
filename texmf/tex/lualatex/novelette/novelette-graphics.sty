@@ -1,0 +1,453 @@
+%% This is file novelette-graphics.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-graphics}[2026-04-25 Graphics]
+
+
+%% OVERVIEW:
+%%   Novelette does not use standard LaTeX graphics commands, such as \includegraphics. You cannot
+%% create vector (TiKz) drawings, or include eps/pdf files.
+%%
+%% A) Allowed Locations: You may never place an image in footnotes or page headers. You may never
+%% place an image inline with ordinary text; place it between paragraphs, where the image will be
+%% its own paragraph.
+%%   Suggestion: Your book's title page should be attractive. Since Novelette does not allow
+%% fonts other than its own, you may create a dramatic effect by creating all (or most) of the
+%% title page as an image, with rasterized text in decorative fonts.
+%%
+%% B) File Storage: Image files must be stored in the same folder as the main document, or in
+%% a subfolder from there. You may not load files via absolute path, or by using ../ to rise
+%% folder level, or by symlinks (soft links). The path may not use the ~ character. No spaces.
+%%   This ensures that when you make a backup copy of your main document folder, its images
+%% will also be copied.
+%%   For testing purposes, Novelette provides a few images in its own tex/lualatex/novelette
+%% folder. These images can be used by filename alone, without path.
+%%
+%% C) File Format: All graphics must be raster png format. They may be monochrome black/white
+%% at 1-bit per pixel, or single-channel grayscale (not RGB, no alpha) at 8-bits per pixel.
+%%   Recommended resolution (density) is 600 or more pixels/inch (up to 1200) for monochrome,
+%% 300 pixels/inch (rarely anything else) for grayscale.
+%%   Tech note: The images are not stored in PDF as png format, but are decompressed/recompressed
+%% to a png-like format internal to PDF.
+%%   In preview and final modes, Novelette inspects image files for PDF/X-1a:2001 conformance.
+%% They must meet the above requirements, and have no color profile or private metadata. Although
+%% graphics arts experts know how to do this when the image is created, most ordinary users
+%% (and some experts) get it wrong. So Novelette provides shell scripts that correct mistakes.
+%% See folder 'doc/lualatex/novelette/utilities' for instructions.
+%%
+%% D) Size: The maximum height of an \image must be specified by [lines=L] option of the \image
+%% command, for integer L. If you fail to specify [lines=L], it is an error.
+%%   This creates a gap of L normal text lines, in which the \image sits. If shorter than that,
+%% the \image is padded. If too tall to fit, error; then the \image is not printed, and a fitting
+%% placeholder prints instead.
+%%   The maximum width of an \image is the text line width.
+%%
+%% E) Horizontal Alignment: An image can be aligned to left, right, or center. This is specified
+%% by [align=A] option of the \image command. A is one of left, right, center. Default center.
+%%
+%% F) Vertical Alignment: When an image is shorter than the gap reserved by its [lines=L] option,
+%% it will be padded above and/or below. Option [tweak=T] adjusts the padding. [tweak=up] prints
+%% the image with all padding below; [tweak=down] prints with all padding above; [tweak==mid]
+%% (default) splits the padding. [tweak=drop] is as low as the image can go, lower than down;
+%% it should only be used when the image is a scene separator.
+%%
+%% G) Floats: Pay attention! Novelette floats are similar to standard LaTeX floats, but have
+%% slightly different possible choices and behavior.
+%%   In some locations, an image may not float; a float request is ignored, and warning issued.
+%% No floats allowed in frontmatter, backmatter, or display zones. Elsewhere, which is between
+%% paragraphs of ordinary main text in mainmatter, an image may float.
+%%   Standard LaTeX allows each image to request one or more float possibilities. Novelette
+%% only allows one choice per image, set by [float=F] option of the \image command. F may be only
+%% one of: none, here, top, bottom. [float=none] is forced, where floats are disallowed.
+%% [float=here] is the default elsewhere, with automatic alternative 'top' if 'here' does not fit.
+%%   There are no page floats. Looks ugly in fiction. Instead, create a component (between others)
+%% containing the image. If the height of the image exceeds 20 lines, then the component must
+%% use the [single] option.
+%%
+%% H) General Advice: Print services recommend that line art use line width at least 0.75pt.
+%% That is useful advice, but it is not enforced by Novelette or by the printers.
+%%   Print services, and online user forums, insist that grayscale image avoid very light and
+%% very dark grays. Remember that your book will not be printed by a method that is intended
+%% for photographic reproduction. When you process images using Novelette's shell scripts,
+%% near-black will be forced to black, and near-white will be forced to white.
+%%   Novelette expects that your use of images will be rare. If your book is a graphic novel,
+%% or other image-intensive work, then Novelette is not for you.
+%%
+%% I) Placeholders: Novelette wants you to 'write now, do graphics later'.
+%%   In draft mode, the \image command does not look for its files. You may use empty braces where
+%% the file name should be, or write a brief reminder of what the image (when created) will mean.
+%% A placeholder (gray rectangle) will print. The placeholder will have the correct alignment,
+%% vertical lines displacement, and float. Only its width is arbitrary. Later, when you have
+%% the actual image, it will replace the placeholder at that exact location.
+%%   If you already have the image file, \image* (with asterisk) will print it, as long as it
+%% fits within its reserved number of lines. Else, error and placeholder. But the image file
+%% will not be tested for all conformance specifications, since that takes time.
+%%   In preview and final modes, \image and \image* are identical. The image must exist, must fit,
+%% and must meet all specifications. Else, error and placeholder.
+%%
+%% J) Text Color: In short, text cannot be color. It cannot be grayscale. All text must be black.
+%%   There is no 'gray ink' in the method that will be used to print your book. If Novelette
+%% allowed gray text, the printer would convert it to raster image. Although most printers can
+%% do that, online forums suggest that the results are unpredictable, and outside your control.
+%%   If you need gray text, rasterize it to a png image, instead of letting the printer do it.
+%% Be sure that the text is bold or heavy, and not too small. Test the result on a home printer,
+%% using only black ink (no CMY ink).
+%%   Tech note: Large-volume commercial presses may have gray ink, even several shades of gray!
+%% They are 'spot colors' pre-mixed to specifications, not CMYK. But this is not available to you.
+%%   Developer note: In 'dev' mode, Novelette applies gray shades to certain areas, so that
+%% layout and alignment can be visualized. This shading is not available to ordinary users.
+
+
+%% IMAGE: \image[option]{path/to/filename.png}  also starred version.
+%%   The optional argument is not truly optional, because it must at least set the number of lines
+%% that the image will displace. The default (3 lines) is a placeholder, and is an error.
+%%   In draft mode, the  mandatory argument may be left empty, or you may write a very short
+%% description (such as "map of Whereville"). This is because \image will not look for a file.
+%%   But the starred \image* always looks for a file. In preview and final modes, you must provide
+%% the file, whether \image or \image*.
+\def\ftype@figure{1} %% Standard.
+\def\nvt@imgrulewd{0pt} %% Nonzero in dev mode. Applies to strut that enforces lines=L.
+\def\nvt@offspec{{\upshape\normalfont\nvt@aff{RawFeature={+cv99}}\char"FFFD}} %% An error symbol.
+\DeclareDocumentCommand\image{sO{}m}{%%
+  \begingroup%%
+  \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnum\tmpok=0\relax%%
+    \nvt@err{Cannot place \string\image\space in footnote or page header.^^J%%
+      Cannot place \string\image\space in \string\name, \string\subname, %%
+      or block environment.}%%
+    {\char"FFFD}%%
+  \fi%%
+  \ifnvt@inscenetext%%
+    \nvt@err{Cannot place \string\image\space in \string\scenetext.^^J%%
+      Try the \string\sceneimage\space command.}%%
+    \def\tmpok{0}%%
+  \fi%%
+  \ifnum\tmpok=1\relax%%
+    \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
+    \def\tmpimgalign{0}\def\tmptweak{0}\def\tmplines{0}\def\tmpvalidate{0}%%
+    \ifnvt@indisplay\def\tmpfloat{0}\else\def\tmpfloat{1}\fi%%
+    \ifnvt@infrontmatter\def\tmpfloat{0}\fi%%
+    \ifnvt@inbackmatter\def\tmpfloat{0}\fi%%
+    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph.
+    \catcode`\~=12\def\zopt{#2}%% Otherwise, ~ would be undetected here.
+    \IfBooleanTF{#1}%%
+      {\directlua{nvt.parseimage('star','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
+    \ifnum\tmplines>20\relax%%
+      \ifnvt@compsingle\else\def\tmpimgreturn{0}\fi%%
+    \fi%%
+    \ifnum\tmpimgreturn=0\relax%%
+      \nvt@err{Bad \string\image\space option [\zopt].^^J%%
+        \spii Format: [lines=L,align=A,float=F,tweak=T]^^J%%
+        \spiv L -> Integer 1<=L<=20. Must be set.^^J%%
+        \spix Exception: In component with [single] option, max L= lines per page.^^J%%
+        \spiv A -> left right center. Default center.^^J%%
+        \spiv F -> none here top bottom. Choose only one.^^J%%
+        \spix If here, then top is automatic backup.^^J%%
+        \spix In frontmatter, backmatter, displays: default none. No other allowed.^^J%%
+        \spix Elsewhere: default here.^^J%%
+        \spiv T -> down up mid. Default mid.^^J%%
+        \spix down ->  Bottom of image at baseline of lowest displaced line.^^J%%
+        \spix up -> Top at accented uppercase height of highest displaced line.^^J%%
+        \spix mid -> Splits padding above/below image.}%%
+    \fi%%
+    \ifnum\tmpimgalign=-1\relax\def\imgleft{}\def\imgright{}\fi%% \sceneimage
+    \ifnum\tmpimgalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpimgalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpimgalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
+    \ifnum\tmplines=0\relax%%
+      \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=linesPerPage.}%%
+      \def\tmplines{3}%% Placeholder default. Almost always an incorrect value.
+    \fi%%
+    \ifnum\tmpisfile=0\relax\def\imgfake{1}\fi%%
+    \ifnum\tmpisfile=1\relax%%
+      \IfFileExists{#3}{%%
+        \def\imgfake{0}%%
+      }{%%
+        \nvt@err{Missing image file #3.^^J%%
+          \spii The path and filename have correct format, but the file is not there.^^J%%
+          \spii Either you mis-spelled the path or filename, or no such file.}%%
+        \def\imgfake{1}%%
+      }%%
+    \fi%%
+    \ifnum\tmpisfile=2\relax%%
+      \nvt@err{Bad image argument {#3}.^^J%%
+        \spii There are several possibilities:^^J%%
+        \spiv 1. Image filename does not have .png file extension.^^J%%
+        \spiv 2. Path to image file is not relative to main document.^^J%%
+        \spix Do not use path relative to sub-documents.^^J%%
+        \spix Do not use absolute path, or symlink (softlink).^^J%%
+        \spiv 3. Image file is not in same folder as main document,^^J%%
+        \spix or in subfolder from main document (max 5 levels).^^J%%
+        \spiv 4. Path or filename has forbidden characters.^^J%%
+        \spix You may use hyphen or underscore, but not space or tilde.}%%
+      \def\imgfake{1}%%
+    \fi%%
+    \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
+    \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
+    \ifnum\tmpfloat=2\relax\def\fps@figure{!t}\fi%%
+    \ifnum\tmpfloat=3\relax\def\fps@figure{!b}\fi%%
+    \ifnvt@indisplay%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+      \def\fps@figure{}%%
+    \fi%%
+    \ifnvt@infrontmatter%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+      \def\fps@figure{}%%
+    \fi%%
+    \ifnvt@inbackmatter%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+      \def\fps@figure{}%%
+    \fi%%
+    \ifnum\imgfake=0\relax\nvt@realimage{#3}\else\nvt@fakeimage\fi%%
+    \nvt@printimage%%
+    \par\vspace*{-\nvt@bls}\null%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% Fake image, placeholder rectangle:
+\def\nvt@fakeimage{%%
+  \ifnvt@insceneimage%%
+    \def\imgwd{2in}\def\imght{.24in}%%
+  \else%%
+    \edef\imgwd{\fpeval{0.6*\textwidth}pt}%%
+    \edef\imght{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls}pt}%%
+  \fi%%
+  \sbox0{{\nvt@gray{8}\rule{\imgwd}{\imght}}}%%
+  \def\imglabel{{\nvt@gray{4}\nvt@aff{RawFeature={+titl},Scale=.75}\tmplabel}}%%
+}%%
+%%
+
+
+
+%% SCENEIMAGE: \sceneimage[option]{content}  also starred command.
+%%   When a scene break is an image, you can use \image. But in many cases, that will not provide
+%% the vertical spacing that you need.
+%%   The \sceneimage command behaves like \scenetext, in terms of its vertical space. However,
+%% the content is interpreted the way that \image interprets its content. That is, in draft mode
+%% it prints a gray placeholder rectangle; in preview or final mode, the content is used as
+%% path/to/filename.png. You do not write the \image command. \sceneimage* uses \image*.
+%%   The only option is [align=A] where A is one of left, right, center. Default center.
+%% Unlike \image, you have no choice for number of lines, or tweak. The image never floats.
+%% Width of image cannot exceed 3.5in. Height of image cannot exceed 0.24in. These values are
+%% regardless of page layout. The image will be auto-tweaked for best results.
+%%   As with \scenetext, the first line of the scene gap is omitted at the top of a page, and the
+%% following paragraph is not indented.
+\newif\ifnvt@sistar
+\newif\ifnvt@insceneimage
+\DeclareDocumentCommand\sceneimage{sO{}m}{%%
+  \par\edef\tmppgtot{\fpeval{\pagetotal = 0pt}}%%
+  \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
+  \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
+  \begingroup\setlength\parindent{0pt}%%
+  \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@inscenetext\def\tmpok{0}\fi%%
+  \ifnvt@insceneimage\def\tmpok{0}\fi%%
+  %% test content for macros, ~ etc.
+  \ifnum\tmpok=0\relax%%
+    \nvt@err{Command \string\sceneimage\space cannot be nested in itself,^^J%%
+      \spii or used in \string\scenetext, \string\name, \string\subname, or block environment.}%%
+    \char"FFFD\nvt@par%%
+  \else%%
+    \nvt@insceneimagetrue%%
+    \directlua{nvt.parsescenestyle('\luaescapestring{#2}','scene')}%%
+    \ifnum\tmpscreturn=1\relax%%
+      \ifnum\tmpscalign=0\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{\hfill\strut}\fi%%
+      \ifnum\tmpscalign=1\relax\def\tmpscleft{}\def\tmpscright{\hfill\strut}\fi%%
+      \ifnum\tmpscalign=2\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{}\fi%%
+      \IfBooleanTF{#1}{\nvt@sistartrue}{\nvt@sistarfalse}%%
+      \ifnvt@sistar\image*[type=scene]{#3}\else\image[type=scene]{#3}\fi%%
+    \else%%
+      \nvt@err{Bad \string\sceneimage[option]{content} command.^^J%%
+      \spii Option: [align=A]^^J%%
+      \spiv A -> left right center. Default \nvt@scalign.}%%
+      \char"FFFD\nvt@par%%
+    \fi%%
+  \fi%%
+  \endgroup\nopagebreak\blankline%%
+}%%
+%%
+
+
+%% Real image (if bad, defaults to fake):
+\def\nvt@realimage#1{%%
+  \sbox0{#1}\def\imglabel{}%%
+  \edef\tmpht{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls}pt}%%
+  \edef\tmpfit{\fpeval{(\ht0 > \tmpht) + (\wd0 > \textwidth)}}%%
+  \ifnum\tmpfit>0\relax%%
+    \nvt@warn{Image #1 is too large.^^J%%
+      \spii Reduce image width and/or height, or increase [lines=L] option.}%% %%%% \sceneimage ?
+    \def\tmplabel{oversize image}\nvt@fakeimage%%
+  \else%%
+    \def\tmpvalid{1}%%
+    \ifnum\tmpvalidate=1\relax\nvt@validateimage{#1}\fi%%
+    \ifnum\tmpvalid=0\relax%%
+      \nvt@warn{Image file #1 failed validation.^^J%%
+        See Novelette docs for how to fix this problem.^^J%%
+        Cannot produce preview or final mode, if any image is not valid.}%%
+      \def\tmplabel{failed validation}\nvt@fakeimage%%
+    \else%%
+      \@ifundefined{#1 image:I}{%%
+        \saveimageresource attr{/Interpolate true}{#1}%%
+        \sbox0{\useimageresource\lastsavedimageresourceindex}%%
+        \expandafter\xdef\csname #1 image:I\endcsname
+          {\useimageresource\the\lastsavedimageresourceindex}%%
+        \wlog{<#1, id=\the\lastsavedimageresourceindex, interpolate=true>}%%
+      }{%%
+        \sbox0{\csname #1 image:I\endcsname}%%
+      }%%
+    \fi%%
+  \fi%%
+}%%
+%%
+
+
+%% Print the real or fake image:
+\def\nvt@printimage{%%
+  \ifnvt@insceneimage%% %%%%%
+    \edef\imgruleht{\fpeval{\nvt@bls}pt}%%
+  \else%%
+    \edef\imgruleht{\fpeval{\tmplines*\nvt@bls}pt}%%
+  \fi%%
+  \ifnum\tmptweak=0\relax\edef\tmppad{\fpeval{.5*(.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0)}pt}\fi%%
+  \ifnum\tmptweak=1\relax\edef\tmppad{\fpeval{.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0}pt}\fi%%
+  \ifnum\tmptweak=2\relax\def\tmppad{0pt}\fi%%
+  \ifnvt@insceneimage\edef\tmppad{\fpeval{.117in - \ht0}pt}\fi%% %%%%%
+  \ifx\fps@figure\@empty\else\@float{figure}\fi%%
+  \nvt@zrule\imgleft\rule{\nvt@imgrulewd}{\imgruleht}%%
+  \smash{\raisebox{\tmppad}{\usebox0}}%%
+  \ifx\imglabel\@empty\else\llap{\smash{\raisebox{\tmppad}{\imglabel}}}\fi%%
+  \imgright\nvt@zrule\par%%
+  \ifx\fps@figure\@empty\else\end@float\fi%%
+}%%
+%%
+
+
+%% Image file validation:
+\def\nvt@validateimage#1{%%
+  \directlua{nvt.validateimage('\luaescapestring{#1}')}%%
+}%%
+%%
+
+
+
+%% GRAY DEFINITIONS:
+%%   Novelette does not allow grayscale text, just grayscale images. No color anywhere.
+%% This code allows the developer to apply background shades of gray, for showing certain areas.
+%% It also creates gray rectangles, for image placeholders. It is not used in a good final PDF.
+\chardef\main@pdfcolorstack=0\relax
+\@ifundefined{@pdfcolorstack}{\def\@pdfcolorstack{\main@pdfcolorstack}}{}
+\def\current@color{0 g 0 G}
+\def\set@color{%%
+  \pdfextension colorstack\@pdfcolorstack push{\current@color}\aftergroup\reset@color%%
+}%%
+\def\reset@color{\pdfextension colorstack\@pdfcolorstack pop\relax}
+\def\color@gray#1#2{\edef#1{#2 g #2 G}}
+\long\def\nvt@gray#1{%% #1 is unbraced integer 1-9 (1=darkest, 9=lightest).
+  \csname color@gray\endcsname\current@color{.#1}\set@color\ignorespaces%%
+}%%
+\def\nvt@luagray{%% When \enable{examine}.
+  \newattribute\LuaGray@Attribute
+  \let\LuaGray@setattribute\setattribute
+  \directlua{nvt.setattribute(\number\allocationnumber)}
+  \protected\def\set@color{%
+    \LuaGray@setattribute\LuaGray@Attribute{%
+      \directlua{nvt.get("\luaescapestring{\current@color}")}%
+    }%
+   \aftergroup\reset@color
+  }
+  \def\reset@color{}
+  \set@color
+}%%
+%%
+
+
+%% DEV MODE SHADING (developer only, unrelated to images):
+%%   In dev mode, the margins and baselines are shaded. This helps the developer write code
+%% for the size and placement of images, and for grid alignment after display.
+%%   The darkest gray vertical stripe, at left of verso and right of recto, is the glue area.
+%% On all sides, dark gray defines the minimum margins, where nothing may print. The top margin
+%% is the minimum. The bottom margin may be minimum; but if higher, it is medium gray.
+%%   Depending on trimsize and layout, the actual side margins may be wider than minimum.
+%% Medium gray stripes (if present) show where the actual side margins differ from minimum.
+%% Nothing may print in the actual side margins.
+%%   If the layout has header and/or footer, medium gray stripes show the gaps between them
+%% and the main text area. Nothing may print in those gaps.
+%%   Light gray stripes show the standard baseline for each line of text, and header/footer text.
+%% The top of the stripe is at baseline. Text may (and usually will) descend into the stripes.
+%%   The remaining white stripes are where text (other than descenders) prints. No text may
+%% rise above its area, into the descender stripe above it. In practice, it will not get close.
+%%   Off-grid elements (images, and anything within display) do not obey the shaded baselines.
+%% However, the following ordinary text will be restored to grid baselines.
+%%   In addition, the width of image struts is changed, so the struts become visible.
+\newcounter{nvt@shadecount} %% Used below.
+\def\nvt@shade#1#2#3#4#5{%% #1=integer gray value, #2=LLX, #3=LLY, #4=Width, #5=Height.
+  \put(1in+#2,-1in-\pageheight+#3){{\nvt@gray#1\rule{#4}{#5}}}%%
+}%%
+\def\nvt@devshade{%%
+  \AddToHook{shipout/background}{%%
+    \edef\tmptop{\fpeval{\pageheight-\topmargin}pt}%%
+    \nvt@shade7{0pt}{\tmptop}{\pagewidth}{\topmargin}%% actual top margin
+    \edef\tmprl{\fpeval{\tmptop-\headheight-\headsep-\nvt@bls}pt}%%
+    \ifnvt@hasheader%%
+      \edef\tmphs{\fpeval{\headsep-\nvt@bld}pt}%%
+      \edef\tmphb{\fpeval{\tmprl+\nvt@bls}pt}%%
+      \edef\tmphl{\fpeval{\tmphb+\tmphs}pt}%%
+      \edef\tmphd{\fpeval{\tmphb-\nvt@bld}pt}%%
+      \nvt@shade9{0pt}{\tmphl}{\pagewidth}{\nvt@bld}%% header baseline
+      \nvt@shade7{0pt}{\tmphb}{\pagewidth}{\tmphs}%% headsep, gap between header and main text
+      \nvt@shade9{0pt}{\tmphd}{\pagewidth}{\nvt@bld}%% virtual descender of line zero.
+    \fi%%
+    \setcounter{nvt@shadecount}{0}%%
+    \loop%%
+      \edef\tmpsl{\fpeval{\tmprl-\nvt@bld-\value{nvt@shadecount}*\nvt@bls}pt}%%
+      \nvt@shade9{0pt}{\tmpsl}{\pagewidth}{\nvt@bld}%% main text baselines
+      \stepcounter{nvt@shadecount}%%
+    \ifnum\value{nvt@shadecount}<\nvt@lines\relax%%
+    \repeat%%
+    \edef\tmpbot{\fpeval{\tmptop-\headheight-\headsep-\textheight-\footskip-\nvt@bld}pt}%%
+    \nvt@shade7{0pt}{0pt}{\pagewidth}{\tmpbot}%% actual bottom margin
+    \ifnvt@hasfooter%%
+      \edef\tmpfpm{\fpeval{\tmpsl-\footskip+\nvt@bls}pt}%%
+      \edef\tmpfmm{\fpeval{\footskip-\nvt@bld-\nvt@blh}pt}%%
+      \nvt@shade7{0pt}{\tmpfpm}{\pagewidth}{\tmpfmm}%% gap between main text and footer
+      \edef\tmpfdp{\fpeval{\tmpfpm-\nvt@bls}pt}%%
+      \nvt@shade9{0pt}{\tmpfdp}{\pagewidth}{\nvt@bld}%% footer baseline
+    \fi%%
+    %% minimum and actual side margins:
+    \ifodd\c@page%%
+      \nvt@shade7{0pt}{0pt}{\oddsidemargin}{\pageheight}%%
+      \nvt@shade7{\oddsidemargin+\textwidth}{0pt}{\evensidemargin}{\pageheight}%%
+      \nvt@shade3{0pt}{0pt}{\nvt@minspinemargin}{\pageheight}%%
+      \nvt@shade3{\pagewidth-\nvt@minmargin}{0pt}{\nvt@minmargin}{\pageheight}%%
+    \else%%
+      \nvt@shade7{0pt}{0pt}{\evensidemargin}{\pageheight}%%
+      \nvt@shade7{\evensidemargin+\textwidth}{0pt}{\oddsidemargin}{\pageheight}%%
+      \nvt@shade3{0pt}{0pt}{\nvt@minmargin}{\pageheight}%%
+      \nvt@shade3{\pagewidth-\nvt@minspinemargin}{0pt}{\nvt@minspinemargin}{\pageheight}%%
+    \fi%%
+    \nvt@shade3{0pt}{\pageheight-\nvt@minmargin}{\pagewidth}{\nvt@minmargin}%% minimum top margin
+    \nvt@shade3{0pt}{0pt}{\pagewidth}{\nvt@minmargin}%% minimum bottom margin
+    %% glue strips:
+    \ifodd\c@page%%
+      \nvt@shade2{0pt}{0pt}{\nvt@glue}{\pageheight}%%
+    \else%%
+      \nvt@shade2{\pagewidth-\nvt@glue}{0pt}{\nvt@glue}{\pageheight}%%
+    \fi%%
+  }%%
+}%%
+%%
+
+
+
+%%
+\endinput
+%% End of file 'novelette-graphics.sty'.

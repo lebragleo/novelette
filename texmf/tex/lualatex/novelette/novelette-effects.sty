@@ -1,0 +1,649 @@
+%% This is file novelette-effects.sty, part of Novelette document class.
+%% For Copyright and License, see accompaning file 'novelette.cls'.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{novelette-effects}[2026-04-25 Text Effects]
+
+
+%% OVERVIEW:
+%%   This file defines several environments and commands that are used for special text effects.
+%% Some of them may only be used in certain locations. Inappropriate usage will throw an error
+%% or warning, and the effect will be ignored.
+
+
+%% TABLE OF CONTENTS:
+%%   Most popular fiction does not have a table of contents. But if your book is a collection
+%% of short stories, or a novel with distinctive chapter names, then it might have the table.
+%%   Novelette cannot generate a table of contents. If you need one, you must design it yourself,
+%% and must manually write the page numbers after you know them (when almost finished).
+%%   The \next command is a placeholder. It prints ## there. Later, you will replace each \next
+%% with actual page numbers. If you request preview or final mode, any \next is an error.
+%%   To create the table, use a component, with option [toc]. The table name, and possibly other
+%% material, must precede \maintext. Then use a block environment to hold the table entries.
+%% The block may be [center] or symmetric side offsets. If using offsets, you will needto
+%% decide how much to use, depending on the length of entry texts.
+%%   Use the \entry{name}{page} command to create nice-looking entries. If the block is [center]
+%% then 6 spaced dots will separate the name from the page number (temporarily \next).
+%% If the block uses offsets, then the number of dots will be whatever is needed per-line.
+%% When an entry requires a short description, write it beneath its \entry.
+%%   Command \padentry{number} may be used, prior to the first \entry. The number is decimal
+%% from 0 to 1. This addes that amount of baselinekip above each \entry. For example,
+%% \padentry{0.5} adds half a baselineskip gap above each \entry. This is useful if you wish to
+%% stretch the table. for better visual balance.
+%%   You may use \image, but not within a block environment, so place any \image before or after
+%% the block of entries.
+%%   If your book has both a dedication and a table of contents, the table is second. However,
+%% if the decidation is short, you may cheat: Write it between the table name and the entries,
+%% instead of using a separate dedication page.
+%%   The table may extend to a second page (or more).
+\def\nvt@entrypad{0pt} %% Default.
+\DeclareDocumentCommand\padentry{m}{%% Argument is a decimal 0-2, multiple of baselineskip.
+  \ifnvt@indisplay%%
+    \directlua{nvt.parseentry('\luaescapestring{#1}')}%%
+    \ifnum\tmppad=-1\relax%%
+      \nvt@warn{Bad \string\padentry. Syntax: \string\padentry{decimal number from 0 to 2}.}%%
+    \else%%
+      \edef\nvt@entrypad{\fpeval{\tmppad*\nvt@bls}pt}%%
+    \fi%%
+  \else%%
+    \nvt@warn{Cannot use \string\padentry\space outside component environment.}%%
+  \fi%%
+}%%
+\DeclareDocumentCommand\entry{mm}{%% {name}{page}
+  \ifnvt@indisplay%%
+    \sbox0{#1 . . . #2}\edef\tmpl{\fpeval{\wd0>\linewidth}}%%
+    \ifnum\tmpl=1\relax\nvt@warn{\string\entry{#1}{#2} too long for one line.}\fi%%
+    \par\vspace*{\nvt@entrypad}\strut#1 \dotfill\space#2\strut\par%%
+  \else%%
+    \nvt@warn{Cannot use \string\entry\space outside display environment.}%%
+    \par\strut\sbox1{\char"FFFD\relax entry}%%
+    \char"FFFD\relax entry\hspace{-\wd1}\smash{\rule[-.25em]{\wd1}{1pt}}%%
+    \space cannot be used here.\par%%
+  \fi%%
+}%%
+%%
+
+
+%% BLANK PAGE: Never inserted automatically. For your own use, but only if necessary.
+\def\blankpage{%%
+  \clearpage\nvt@thispagestyle{empty}\null\clearpage\stepcounter{nvt@expectpage}%%
+}%%
+%%
+
+
+%% BLANK VERSO: Automatically inserted where necessary.
+\def\nvt@blankverso{%%
+  \clearpage%%
+  \ifodd\c@page\else%%
+    \nvt@thispagestyle{empty}\null\clearpage\stepcounter{nvt@expectpage}%%
+  \fi%%
+}%%
+%%
+
+
+%% BLANK LINE: \blankline
+%%   The simplest scene break is a blank line, although this may be used for other purposes.
+%% May repeat for more lines. The first line of text, following a \blankline, is not indented.
+%%   Also use \blankline in a display zone, to change where the first line of \maintext prints.
+\def\blankline{\par\null\@afterindentfalse\@afterheading}%%
+%%
+
+
+%% DINKUS:
+%%   This is the traditional typesetter term for a non-empty line, used as a scene break.
+%% A \dinkus is used instead of \blankline when the gap would be first or last on a page,
+%% where the blank line might not be noticed. It consists of three widely-spaced low asterisks.
+%% The following line is not indented.
+\def\dinkus{%%
+  \par\noindent%%
+  \nvt@center\strut\upshape\char"204E\hspace{2em}\char"204E\hspace{2em}\char"204E\par\nvt@endcenter%%
+  \@afterindentfalse\@afterheading%%
+}%%
+%%
+
+
+%% BLOCKLINE TEXT: Optional use with block environment.
+%%   Sometimes, a poem or epigraph will look best when the position of its block is determined
+%% by the width of a sample line of text, which may or may not be in the block itself.
+%%   You may set \blockline{line of text} before the block to which it applies. It remains
+%% effective until changed by another \blockline.
+%%   You may use Italics, small caps, and other features allowed in ordinary main text. However,
+%% the blockline width must not exceed the textwidth less two normal paragraph indents.
+%%   The blockline width is measured with beginning paragraph indent. If you need to use it with
+%% paragraph indent, write \blockline{\indent line of text} there.
+%%   The blockline text does not print. If you write that text in the block (the usual situation),
+%% it will not necessarily appear on a single line, unless it is the first line.
+\def\nvt@blockline{} %% Default empty.
+\def\nvt@sterr{%%
+  \nvt@err{Bad \string\blockline. Only one line: no wrap or \noexpand\\ or \string\par.}%%
+  \def\tmpok{no}%%
+}%%
+\long\def\blockline#1{%%
+  \begingroup\def\par{\nvt@sterr}\def\\{\nvt@sterr}\def\tmpok{}%%
+  \sbox0{#1}\ifx\tmpok\@empty\gdef\nvt@blockline{#1}\fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% BLOCK ENVIRONMENT:  \begin{block}[offset=L/R,align=A,text=T,indent=I] ... \end{block}
+%%   The block environment may be used for block quotes, epigraphs, poems, and other situations
+%% where the text is distinctive. The block may contain one or more paragraphs, and may span pages
+%% You may not place images within the block.
+%%   You may not nest a block within another. If a block is within a display, it is not affected
+%% by any size, font, or alignment commands outside the block.
+%%   You may nest the center environment within a block. The centered text will obey the sides
+%% set by the block.
+%%   Without options, the left side of the block is offset at twice the normal paragraph indent,
+%% and not offset at its right side. This is typical of block quotes. Text is normal font,
+%% normal size. Paragraphs are indented as usual.
+\newif\ifnvt@inblock %% True within block environment.
+\DeclareDocumentEnvironment{block}{O{}}{%%
+  \par\null\vspace{-\nvt@bls}\begingroup%%
+  \ifnvt@infootnote\nvt@fatal{Cannot place block within a footnote, page \thepage.}\fi%%
+  \ifnvt@inblock\nvt@fatal{Cannot nest a block within another, page \thepage.}\fi%%
+  \ifnvt@inheader\nvt@fatal{Cannot place block within page headers.}\fi%%
+  \nvt@inblocktrue%%
+  \def\tmpl{2}\def\tmpr{0}\def\tmpt{0}\def\tmpblockalign{0}%%
+  \ifnvt@indisplay%%
+    \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
+  \else%%
+    \directlua{nvt.parseblock('\luaescapestring{#1}','M')}%%
+  \fi%%
+  \vspace*{-\nvt@bls}\strut\par\rule{0pt}{\nvt@blh}%%
+  \ifnum\tmpt=1\relax\def\nvt@tmpt{1}\nvt@small\else\def\nvt@tmpt{0}\fi%%
+  \ifnum\tmpt=2\relax%%
+    \nvt@warn{Block option [small] cannot be used outside display zone. Ignored.}%%
+  \fi%%
+  \def\tmptest{s}\ifx\tmpl\tmptest%%
+    \sbox0{\nvt@blockline}%%
+    \edef\tmpz{\fpeval{((\textwidth-\wd0)<(2*\nvt@parindent))+(\wd0<4*\nvt@parindent)}}%%
+    \ifnum\tmpz>0\relax%%
+      \nvt@err{The \string\blockline\space is too wide or too narrow for the block.}%%
+      \edef\tmplind{\fpeval{2*\nvt@parindent}pt}\def\tmprind{0pt}%%
+    \else%%
+      \edef\tmplind{\fpeval{(\textwidth-\wd0)/2}pt}%%
+      \def\tmptest{s}\ifx\tmpr\tmptest\def\tmprind{\tmplind}\else\def\tmprind{0pt}\fi%%
+    \fi%%
+  \else%%
+    \edef\tmplind{\fpeval{\tmpl*\nvt@parindent}pt}%%
+    \edef\tmprind{\fpeval{\tmpr*\nvt@parindent}pt}%%
+  \fi%%
+%%    tex.sprint('\\setlength\\parindent{0pt}')
+%%    tex.sprint('\\hyphenpenalty 1000\\relax\\exhyphenpenalty 1000\\relax')
+%%    tex.sprint('\\doublehyphendemerits 10000\\relax\\finalhyphendemerits 10000\\relax{}')
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@err{Bad option for block. Unknown settings or bad side margins.^^J%%
+      \spii Format: [offset=L/R,align=A,text=T,indent=I]^^J%%
+      \spiv L/R may both be numbers (prefer integers), or s/s, or s/0. Default 2/0.^^J%%
+      \spix Numbers -> left/right offsets. Multiples of normal paragraph indent.^^J%%
+      \spix\spii Limits 0<=L<8, 0<=R<=8, (L+R)<=12.^^J%%
+      \spiv s/s and s/0 require prior \string\blockline{text}. See Novelette docs.^^J%%
+      \spix s/s -> Block width is width of blockline. Symmetrical offsets.^^J%%
+      \spix s/0 -> Block width is width of blockline. All ofset at left.^^J%%
+      \spix There is no 0/s. For that effect, manually break lines.^^J%%
+      \spiv T -> normal small. Default normal.^^J%%
+      \spix If small, reduced text size and baselineskip.^^J%%
+      \spix Only display zone allows choice of small or normal.^^J%%
+      \spiv A -> center left right justify. Default justify.^^J%%
+      \spix Text alignment relative to block offsets.^^J%%
+      \spix If not justify, hyphenation disabled.^^J%%
+      \spiv I -> 0 or 1. Default 1, normal paragraph indent. 0 means no indent.}%%
+  \fi%%
+  \setlength{\leftmargin}{\tmplind}%%
+  \setlength{\rightmargin}{\tmprind}%%
+  \advance\linewidth -\leftmargin%%
+  \advance\linewidth -\rightmargin%%
+  \advance\@totalleftmargin\leftmargin%%
+  \@setpar{{\@@par}}%%
+  \parshape 1 \@totalleftmargin \linewidth%%
+  \ifnum\tmpblockalign>0\relax\setlength\parindent{0pt}\fi%%
+  \ifnum\tmpblockalign=1\relax\nvt@center\fi%%
+  \ifnum\tmpblockalign=2\relax\nvt@raggedright\fi%%
+  \ifnum\tmpblockalign=3\relax\nvt@raggedleft\fi%%
+  \ignorespaces%%
+}{%%
+  \par\ifnum\tmpblockalign=1\relax\nvt@endcenter\fi%%
+%%%%%  \ifnum\nvt@tmpt=1\relax\vspace*{.125\nvt@bld}\fi%%
+  \endgroup\vspace*{-\nvt@bls}\strut\par%%
+}%%
+%%
+
+
+%% NAME: \name[option]{one line of content}
+%% SUBNAME: \subname[option{one line of content}
+%%   These commands may only be used in display zones. There is no particular meaning to either
+%% \name or \subname. They are merely convenient commands for styling non-main text. You may use
+%% either command repeatedly, in any order, in the same display zone. Whether or not you set
+%% \name to be more or less prominent than \subname, is your design choice. Although these
+%% commands are intended for such purposes as chapter titles, Novelette does not care why you
+%% use them. There is no automatic chapter numbering (see \next command, for placeholder).
+%%   If you do not like the built-in defaults, you may change the default styles by setting
+%% \namestyle and \subnamestyle in Preamble. In any case, you may locally change the style
+%% via command option. Anything not set by option will retain its gloal default value.
+%%   The scale will necessarily affect the vertical space, which will usually be a non-integer
+%% number of lines. No problem, since line grid is restored at \maintext. You will need to add
+%% or subtract lines from the bottom of the display zone, if you wish to have \maintext start
+%% at a particular line.
+\def\nvt@noparthere{%%
+  \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
+    \spii inside \string\name, \string\subname, or \string\scenetext.}%%
+}%%
+\newif\ifnvt@instyle %% True within \name, \subname, and \scenetext commands.
+\DeclareDocumentCommand\name{O{}+m}{%% +m will be re-parsed as m.
+  \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \begingroup\nvt@instyletrue%%
+  \ifnum\tmpok=1\relax%%
+    \par\vspace*{-\nvt@bls}\strut\par%%
+    \setlength\parindent{0pt}%%
+    \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}%%
+    \def\tmpscale{}\def\tmptrack{}%%
+    \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}%%
+    \ifnum\tmpreturn=1\relax%%
+      \ifnum\tmpfn=-1\relax\def\tmpfont{\nvt@namefont}\def\tmpsp{\nvt@namesp}\fi%%
+      \ifnum\tmpfn=0\relax\def\tmpfont{\normalfont}\fi%%
+      \ifnum\tmpfn=1\relax\def\tmpfont{\nvt@dark}\fi%%
+      \ifnum\tmpfn=2\relax\def\tmpfont{\nvt@thick}\fi%%
+      \ifnum\tmpfn=3\relax\def\tmpfont{\nvt@heavy}\fi%%
+      \ifnum\tmpfn=4\relax\def\tmpfont{\nvt@wide}\fi%%
+      \ifnum\tmpfn=5\relax\def\tmpfont{\nvt@srir}\fi%%
+      \ifnum\tmpfn=6\relax\def\tmpfont{\nvt@gero}\fi%%
+      \ifnum\tmpfn=7\relax\def\tmpfont{\nvt@black}\fi%%
+      \ifnum\tmpfn=8\relax\def\tmpfont{\nvt@thin}\fi%%
+      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@icel}\fi%%
+      \ifnum\tmpfn=10\relax\def\tmpfont{\nvt@plas}\fi%%
+      \ifx\tmptrack\@empty\edef\tmptrack{\nvt@nametrack}\fi%%
+      \ifnum\tmpalign=-1\relax\def\tmpleft{\nvt@namel}\def\tmpright{\nvt@namer}\fi%%
+      \ifnum\tmpalign=0\relax\def\tmpleft{1}\def\tmpright{1}\fi%%
+      \ifnum\tmpalign=1\relax\def\tmpleft{0}\def\tmpright{1}\fi%%
+      \ifnum\tmpalign=2\relax\def\tmpleft{1}\def\tmpright{0}\fi%%
+      \ifnum\tmpcase=-1\relax\def\tmpraw{\nvt@nameraw}\fi%%
+      \ifnum\tmpcase=0\relax\def\tmpraw{RawFeature={+ss17}}\fi%%
+      \ifnum\tmpcase=1\relax\def\tmpraw{RawFeature={+smcp,+ss17}}\fi%%
+      \ifnum\tmpcase=2\relax\def\tmpraw{RawFeature={+onum,+ss17}}\fi%%
+      \ifnum\tmpcase=3\relax\def\tmpraw{RawFeature={+smcp,+onum,+ss17}}\fi%%
+      \ifnum\tmpcase=4\relax\def\tmpraw{RawFeature={+titl,+lnum,+ss17}}\fi%%
+\def\tmpraw{}%% 
+      \ifx\tmpscale\@empty\edef\tmpscale{\nvt@namescale}\fi%%
+      \ifnum\tmpauto=-1\relax\edef\tmpauto{\nvt@nameauto}\fi%%
+      \edef\tmpd{\fpeval{(0.23*\tmpscale*\nvt@em)+\nvt@linegap}pt}%%
+      \edef\tmph{\fpeval{(0.84*\tmpscale*\nvt@em)+\tmpd}pt}%%
+      \edef\tmpws{\fpeval{\tmpscale < 1.01}}%%
+%%      \ifnum\tmpws=1\relax\def\tmpstrut{\strut}\else
+\def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}%%\fi%%
+      \edef\tmpspace{\fpeval{(\tmpscale*\tmpsp + .02*\tmptrack)*\nvt@em}pt}%%
+      \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%%
+    \else%%
+      \nvt@err{Bad option for \string\name.^^J%%
+        \spii Format: \string\name[font=F,scale=S,track=T,align=A,case=C]{content}^^J%%
+        \spiv F -> main dark thick heavy black wide thin icel gero plas. Default \nvt@namefn.^^J%%
+        \spiv S -> Number 1<=S<=4. May be decimal. Default \nvt@namescale.^^J%%
+        \spix If followed by a, will auto-adjust slightly over-wide content.^^J%%
+        \spiv T -> Integer 0-9. Tracking, tight to very loose. Default \nvt@nametrack.^^J%%
+        \spiv A -> center left right. Default \nvt@namealign.^^J%%
+        \spiv C -> none titl smcp onum smon. Ignored unless font=main. Default \nvt@namecn.^^J%%
+        \spix none -> No changes.^^J%%
+        \spix titl -> Lowercase letters become titling caps.^^J%%
+        \spix smcp -> Lowercase letters become small caps.^^J%%
+        \spix onum -> Numerals become oldstyle.^^J%%
+        \spix smon -> Combines smcp and onum.}%%
+    \fi%%
+    \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
+    \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpspace\char"200D{#2}\char"200D}}%%
+    \edef\tmpwdz{\the\wd0}%%
+    \edef\tmpwide{\fpeval{\wd0 > \textwidth}}%%
+    \ifnum\tmpwide=1\relax%%
+      \ifnum\tmpauto=1\relax%%
+        \edef\tmpnewscale{\fpeval{0.999*\tmpscale*\textwidth/\wd0}}%%
+        \edef\tmpd{\fpeval{(0.23*\tmpnewscale*\nvt@em)+\nvt@linegap}pt}%%
+        \edef\tmph{\fpeval{(0.84*\tmpnewscale*\nvt@em)+\tmpd}pt}%%
+        \edef\tmpws{\fpeval{\tmpscale < 1.01}}%%
+        \ifnum\tmpws=1\relax\def\tmpstrut{\strut}\else\def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}\fi%%
+        \edef\tmpnewspace{\fpeval{(\tmpnewscale*\tmpsp + .02*\tmptrack)*\nvt@em}pt}%%
+        \def\tmpnewfeat{\nvt@aff{\tmpraw,Scale=\tmpnewscale,LetterSpace=\tmptrack}}%%
+        \sbox0{{\tmpfont\tmpnewfeat\spaceskip=\tmpnewspace\char"200D{#2}\char"200D}}%%
+        \edef\tmpnewwide{%%
+          \fpeval{(\wd0 > \textwidth) + (\tmpnewscale < 1) + (\tmpnewscale/\tmpscale < 0.88)}%%
+        }%%
+        \ifnum\tmpnewwide=0\relax%%
+          \edef\tmpnewscaletrunc{\fpeval{trunc(\tmpnewscale,3)}}%%
+          \typeout{Alert: Auto-adjusted \string\name\space scale from \tmpscale\space %%
+            to \tmpnewscaletrunc.}%%
+        \else%%
+          \edef\tmphowmuch{\fpeval{ceil(100*\wd0/\textwidth,2)}}%%
+          \nvt@err{Content of \string\name\space is too wide. Must fit on one line.^^J%%
+            \spii Measured content width is \tmphowmuch\@percentchar\space of max textwidth.^^J%%
+            \spii Unable to auto-adjust. Reduce content or reduce scale.}%%
+          \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpspace{\char"FFFD}}%%
+        \fi%%
+      \else%%
+        \edef\tmphowmuch{\fpeval{ceil(100*\wd0/\textwidth,2)}}%%
+        \nvt@err{Content of \string\name\space is too wide. Must fit on one line.^^J%%
+          \spii Measured content width is \tmphowmuch\@percentchar\space of max textwidth.^^J%%
+          \spii Reduce content or reduce scale.}%%
+        \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpspace{\char"FFFD}}%%
+      \fi%%
+    \fi%%
+    \ifnum\tmpleft=1\relax\tmpstrut\hfill\fi%%
+    \smash{\usebox0}%%
+    \ifnum\tmpright=1\relax\hfill\tmpstrut\fi\nvt@par%%
+    \vspace{-\nvt@bls}\strut\nvt@par%%
+  \else%%
+    \nvt@err{Command \string\name\space may only be used within display zones.^^J%%
+      \spii It may not be nested, or used within block environment.}%%
+    \char"FFFD\obeyspaces%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+\DeclareDocumentCommand\subname{O{}+m}{%% +m will be re-parsed as m.
+  \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \begingroup\nvt@instyletrue%%
+  \ifnum\tmpok=1\relax%%
+    \par\vspace*{-\nvt@bls}\strut\par%%
+    \setlength\parindent{0pt}%%
+    \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}%%
+    \def\tmpscale{}\def\tmptrack{}%%
+    \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}%%
+    \ifnum\tmpreturn=1\relax%%
+      \ifnum\tmpfn=-1\relax\def\tmpfont{\nvt@subfont}\def\tmpsp{\nvt@subsp}\fi%%
+      \ifnum\tmpfn=0\relax\def\tmpfont{\normalfont}\fi%%
+      \ifnum\tmpfn=1\relax\def\tmpfont{\nvt@dark}\fi%%
+      \ifnum\tmpfn=2\relax\def\tmpfont{\nvt@thick}\fi%%
+      \ifnum\tmpfn=3\relax\def\tmpfont{\nvt@heavy}\fi%%
+      \ifnum\tmpfn=4\relax\def\tmpfont{\nvt@wide}\fi%%
+      \ifnum\tmpfn=5\relax\def\tmpfont{\nvt@srir}\fi%%
+      \ifnum\tmpfn=6\relax\def\tmpfont{\nvt@gero}\fi%%
+      \ifnum\tmpfn=7\relax\def\tmpfont{\nvt@black}\fi%%
+      \ifnum\tmpfn=8\relax\def\tmpfont{\nvt@thin}\fi%%
+      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@icel}\fi%%
+      \ifnum\tmpfn=10\relax\def\tmpfont{\nvt@plas}\fi%%
+      \ifx\tmptrack\@empty\edef\tmptrack{\nvt@subtrack}\fi%%
+      \ifnum\tmpalign=-1\relax\def\tmpleft{\nvt@subl}\def\tmpright{\nvt@subr}\fi%%
+      \ifnum\tmpalign=0\relax\def\tmpleft{1}\def\tmpright{1}\fi%%
+      \ifnum\tmpalign=1\relax\def\tmpleft{0}\def\tmpright{1}\fi%%
+      \ifnum\tmpalign=2\relax\def\tmpleft{1}\def\tmpright{0}\fi%%
+      \ifnum\tmpcase=-1\relax\def\tmpraw{\nvt@subraw}\fi%%
+      \ifnum\tmpcase=0\relax\def\tmpraw{RawFeature={+ss17}}\fi%%
+      \ifnum\tmpcase=1\relax\def\tmpraw{RawFeature={+smcp,+ss17}}\fi%%
+      \ifnum\tmpcase=2\relax\def\tmpraw{RawFeature={+onum,+ss17}}\fi%%
+      \ifnum\tmpcase=3\relax\def\tmpraw{RawFeature={+smcp,+onum,+ss17}}\fi%%
+      \ifnum\tmpcase=4\relax\def\tmpraw{RawFeature={+titl,+lnum,+ss17}}\fi%%
+      \ifx\tmpscale\@empty\edef\tmpscale{\nvt@subscale}\fi%%
+      \ifnum\tmpauto=-1\relax\edef\tmpauto{\nvt@subauto}\fi%%
+      \edef\tmpd{\fpeval{max((0.23*\tmpscale*\nvt@em)+\nvt@linegap,\nvt@bld)}pt}%%
+      \edef\tmph{\fpeval{max((0.84*\tmpscale*\nvt@em)+\tmpd,\nvt@bls)}pt}%%
+      \edef\tmpws{\fpeval{\tmpscale < 1.01}}%%
+      \ifnum\tmpws=1\relax\def\tmpstrut{\strut}\else\def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}\fi%%
+      \edef\tmpspace{\fpeval{(\tmpscale*\tmpsp + .02*\tmptrack)*\nvt@em}pt}%%
+      \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%%
+    \else%%
+      \nvt@err{Bad option for \string\subname.^^J%%
+        \spii Format: \string\subname[font=F,scale=S,track=T,align=A,case=C]{content}^^J%%
+        \spiv F -> main dark thick heavy black wide thin icel gero plas. Default \nvt@subfn.^^J%%
+        \spiv S -> Number 1<=S<=4. May be decimal. Default \nvt@subscale.^^J%%
+        \spix If followed by a, will auto-adjust slightly over-wide content.^^J%%
+        \spiv T -> Integer 0-9. Tracking, tight to very loose. Default \nvt@subtrack.^^J%%
+        \spiv A -> center left right. Default \nvt@subalign.^^J%%
+        \spiv C -> none titl smcp onum smon. Ignored unless font=main. Default \nvt@subcn.^^J%%
+        \spix none -> No changes.^^J%%
+        \spix titl -> Lowercase letters become titling caps.^^J%%
+        \spix smcp -> Lowercase letters become small caps.^^J%%
+        \spix onum -> Numerals become oldstyle.^^J%%
+        \spix smon -> Combines smcp and onum.}%%
+    \fi%%
+    \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
+    \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpspace\char"200D{#2}\char"200D}}%%
+    \edef\tmpwdz{\the\wd0}%%
+    \edef\tmpwide{\fpeval{\wd0 > \textwidth}}%%
+    \ifnum\tmpwide=1\relax%%
+      \ifnum\tmpauto=1\relax%%
+        \edef\tmpnewscale{\fpeval{0.9996*\tmpscale*\textwidth/\wd0}}%%
+        \edef\tmpd{\fpeval{(0.23*\tmpnewscale*\nvt@em)+\nvt@linegap}pt}%%
+        \edef\tmph{\fpeval{(0.84*\tmpnewscale*\nvt@em)+\tmpd}pt}%%
+        \edef\tmpws{\fpeval{\tmpscale < 1.01}}%%
+        \ifnum\tmpws=1\relax\def\tmpstrut{\strut}\else\def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}\fi%%
+        \edef\tmpnewspace{\fpeval{(\tmpnewscale*\tmpsp + .02*\tmptrack)*\nvt@em}pt}%%
+        \def\tmpnewfeat{\nvt@aff{\tmpraw,Scale=\tmpnewscale,LetterSpace=\tmptrack}}%%
+        \sbox0{{\tmpfont\tmpnewfeat\spaceskip=\tmpnewspace\char"200D{#2}\char"200D}}%%
+        \edef\tmpnewwide{%%
+          \fpeval{(\wd0 > \textwidth) + (\tmpnewscale < 1) + (\tmpnewscale/\tmpscale < 0.88)}%%
+        }%%
+        \ifnum\tmpnewwide=0\relax%%
+          \edef\tmpnewscaletrunc{\fpeval{trunc(\tmpnewscale,3)}}%%
+          \typeout{Alert: Auto-adjusted \string\subname\space scale from \tmpscale\space %%
+            to \tmpnewscaletrunc.}%%
+        \else%%
+          \edef\tmphowmuch{\fpeval{ceil(100*\wd0/\textwidth,2)}}%%
+          \nvt@err{Content of \string\subname\space is too wide. Must fit on one line.^^J%%
+            \spii Measured content width is \tmphowmuch\percentchar of max textwidth.^^J%%
+            \spii Unable to auto-adjust. Reduce content or reduce scale.}%%
+          \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpspace{\char"FFFD}}%%
+        \fi%%
+      \else%%
+        \edef\tmphowmuch{\fpeval{ceil(100*\wd0/\textwidth,2)}}%%
+        \nvt@err{Content of \string\subname\space is too wide. Must fit on one line.^^J%%
+          \spii Measured content width is \tmphowmuch\percentchar of max textwidth.^^J%%
+          \spii Reduce content or reduce scale.}%%
+        \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpspace{\char"FFFD}}%%
+      \fi%%
+    \fi%%
+    \ifnum\tmpleft=1\relax\tmpstrut\hfill\fi%%
+    \smash{\usebox0}%%
+    \ifnum\tmpright=1\relax\hfill\tmpstrut\fi\nvt@par%%
+    \vspace{-\nvt@bls}\strut\nvt@par%%
+  \else%%
+    \nvt@err{Command \string\subname\space may only be used within display zones.^^J%%
+      \spii It may not be nested, or used within block environment.}%%
+    \char"FFFD\obeyspaces%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% SCENE: \scenetext[option]{content}  see also \sceneimage in graphics file.
+%%   The simplest scene breaks are one or more \blankline, possible with \dinkus where needed.
+%% You may also use ordinary text, perhaps aligned via the block environment. Or you may use
+%% an ordinary image.
+%%   But if a chapter of your story has distinct sub-chapters, each with its own name, then the
+%% \scenetext command may be useful. This creates a three-line gap between paragraphs. The first
+%% line is always blank, and is omitted if the \scenetext happens to fall at the top of a page.
+%% If you prefer a larger gap, use \blankline before or after \scenetext.
+%%   The \scenetext content must fit on one line, maximum width 4in regardless of layout. The text
+%% sits slightly below the middle of the other two lines. Its is styled to be slightly different
+%% than normal text. The first paragraph following \scenetext is not indented.
+%%   Scenes have no automatic numbering. Do it yourself. See the \next command.
+\newif\ifnvt@inscenetext %% True within \scenetext.
+\DeclareDocumentCommand\scenetext{O{}+m}{%% +m will be re-parsed as m.
+  \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@inscenetext\def\tmpok{0}\fi%%
+  \ifnvt@insceneimage\def\tmpok{0}\fi%%
+  \begingroup\nvt@inscenetexttrue%%
+  \ifnum\tmpok=1\relax%%
+    \par\edef\tmppgtot{\fpeval{\pagetotal = 0pt}}%%
+    \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
+    \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
+    \setlength\parindent{0pt}%%
+    \def\tmpscalign{-1}\def\tmpscleft{\nvt@scleft}\def\tmpscright{\nvt@scright}%%
+    \def\textit##1{##1}\def\it##1{##1}%%
+    \def\smcp##1{##1}\def\SMCP##1{##1}\def\Smcp##1{##1}\def\onum##1{##1}%%
+    \directlua{nvt.parsescenestyle('\luaescapestring{#1}','scene')}%%
+    \ifnum\tmpscreturn=1\relax%%
+      \ifnum\tmpscalign=0\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{\hfill\strut}\fi%%
+      \ifnum\tmpscalign=1\relax\def\tmpscleft{}\def\tmpscright{\hfill\strut}\fi%%
+      \ifnum\tmpscalign=2\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{}\fi%%
+      \sbox0{\nvt@aff{RawFeature={+titl,+case},Scale=1.08,FakeStretch=.96,LetterSpace=4}%%
+        \char"200D{#2}\char"200D}%%
+      \edef\tmpfit{\fpeval{\wd0 > 4in}}%%
+      \ifnum\tmpfit=1\relax%%
+        \nvt@warn{\string\scenetext\space content width exceeds 4in. Too wide.}%%
+        \sbox0{\char"FFFD\space \string\scenetext\space content is too wide.}%%
+      \fi%%
+      \strut\tmpscleft\smash{\raisebox{-.108\nvt@em}{\usebox0}}\tmpscright\strut\par%%
+    \else%%
+      \nvt@err{Bad \string\scenetext[option]{content} command.^^J%%
+      \spii Option: [align=A]^^J%%
+      \spiv A -> left right center. Default \nvt@scalign.^^J%%
+      \spii Content must fit on one line, max width 4in.^^J%%
+      \spii Text is specially styled for this purpose. Ignores other styling.}%%
+      {\char"FFFD}%%
+    \fi%%
+  \else%%
+    \nvt@err{Command \string\scenetext\space cannot be nested in itself,^^J%%
+      \spii or used in \string\sceneimage, \string\name, \string\subname, or block environment.}%%
+    \char"FFFD\obeyspaces%%
+  \fi%%
+  \endgroup\nopagebreak\blankline%%
+}%%
+%%
+
+
+%% INITIAL LETTER(S): \init{character} also starred \init*
+%%   The \init command scales its character to larger than normal size. It may be used immediately
+%% beneath \maintext. Typically, this is at the start of a chapter.
+%%   You cannot use \init anywhere other than the above-mentioned places. If you do that,
+%% the character prints at normal size, and a warning results.
+%%   The {character} may include preceding punctuation, such as quotes, guillemet, or Spanish
+%% inverted marks. Except for Dutch IJ, use only a single alphabetic character. Do not use
+%% \init for creating a numbered list. You may choose to place the following few words in
+%% small caps, for an interesting effect.
+%%   A blank line is inserted above \init, to prevent the enlarged character from crashing into
+%% whatever is above it. The descender on characters such as Ccedilla will not crash into
+%% the line below.
+%%   The enlarged character kerns against its surrounding U+2060 control characters. At left,
+%% that absorbs excess bearing. At right, it lets T hang above the following text. Feature ss20
+%% adjusts some characters for proper appearance at scale.
+%%   If the following text is too close for your taste, use \init*{character}. That inserts
+%% a tiny amount of space between the initial character and whatever follows.
+\DeclareDocumentCommand\init{sm}{%%
+  \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%%
+  \def\tmptest{1}\ifx\nvt@initscale\tmptest\relax\def\tmpok{0}\fi%%
+  \ifnvt@infootnote\def\tmpok{0}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnvt@indisplay\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \begingroup\let\itshape\relax%%
+  \def~{\hspace{.2\nvt@em}}%%
+  \ifnum\tmpok=1\relax%%
+    \sbox1{%%
+      \nvt@aff{RawFeature={-smcp,-c2sc,+ss20},Scale=\nvt@initscale,FakeStretch=.94}%%
+        \char"2060{#2}\char"2060%%
+    }%%
+    {\strut\smash{\usebox1}}%%
+    \IfBooleanTF{#1}{\hspace{.04em}}{}%%
+  \else
+    \nvt@warn{\string\init only allowed at start of paragraph following ^^J%%
+      \spii \string\maintext. Do not use \string\indent, or \string\noindent\space there.}%%
+    {#2}%%
+  \fi%%
+  \endgroup%%
+  \obeyspaces%%
+}%%
+%%
+
+
+%% DROP CAP: \dcap{letter} also \dcap*{letter}
+%%   Drop caps are rarely used in popular fiction, because they do not look good if the first
+%% paragraph does not continue to at least two full lines beneath the drop cap. That is rare,
+%% due to short paragraphs and dialogue. But if you plan ahead, and write your chapters using
+%% a long opening paragraph, then you may consider drop caps. Otherwise, \init is better.
+%%   The drop cap should be a single letter, without preceding punctuation. A macro code such as
+%% \'A is considered to be a single letter. But Novelette does not enforce this limitation.
+%%   All drop caps will occupy two lines. No more, no less. The X-height of the drop cap will be
+%% at the X-height of ordinary letters, so it will be above the following lowercase/smcp text.
+%% The baseline of the drop cap will be the same amount below the baseline of where it sits,
+%% providing a nice visual symmetry (in the designer's opinion). If the drop cap has diacritical
+%% above, it will rise above. If the drop cap is J Q or Ccedilla, the font provides letters
+%% that do not intrude into the line below the drop cap. The font is always the main font.
+%%   The unstarred \dcap spaces both lines equally (they vertically align) whether or not the
+%% drop cap is a one-letter word. The starred \dcap* brings the immediately following text closer,
+%% unless the drop cap is a one-letter word; in that case, the space serves to align vertically.
+%%   Best practice is to follow the drop cap with some text in small caps. Not the whole line.
+%% That is for you to decide.
+%%   Except in display zones, Novelette scales horizontal by em, vertical by baselineskip.
+%% Thus, different scales are applied to the dcap letter; its aspect ratio changes with layout.
+%% The numbers apply aspect ratio 1 for smallest baselineskip, h/w>1 for taller baselineskip.
+\DeclareDocumentCommand\dcap{sm}{%%
+  \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%%
+  \def\tmptest{1}\ifx\nvt@initscale\tmptest\relax\def\tmpok{0}\fi%%
+  \ifnum\tmpok=1\relax\vspace*{\nvt@bls}\fi%%
+  \ifnvt@infootnote\def\tmpok{0}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnvt@indisplay\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \let\itshape\relax%%
+  \ifnum\tmpok=1\relax%%
+    %% Vertical stretch depends on em and bls, but horizontal only on em. Xheight=.65em.
+    \edef\tmpscale{\fpeval{(\nvt@bls+.856\nvt@em)/(.65*\nvt@em)}}%%
+    \edef\tmpstretch{\fpeval{3.17/\tmpscale}}%%
+\edef\tmpback{\fpeval{((\tmpscale-1)*\tmpstretch*.044em)+.1\nvt@em}pt}%% for O
+\def\tmpback{.1\nvt@em}%%
+    \sbox0{%%
+      \hspace{-\tmpback}%%
+      \nvt@aff{RawFeature={-smcp,-c2sc,-ss14,+ss20,+cv18},Scale=\tmpscale,FakeStretch=\tmpstretch}%%
+      {\char"200D{#2}\char"200D}%%
+    }%%
+    \xdef\tmpwd{\fpeval{\wd0 + .1\nvt@em}pt}%%
+    \xdef\tmplw{\fpeval{\textwidth - \tmpwd}pt}%%
+    \parshape=3 \tmpwd \tmplw \tmpwd \tmplw 0pt \the\textwidth\relax%% No inner group here.
+%%    \strut\smash{\llap{\raisebox{-\nvt@bls}{\usebox0}}}%%
+\edef\tmpdn{\fpeval{-\nvt@bls-.206*\nvt@em}pt}%%
+%%\strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
+\strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
+    \IfBooleanTF{#1}{\hspace{-.1\nvt@em}}{}%%
+  \else%%
+    \nvt@warn{\string\init, or \string\dcap, only allowed at start of paragraph.^^J%%
+      \spii Do not use \string\indent, or \string\noindent\space there.}%%
+    {#2}%%
+  \fi%%
+  \char"200D\obeyspaces%%
+}%%
+%%
+
+
+%% PLACEHOLDER \next for chapter/scene numbers:
+%%   Novelette does not have automatic chapter/scene numbers. Do it yourself. In draft mode,
+%% the \next command prints ## there, as a reminder that you must later change it to whichever
+%% number is necessary. If any \next remains, you cannot move to preview or final mode.
+\newif\ifnvt@didnext %% Become true if 1 or more \next used.
+\def\next{%%
+  \#\#%%
+  \global\nvt@didnexttrue\directlua{nvt.countnext=nvt.countnext+1}%%
+  \obeyspaces%%
+}%%
+%%
+
+
+%% UNAVAILABLE COMMANDS:
+%%   Novelette does not use many standard LaTeX commands, but instead uses other methods.
+\def\nvt@nocmd#1{%%
+  \nvt@warn{Novelette has no command #1.^^J%%
+    \spii See these commands: \string\namedefault, \string\subnamedefault,^^J%%
+    \spii\string\headstyle, and options for block environment.}
+}%%
+\def\footnotesize{\nvt@nocmd{\string\footnotesize}}
+\def\tiny{\nvt@nocmd{\string\tiny}}
+\def\scriptsize{\nvt@nocmd{\string\scriptsize}}
+\def\small{\nvt@nocmd{\string\small}}
+\def\large{\nvt@nocmd{\string\large}}
+\def\Large{\nvt@nocmd{\string\Large}}
+\def\LARGE{\nvt@nocmd{\string\LARGE}}
+\def\huge{\nvt@nocmd{\string\huge}}
+\def\Huge{\nvt@nocmd{\string\Huge}}
+\def\HUGE{\nvt@nocmd{\string\HUGE}}
+\DeclareDocumentCommand\textls{O{}+m}{\nvt@nocommand{\string\textls}#2}
+%%
+
+
+
+%%
+\endinput
+%% End of file 'novelette-effects.sty'.
