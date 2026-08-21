@@ -239,7 +239,7 @@
     \par\vspace*{-\nvt@bls}\strut\par%%
     \setlength\parindent{0pt}%%
     \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}%%
-    \def\tmpscale{}\def\tmptrack{}%%
+    \def\tmpscale{}\def\tmptrack{}\def\tmpnofont{}%%
     \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=1\relax%%
       \ifnum\tmpfn=-1\relax\def\tmpfont{\nvt@namefont}\def\tmpsp{\nvt@namesp}\fi%%
@@ -289,6 +289,11 @@
         \spix smcp -> Lowercase letters become small caps.^^J%%
         \spix onum -> Numerals become oldstyle.^^J%%
         \spix smon -> Combines smcp and onum.}%%
+    \fi%%
+    \ifx\tmpnofont\@empty\else%%
+      \nvt@err{Requested font '\tmpnofont' but did not load it.^^J%%
+      \spii Fix: In Preamble, write \string\loadfont{\tmpnofont}.}%%
+      \def\tmpfont{\nvt@namefont}\def\tmpsp{\nvt@namesp}%%
     \fi%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
     \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpspace\char"200D{#2}\char"200D}}%%
@@ -347,7 +352,7 @@
     \par\vspace*{-\nvt@bls}\strut\par%%
     \setlength\parindent{0pt}%%
     \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}%%
-    \def\tmpscale{}\def\tmptrack{}%%
+    \def\tmpscale{}\def\tmptrack{}\def\tmpnofont{}%%
     \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=1\relax%%
       \ifnum\tmpfn=-1\relax\def\tmpfont{\nvt@subfont}\def\tmpsp{\nvt@subsp}\fi%%
@@ -395,6 +400,11 @@
         \spix smcp -> Lowercase letters become small caps.^^J%%
         \spix onum -> Numerals become oldstyle.^^J%%
         \spix smon -> Combines smcp and onum.}%%
+    \fi%%
+    \ifx\tmpnofont\@empty\else%%
+      \nvt@err{Requested font '\tmpnofont' but did not load it.^^J%%
+      \spii Fix: In Preamble, write \string\loadfont{\tmpnofont}.}%%
+      \def\tmpfont{\nvt@namefont}\def\tmpsp{\nvt@namesp}%%
     \fi%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
     \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpspace\char"200D{#2}\char"200D}}%%
@@ -470,7 +480,7 @@
     \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
     \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
     \setlength\parindent{0pt}%%
-    \def\tmpscalign{-1}\def\tmpscleft{\nvt@scleft}\def\tmpscright{\nvt@scright}%%
+    \def\tmpscalign{-1}\def\tmpscleft{\nvt@scleft}\def\tmpscright{\nvt@scright}\def\tmpfont{}%%
     \def\textit##1{##1}\def\it##1{##1}%%
     \def\smcp##1{##1}\def\SMCP##1{##1}\def\Smcp##1{##1}\def\onum##1{##1}%%
     \directlua{nvt.parsescenestyle('\luaescapestring{#1}','scene')}%%

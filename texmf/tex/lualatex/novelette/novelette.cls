@@ -59,7 +59,7 @@
 %%
 
 \NeedsTeXFormat{LaTeX2e}[2025/01/01] %% Requires TeX 2025 or later.
-\ProvidesClass{novelette}[2026/04/25 v0.1.^^JLuaLaTeX document class, original popular fiction.]
+\ProvidesClass{novelette}[2026/08/20 v0.1.2^^JLuaLaTeX document class, original popular fiction.]
 
 %% OVERVIEW:
 %%   Novelette is intended for one thing only: original popular fiction, printed. What that means:
@@ -179,6 +179,16 @@
 %%   Some packages must know those settings, before they load.
 \RequirePackage{novelette-errwarnban} %% Custom errors, warnings, and banned LaTeX commands.
 \newif\ifnvt@incomponent %% True within component environment.
+\newif\ifnvt@wantdark %% Refers to font; also following lines:
+\newif\ifnvt@wantthick
+\newif\ifnvt@wantheavy
+\newif\ifnvt@wantblack
+\newif\ifnvt@wantwide
+\newif\ifnvt@wantthin
+\newif\ifnvt@wantsrir
+\newif\ifnvt@wantgero
+\newif\ifnvt@wanticel
+\newif\ifnvt@wantplas
 \let\nvt@par\par\relax %% For local \par tweaks.
 \let\nvt@brk\\\relax %% For break tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
@@ -304,6 +314,7 @@
       return nvt.check_page
     }%%
   \fi
+  \directlua{nvt.preamble=0}
   \ifdefined\nvt@thisdoc
     \typeout{Info: Now beginning the subdoc.^^J}
     \nvt@input{\nvt@filepath\nvt@thisdocpath/\nvt@thisdoc}

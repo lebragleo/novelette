@@ -188,17 +188,17 @@
 
 %% These fonts are only used in certain locations.
 %% They do not need expansion or protrusion. The macros that use them, kern the text with uni200D.
-\nvt@newfontface\nvt@dark{NoveletteSans-Dark}
-\nvt@newfontface\nvt@thick{NoveletteSans-Thick}
-\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}
-\nvt@newfontface\nvt@black{NoveletteSans-Black}
-\nvt@newfontface\nvt@wide{NoveletteSans-Wide}
-\nvt@newfontface\nvt@thin{NoveletteSans-Thin}
+\ifnvt@wantdark\nvt@newfontface\nvt@dark{NoveletteSans-Dark}\fi
+\ifnvt@wantthick\nvt@newfontface\nvt@thick{NoveletteSans-Thick}\fi
+\ifnvt@wantheavy\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}\fi
+\ifnvt@wantblack\nvt@newfontface\nvt@black{NoveletteSans-Black}\fi
+\ifnvt@wantwide\nvt@newfontface\nvt@wide{NoveletteSans-Wide}\fi
+\ifnvt@wantthin\nvt@newfontface\nvt@thin{NoveletteSans-Thin}\fi
 %%
-\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}
-\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}
-\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}
-\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}
+\ifnvt@wantsrir\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}\fi
+\ifnvt@wantgero\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}\fi
+\ifnvt@wanticel\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}\fi
+\ifnvt@wantplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
 %%
 \def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
 %%

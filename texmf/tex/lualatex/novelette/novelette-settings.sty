@@ -563,6 +563,24 @@
 %%
 
 
+%% LOAD FONT FOR LATER USE:
+%%   The Serif fonts are always loaded. A Sans or Deco font is loaded if a setting requests it.
+%% But If a local command requests a font that was not already loaded, error. This command
+%% loads a font that would not otherwise be loaded, so it can be used later.
+%% Use one or more comma-separated font codes, such as \loadfont{dark,heavy}.
+\DeclareDocumentCommand\loadfont{m}{%%
+  \def\tmpreturn{1}
+  \directlua{nvt.parseloadfont('\luaescapestring{#1}')}
+  \ifnum\tmpreturn=0\relax
+    \nvt@fatal{Bad setting for \string\loadfont.^^J%%
+      \spii Format: \string\loadfont{comma,separated,codes}^^J%%
+      \spii Codes: dark thick heavy wide black thin icel srir gero plas.}%%
+  \fi
+}%%
+\@onlypreamble\loadfont
+%%
+
+
 %% HYPHENATION LANGUAGE:
 %%   Novelette is monolingual. You may load a single hyphenation pattern for one of the
 %% major Western European languages. Although you may type text in any language supported

@@ -84,6 +84,17 @@ nvt.luaerr = false -- Becomes true if lua error.
 nvt.metric = false -- Becomes true if trimsize uses mm units. Once true, remains true.
 nvt.pagelist = '' -- Might become nonempty when nvt.examine==true.
 nvt.thisdoc = '' -- Becomes nonempty when compiling only subdoc files.
+nvt.preamble = 1 -- Becomes 0 AtBeginDocument.
+nvt.hasdark = 0 -- Becomes 1 if a Preamble setting loads the dark font. Likewise for these:
+nvt.hasthick = 0
+nvt.hasheavy = 0
+nvt.haswide = 0
+nvt.hassrir = 0
+nvt.hasgero = 0
+nvt.hasblack = 0
+nvt.hasthin = 0
+nvt.hasicel = 0
+nvt.hasplas = 0
 local glyph = node.id('glyph')
 local hlist = node.id('hlist')
 local vlist = node.id('vlist')
@@ -106,6 +117,55 @@ nvt.parsesk = function (s)
   else
     tex.sprint('\\def\\tmpreturn{0}')
   end
+end
+--
+
+
+-- Parse \loadfont:
+nvt.parseloadfont = function (s)
+  s = string.gsub(s, ' ', '') ; s = s .. ','
+  if string.find(s, 'dark,') then
+    nvt.hasdark = 1 ; s = string.gsub(s, 'dark', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
+  end
+  if string.find(s, 'thick,') then
+    nvt.hasthick = 1 ; s = string.gsub(s, 'thick', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
+  end
+  if string.find(s, 'heavy,') then
+    nvt.hasheavy = 1 ; s = string.gsub(s, 'heavy', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
+  end
+  if string.find(s, 'wide,') then
+    nvt.haswide = 1 ; s = string.gsub(s, 'wide', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
+  end
+  if string.find(s, 'srir,') then
+    nvt.hassrir = 1 ; s = string.gsub(s, 'srir', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantsrirtrue\\endgroup')
+  end
+  if string.find(s, 'gero,') then
+    nvt.hasgero = 1 ; s = string.gsub(s, 'gero', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
+  end
+  if string.find(s, 'black,') then
+    nvt.hasblack = 1 ; s = string.gsub(s, 'black', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
+  end
+  if string.find(s, 'thin,') then
+    nvt.hasthin = 1 ; s = string.gsub(s, 'thin', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
+  end
+  if string.find(s, 'icel,') then
+    nvt.hasicel = 1 ; s = string.gsub(s, 'icel', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wanticeltrue\\endgroup')
+  end
+  if string.find(s, 'plas,') then
+    nvt.hasplas = 1 ; s = string.gsub(s, 'plas', '')
+    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
+  end
+  s = string.gsub(s, ',', '')
+  if s ~= '' then tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false end
 end
 --
 
@@ -390,33 +450,44 @@ nvt.parseheadstyle = function (s)
       end
       if f == 'dark' then
         s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
       end
       if f == 'thick' then
         s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
       end
       if f == 'heavy' then
         s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
       end
       if f == 'wide' then
         s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
       end
       if f == 'srir' then
         s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantsrirtrue\\endgroup')
       end
       if f == 'gero' then
         s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
+
       end
       if f == 'black' then
         s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
       end
       if f == 'thin' then
         s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.16}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
       end
       if f == 'icel' then
         s = string.gsub(s, 'font=icel', '') ; tex.sprint{'\\def\\tmpfn{9}\\def\\tmpsp{.2}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wanticeltrue\\endgroup')
       end
       if f == 'plas' then
         s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
       end
     end
   end
@@ -468,7 +539,7 @@ end
 -- Parse \namestyle, \subnamestyle, and \name, \subname options:
 nvt.parsenamestyle = function (s) ----- defer to begin document
   s = s .. ',' ; s = string.gsub(s, ' ', '')
-  local n, m, mm, mmm, t, tt, a, f, c, h, d
+  local n, m, mm, mmm, t, tt, a, f, c, h, d ; local miss = ''
   local min = 1 ; local max = 4
   if string.find(s, 'scale=') then
     mm, n = string.gsub(s, '.*scale=', '') ; mm = string.gsub(mm, ',.*', '')
@@ -511,34 +582,85 @@ nvt.parsenamestyle = function (s) ----- defer to begin document
       end
       if f == 'dark' then
         s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
+          nvt.hasdark = 1
+        elseif nvt.hasdark == 0 then miss = 'dark'
+        end
       end
       if f == 'thick' then
         s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
+          nvt.hasthick = 1
+        elseif nvt.hasthick == 0 then miss = 'thick'
+        end
       end
       if f == 'heavy' then
         s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
+          nvt.hasheavy = 1
+        elseif nvt.hasheavy == 0 then miss = 'heavy'
+        end
       end
       if f == 'wide' then
         s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
+          nvt.haswide = 1
+        elseif nvt.haswide == 0 then miss = 'wide'
+        end
       end
       if f == 'srir' then
         s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantssrirtrue\\endgroup')
+          nvt.hassrir = 1
+        elseif nvt.hassrir == 0 then miss = 'srir'
+        end
       end
       if f == 'gero' then
         s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
+          nvt.hasgero = 1
+        elseif nvt.hasgero == 0 then miss = 'gero'
+        end
       end
       if f == 'black' then
         s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
+          nvt.hasblack = 1
+        elseif nvt.hasblack == 0 then miss = 'black'
+        end
       end
       if f == 'thin' then
         s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.12}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
+          nvt.hasthin = 1
+        elseif nvt.hasthin == 0 then miss = 'thin'
+        end
       end
       if f == 'icel' then
         s = string.gsub(s, 'font=icel', '') ; tex.sprint{'\\def\\tmpfn{9}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wanticeltrue\\endgroup')
+          nvt.hasicel = 1
+        elseif nvt.hasicel == 0 then miss = 'icel'
+        end
       end
       if f == 'plas' then
         s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
+          nvt.hasplas = 1
+        elseif nvt.hasplas == 0 then miss = 'plas'
+        end
       end
+      if miss ~= '' then tex.sprint('\\def\\tmpnofont{' .. miss .. '}') ; nvt.good = false end
     end
   end
   if string.find(s, 'case=') then
@@ -575,7 +697,7 @@ end
 -- Parse \scenestyle and \scene options:
 nvt.parsescenestyle = function (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '')
-  local n, t, a, f, c, x, xx
+  local n, t, a, f, c, x, xx ; local miss = ''
   local min = 1 ; local max = 1.5
   if string.find(s, 'scale=') then
     x, n = string.gsub(s, '.*scale=', '') ; x = string.gsub(x, ',.*', '')
@@ -617,34 +739,85 @@ nvt.parsescenestyle = function (s)
       end
       if f == 'dark' then
         s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
+          nvt.hasdark = 1
+        elseif nvt.hasdark == 0 then miss = 'dark'
+        end
       end
       if f == 'thick' then
         s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
+          nvt.hasthick = 1
+        elseif nvt.hasthick == 0 then miss = 'thick'
+        end
       end
       if f == 'heavy' then
         s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
+          nvt.hasheavy = 1
+        elseif nvt.hasheavy == 0 then miss = 'heavy'
+        end
       end
       if f == 'wide' then
         s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
+          nvt.haswide = 1
+        elseif nvt.haswide == 0 then miss = 'wide'
+        end
       end
       if f == 'srir' then
         s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantssrirtrue\\endgroup')
+          nvt.hassrir = 1
+        elseif nvt.hassrir == 0 then miss = 'srir'
+        end
       end
       if f == 'gero' then
         s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
+          nvt.hasgero = 1
+        elseif nvt.hasgero == 0 then miss = 'gero'
+        end
       end
       if f == 'black' then
         s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
+          nvt.hasblack = 1
+        elseif nvt.hasblack == 0 then miss = 'black'
+        end
       end
       if f == 'thin' then
         s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.12}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
+          nvt.hasthin = 1
+        elseif nvt.hasthin == 0 then miss = 'thin'
+        end
       end
       if f == 'icel' then
         s = string.gsub(s, 'font=icel', '') ; tex.sprint{'\\def\\tmpfn{9}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wanticeltrue\\endgroup')
+          nvt.hasicel = 1
+        elseif nvt.hasicel == 0 then miss = 'icel'
+        end
       end
       if f == 'plas' then
         s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
+        if nvt.preamble == 1 then
+          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
+          nvt.hasplas = 1
+        elseif nvt.hasplas == 0 then miss = 'plas'
+        end
       end
+      if miss ~= '' then tex.sprint('\\def\\tmpnofont{' .. miss .. '}') ; nvt.good = false end
     end
   end
   if string.find(s, 'case=') then
