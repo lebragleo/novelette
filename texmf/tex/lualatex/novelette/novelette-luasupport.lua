@@ -1,6 +1,6 @@
 -- This is file 'novelette-luasupport.lua', part of Novelette document class.
 -- For Copyright and License, see accompanying file 'novelette.cls'.
--- File version: 2026-04-25.
+-- File version: 2026-08-20.
 -- Namespace: nvt prefix.
 
 -- Instead of using elaborate LaTeX macros to parse settings, Novelette takes each setting,
@@ -95,9 +95,10 @@ nvt.hasblack = 0
 nvt.hasthin = 0
 nvt.hasicel = 0
 nvt.hasplas = 0
-local glyph = node.id('glyph')
-local hlist = node.id('hlist')
-local vlist = node.id('vlist')
+local GLYPH = node.id('glyph')
+local GLUE = node.id('glue')
+local HLIST = node.id('hlist')
+local VLIST = node.id('vlist')
 --
 
 
@@ -124,6 +125,9 @@ end
 -- Parse \loadfont:
 nvt.parseloadfont = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ','
+  if string.find(s, 'all') then
+    s = 'dark,thick,heavy,wide,srir,gero,black.thin,icel,plas,'
+  end
   if string.find(s, 'dark,') then
     nvt.hasdark = 1 ; s = string.gsub(s, 'dark', '')
     tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
@@ -237,8 +241,8 @@ nvt.parseimage = function (star,opt,file) -----
   end
   if sc == 1 then
     tex.sprint('\\def\\tmplines{1}')
-  elseif f == 'page' then
-    tex.sprint('\\def\\tmplines{' .. (nvt.lines - 6) .. '}')
+  elseif f == 'page' then -----
+    tex.sprint('\\def\\tmplines{' .. (nvt.lines - 6) .. '}') ------
   else
     l, n = string.gsub(opt, '.*lines=', '') ; l = string.gsub(l, ',.*', '')
     if n > 1 then ok = false end
@@ -389,8 +393,8 @@ end
 nvt.get_page_glyphs = function (h,n)
   local p = ' on PDFpage ' .. tex.getcount('c@page') .. '.'
   for t in node.traverse(h) do
-    if t.id == hlist or t.id == vlist then nvt.get_page_glyphs(t.list,n+1) end
-    if t.id == glyph then
+    if t.id == HLIST or t.id == VLIST then nvt.get_page_glyphs(t.list,n+1) end
+    if t.id == GLYPH then
       if t.char == 34 then -- \real{"} has different char code.
         texio.write_nl('! Problem: Double quotes' .. p .. '\n')
         nvt.qq = nvt.qq + 1 ; nvt.good = false
@@ -1045,8 +1049,8 @@ end
 -- This is mandatory in some languages, desirable in others (such as English).
 nvt.prevent_single_letter = function(head)
   while head do
-    if head.id == 37 and unicode.utf8.match(unicode.utf8.char(head.char),'%a') then
-      if head.prev.id == 10 and head.next.id == 10 then
+    if head.id == GLYPH and unicode.utf8.match(unicode.utf8.char(head.char),'%a') then
+      if head.prev.id == GLUE and head.next.id == GLUE then
         local p = node.new('penalty')
         p.penalty = 10000
         node.insert_after(head,head,p)

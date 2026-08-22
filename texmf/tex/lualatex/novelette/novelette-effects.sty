@@ -2,7 +2,7 @@
 %% For Copyright and License, see accompaning file 'novelette.cls'.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{novelette-effects}[2026-04-25 Text Effects]
+\ProvidesPackage{novelette-effects}[2026-08-20 Text Effects]
 
 
 %% OVERVIEW:
@@ -297,6 +297,10 @@
     \fi%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
     \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpspace\char"200D{#2}\char"200D}}%%
+    \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
+    \ifnum\tmpboxdp=1\relax%%
+      \nvt@warn{\string\name\space content has disallowed characters.}%%
+    \fi%%
     \edef\tmpwdz{\the\wd0}%%
     \edef\tmpwide{\fpeval{\wd0 > \textwidth}}%%
     \ifnum\tmpwide=1\relax%%

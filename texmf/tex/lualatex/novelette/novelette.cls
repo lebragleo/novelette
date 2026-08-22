@@ -13,25 +13,32 @@
 %% Where such code is used, its attribution must be retained, unless the code is removed.
 %%
 %% License for fonts:
-%%   The Open Font License. URL openfontlicense.org.
+%%   The SIL Open Font License, without Reserved Font Name. A copy of this license is included
+%% in the same folder as the Novelette OpenType fonts, and is also available at
+%% https://openfontlicense.org.
 %%
-%% License for all Novelette files, other than fonts: The MIT License.
+%% License for all Novelette files, other than fonts:
+%% The MIT License
 %%   Permission is hereby granted, free of charge, to any person obtaining a copy
-%% of this software and associated documentation files (the "Software"), to deal
-%% in the Software without restriction, including without limitation the rights
-%% to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-%% copies of the Software, and to permit persons to whom the Software is
-%% furnished to do so, subject to the following conditions:
-%%   The above copyright notice and this permission notice shall be included in all
-%% copies or substantial portions of the Software.
-%%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-%% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-%% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-%% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-%% LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-%% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-%% SOFTWARE.
+%%   of this software and associated documentation files (the "Software"), to deal
+%%   in the Software without restriction, including without limitation the rights
+%%   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+%%   copies of the Software, and to permit persons to whom the Software is
+%%   furnished to do so, subject to the following conditions:
 %%
+%%   The above copyright notice and this permission notice shall be included in all
+%%   copies or substantial portions of the Software.
+%%
+%%   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+%%   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+%%   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+%%   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+%%   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+%%   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+%%   SOFTWARE.
+%% End MIT License.
+
+
 
 %% NOTES for developers and maintainers:
 %%   Except for code copied into 'novelette-fonts.sty', Novelette does not use ExplSyntax.
@@ -59,7 +66,7 @@
 %%
 
 \NeedsTeXFormat{LaTeX2e}[2025/01/01] %% Requires TeX 2025 or later.
-\ProvidesClass{novelette}[2026/08/20 v0.1.2^^JLuaLaTeX document class, original popular fiction.]
+\ProvidesClass{novelette}[2026/08/20 v0.1.3^^JLuaLaTeX document class, original popular fiction.]
 
 %% OVERVIEW:
 %%   Novelette is intended for one thing only: original popular fiction, printed. What that means:
@@ -228,6 +235,8 @@
     \def\pagecolor{\nvt@nocolorcmd{\string\pagecolor}}
     \def\definecolor{\nvt@nocolorcmd{\string\definecolor}}
   \fi
+  \ifnvt@didversohead\else\def\nvt@versohead{\thetitle}\fi
+  \ifnvt@didrectohead\else\def\nvt@rectohead{\theauthor}\fi
   \def\input#1{}
 }%%
 %%

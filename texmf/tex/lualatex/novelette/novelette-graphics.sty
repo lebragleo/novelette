@@ -2,7 +2,7 @@
 %% For Copyright and License, see accompaning file 'novelette.cls'.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{novelette-graphics}[2026-04-25 Graphics]
+\ProvidesPackage{novelette-graphics}[2026-08-20 Graphics]
 
 
 %% OVERVIEW:
@@ -137,9 +137,9 @@
     \IfBooleanTF{#1}%%
       {\directlua{nvt.parseimage('star','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
       {\directlua{nvt.parseimage('','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
-    \ifnum\tmplines>20\relax%%
-      \ifnvt@compsingle\else\def\tmpimgreturn{0}\fi%%
-    \fi%%
+%%    \ifnum\tmplines>20\relax%%
+%%      \ifnvt@compsingle\else\def\tmpimgreturn{0}\fi%%
+%%    \fi%%
     \ifnum\tmpimgreturn=0\relax%%
       \nvt@err{Bad \string\image\space option [\zopt].^^J%%
         \spii Format: [lines=L,align=A,float=F,tweak=T]^^J%%

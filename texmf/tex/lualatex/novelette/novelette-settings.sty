@@ -2,7 +2,7 @@
 %% For Copyright and License, see accompaning file 'novelette.cls'.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{novelette-settings}[2026-04-25 Novelette Settings]
+\ProvidesPackage{novelette-settings}[2026-08-20 Novelette Settings]
 
 
 %% OVERVIEW:
@@ -70,6 +70,7 @@
 %% as copyright holder, on the copyright page. That avoids problems if someone cheats.
 %% If you don't show your real name, you could only enforce copyright by proving that
 %% "Aloysius Fakename" is "Real E. You". You cannot hide from the distribution database.
+\def\thetitle{Untitled Document}
 \newif\ifnvt@didtitle
 \def\title#1{%%
   \ifnvt@didtitle\nvt@duplicatesettingtrue\fi
@@ -86,6 +87,7 @@
 }%%
 \title{Untitled Document}\nvt@didtitlefalse %% Default.
 %%
+\def\theauthor{Anonymous Author}
 \newif\ifnvt@didauthor
 \def\author#1{%%
   \ifnvt@didauthor\nvt@duplicatesettingtrue\fi
@@ -574,10 +576,13 @@
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\loadfont.^^J%%
       \spii Format: \string\loadfont{comma,separated,codes}^^J%%
-      \spii Codes: dark thick heavy wide black thin icel srir gero plas.}%%
+      \spii Codes: dark thick heavy wide black thin icel srir gero plas.^^J%%
+      \spii For all of them: all.}%%
   \fi
 }%%
+\let\loadfonts\loadfont
 \@onlypreamble\loadfont
+\@onlypreamble\loadfonts
 %%
 
 

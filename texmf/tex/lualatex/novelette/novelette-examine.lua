@@ -1,6 +1,6 @@
 -- This is file 'novelette-examine.lua', part of Novelette document class.
 -- For Copyright and License, see accompanying file 'novelette.cls'.
--- File version: 2026-04-25.
+-- File version: 2026-04-25. Pre-release.
 -- Namespace: nvt
 
 -- This file only loaded if \enable{examine} in draft mode. Loaded AtBeginDocument.

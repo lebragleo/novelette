@@ -2,7 +2,7 @@
 %% For Copyright and License, see accompaning file 'novelette.cls'.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{novelette-layout}[2026-04-25 Page Layout]
+\ProvidesPackage{novelette-layout}[2026-08-20 Page Layout]
 
 
 %% OVERVIEW:
@@ -169,7 +169,7 @@
   }{}%%
   \ifodd\c@page%%
     \edef\tmpexpect{\arabic{nvt@expectpage}}\ifnum\tmpexpect>1\relax%%
-      \begin{component}[single,noguide,empty]\vfil\strut\hfill%%
+      \begin{component}[single,guide=0,thispagestyle=empty]\vfil\strut\hfill%%
         {\normalfont\upshape\nvt@aff{Scale=4}\char"254D}%%
       \hfill\strut\par\null\end{component}%%
     \fi%%
@@ -197,7 +197,7 @@
   \nvt@blankverso%%
   \ifodd\c@page%%
     \ifnvt@noautodeco\else%%
-      \begin{component}[single,noguide,empty]\vfil\strut\hfill%%
+      \begin{component}[single,guide=0,thispagestyle=empty]\vfil\strut\hfill%%
         {\normalfont\upshape\nvt@aff{Scale=4}\char"254D}%%
       \hfill\strut\par\null\end{component}%%
       \nvt@blankverso%%
