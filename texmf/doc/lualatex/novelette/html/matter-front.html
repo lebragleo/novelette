@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Front Matter</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="index.html">Alphabetical Index</a>
+</div>
+
+<h2>Novelette Documentation - Front Matter</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+<p>Front matter precedes your story. It contains information about the book: title, author,
+copyright, and often other things that are not part of the story itself.</p>
+<p>Professional nonfiction often has extended front matter, where the author (or others)
+explain why you should read this book, and why you should believe what you read. Or, in
+the case of reprinted classical material, there may be critical or historical essays there.</p>
+<p>Popular fiction almost never has extended front matter. Get to the story! A good minimum
+for front matter is six (6) pages: Half-Title, Frontispiece (often blank), Title Page,
+Copyright Page, Transitional Page (often a Dedication or Epigraph), blank page. Then the
+main matter (the story) begins on the next page, which is always recto.</p>
+
+
+<h4>Disabling Page Reset: \disable{pagereset}</h4>
+<p>In the PDF, all pages are numbered from 1, without reset. In print, it is usually the case
+that front matter pages are numbered from lowercase roman <code>i</code>, but these numbers
+do not appear unless the frontmatter is extended. Then, the printed page numbering
+is reset to arabic 1 at main matter. This means that page numbers visible in print, are not
+the same as their page numbers in the PDF.</p>
+<p>If you wish to have the PDF page numbers be the same as their printed numbers,
+write <code>\disable{pagereset}</code> in Preamble. Then, page numbers are arabic throughout,
+without reset. It will still be the case that some pages will not show their page numbers.</p>
+
+
+<h4>Using \frontmatter</h4>
+<p>Write <code>\frontmatter</code> immediately after <code>\begin{document}</code>. Once used,
+repeated <code>\frontmatter</code> commands will be ignored.</p>
+
+
+<h4>Half-Title Page</h4>
+<p>It is customary to use a "half-title" as first page in frontmatter. Historically, this was
+a dust cover for books that were printed, but not yet bound. It remains useful, as a way
+to protect the title page, and as a place where readers can get your autograph or
+write a note.</p>
+<p>The half-title page contains nothing but the title. No author. Usually no subtitle.
+It should be styled the same as on the title page, but with smaller text. You may use
+an image.</p>
+
+
+<h4>Frontispiece</h4>
+<p>The second page of front matter has no particular purpose. In the era of great books,
+it might show artwork related to the book's theme. Nowadays, it is likely to contain
+a list of books by the same author, or an advertisement for some product. Most often,
+it is simply blank.</p>
+<ul>
+<li><p>Most print-on-demand services discourage a list of books by the same author, unless they
+are the service for all of them.</p></li>
+<li><p>This is <i>not</i> the place to write about yourself, or your inspiration and experiences
+for writing the story!</p></li>
+<ii><p>If you have high-quality line art related to the story's theme, you may put it here.
+But avoid poor drawings. Photographs can be used, but they will not print well with the
+technology used for your book, so avoid them.</p></li>
+<li><p>You may place a map, a diagram of the crime scene, a family history, a drawing of
+one of the scenes, or something else related to the story. But only place it here,
+if it is an inessential decorative item, rather than something the reader must view
+to understand the story.</p></li>
+<li><p>If in doubt, leave this page blank: <code>\blankpage</code></p></li>
+</ul>
+
+
+<h4>Title Page</h4>
+<p>The third page in front matter is the title page. It contains the title, subtitle, and author.
+Often, it contains the name and location of the publisher at the bottom of the page.
+Remember that the publisher of a self-published book is <i>you</i>, not the print service.</p>
+<p>Best practice is to make a visually interesting title page, possible rendering some of
+it as a fancy image. Do not make it so fancy that the title is hard to read.</p>
+<p>Sample title page:</p>
+<div class="code"><code><!-- do not copy this from its html source text -->
+\begin{component}<br>
+\blanline\blankline\blankline<br>
+\blankline\blankline<br>
+\name{THE}\name{CONSPIRACY}\name{MANIFESTO}<br>
+\blankline<br>
+\subname{LONDON}<br>
+\blankline\blankline\blankline<br>
+\name{Jack DeRipper}<br>
+\vfill % forces next content to bottom<br>
+\begin{block}[align=center]<br>
+Indescribably Bad Press &bull; Honking, New Zealand<br> 
+\end{block}<br>
+\end{component}
+</code></div>
+
+
+
+<h4>Copyright Page</h4>
+<p>The fourth page in front matter is the copyright page. Different jurisdictions and print
+services have requirements for what must or must not appear on this page. Novelette does
+not know. It is your responsibility. Suggestions:</p>
+<ul>
+<li><p>Use the <code>[legal]</code> option for the component environment. This applies
+some formats that are specifically designed for this page:</p>
+<ul>
+<li><p>Text is horizontally centered. Be sure to use manual line breaks <code>\\</code>
+to ensure that line do not wrap or span the full textblock width.</p></li>
+<li><p>The block of text appears slightly below the vertical center of the page.</p></li>
+<li><p>Hyphenation is disabled. Oldstyle numerals are disabled.</p></li>
+<li><p>You may use Italics and small caps. But you may not use <code>\name</code> or any other
+styling commands.</p></li>
+<li><p>You may not use the block environment, because the page already is within a block.</p></li>
+<li><p>Paragraphs are not indented, and there is a line gap between paragraphs.</p></li>
+</ul></li>
+<li><p>Write the title, subtitle, and author.<br>
+Format <code>Title : Subtitle / Author</code>.<br>
+You may use more than one line.</p></li>
+<li><p>If you use a pseudonym as author, use your real name as copyright holder.</p></li>
+<li><p>You may paste the copyright symbol, or write <code>{\copyright}</code>. It is not
+enough to write <code>(c)</code> there.</p></li>
+</ul>
+<p>Sample copyright page, which is very minimal:</p>
+<div class="code"><code><!-- do not copy this from its html source text -->
+\begin{component}[legal]<br>
+The Conspiracy Manifesto : London\\<br>
+/ Jack DeRipper\par<br>
+Copyright ©2026 Penelope Withers.\\<br>
+All Rights Reserved.\par<br>
+Published by Indescribably Bad Press,\\<br>
+Honking, New Zealand.\\<br>
+https://indescribablybadpress.com\par<br>
+ISBN 978-0-00-000000-0\par<br>
+\end{component}
+</code></div>
+
+
+<h4>Transitional Page</h4>
+<p>The copyright page is verso, and the start of your story will be recto. But you do not want
+these pages to face each other. Transition to the rescue, as the fifth page of front matter!</p>
+<p>Possibilities for a transition page:</p>
+<ul>
+<li><p>Epigraph. Under-used. A good epigraph can be most effective. It is a short piece
+of prose or poetry that directly leads to the theme of your book. Perhaps the most
+famous in this category is Tolkien's "One ring to rule them all..."</p>
+<p>Professional publishers make business arrangements so that one author can use some words from
+a different author. Don't do it. You are not in the business.</p>
+<p>Here is <a href="verse.html">how to write an epigraph</a>.</li>
+<li><p>Dedication. Over-used. There was a time when an author would dedicate the book to
+some wealthy nobleman, in hopes of getting a subsidy. Obsolete, but a dedication is still
+used for other purposes. It is simply a short <a href="verse.html">epigraph</a>.</p></li>
+<li><p>Short table of contents. Unusual, but possible. Most popular fiction has no table,
+unless it is a collection of short stories.<p>
+<p>Novelette cannot automatically create a table of contents. If you need one, you must do it
+yourself. <a href="table-of-contents.html">Here is how.</a></p></li>
+<li><p>Brief author's note. Unusual, but possible. Might be useful if your novel is a historical
+romance, and you wish to inform the reader that the story's volcanic eruption really happened
+in that era. Best practice is to style it like a one-page chapter.</p>
+<p>This is <i>not</i> the place to write about yourself! Any author's note must
+directly lead into the story.</p></li>
+<li><p>Repeat of the half-title page. This is sometimes used when the author has nothing else
+to put there. When front matter is extended, the half-title page is reapted at as the
+first page of main matter.</p></li>
+<li><p>If Novelette detects that <code>\mainmatter</code> immediately follows the
+<code>[legal]</code> page, it will insert a placeholder transition, in the form of a large
+design character. Not best, but it does not hurt.</p></li>
+</ul>
+
+
+<h4>Blank Page</h4>
+<p>The verso page, facing the start of your story, must be blank. Easy to do:</p>
+<div class="code"><code>\blankpage</code></div>
+
+
+<h4>Main Matter</h4>
+<p>Front matter ends, and main matter begins, with this command: <code>\mainmatter</code>.
+Unless you used <code>\disable{pagereset}</code> in preamble, that resets the printable
+page number to arabic 1. It does not reset the internal PDF page number.</p>
+<p>Subsequent use of <code>\mainmatter</code> will be ignored.</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

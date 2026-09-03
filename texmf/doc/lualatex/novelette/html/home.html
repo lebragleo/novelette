@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Home</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+HOME &nbsp;
+<a href="installation.html">&bull;Installation</a> &nbsp;
+<a href="tutorials.html">&bull;Tutorials</a> &nbsp;
+<a href="methods.html">&bull;How-To</a> &nbsp;
+<a href="index.html">&bull;Alphabetic Index</a>
+</div>
+
+<h2>Novelette Documentation - Home</h2>
+
+<div id="navbarb">
+<a href="#overview">Overview</a> &nbsp;
+<a href="#platform">Platform Support</a> &nbsp;
+<a href="#writing">Writing/Editing Software</a> &nbsp;
+<a href="#gui">GUI Programs</a> &nbsp;
+<a href="#pod">Print On Demand (POD)</a> &nbsp;
+<a href="#packages">Fonts and Packages</a> &nbsp;
+<a href="#images">Images</a> &nbsp;
+<a href="#language">Language Support</a> &nbsp;
+<a href="#dev">Developer/Maintainer</a>
+</div>
+
+
+<a id="overview"></a>
+<h3>Overview</h3>
+<p>Novelette is a custom LuaLaTeX document class, designed for one purpose only:
+original fiction, printed to paper, no color.</p>
+<p>If your work is an Ebook, nonfiction, academic, or a reprint of someone else's work,
+then do not use Novelette; it will not have features that you need.
+In particular, Novelette does not support math.</p>
+<p>If your book is nonfiction, but looks and reads like fiction, then perhaps you can
+use Novelette. That might includes some memoirs, or travelogues (wthout photos).</p>
+<p>Do you already have good knowledge of LaTeX? If so, then forget most of what you know.
+And, do not look at online LaTeX how-to pages; they do not correspond to Novelette.</p>
+
+
+<a id="platform"></a>
+<h4>Platform Support</h4>
+<p>If you can install TeXlive with LuaTeX support, then you can use Novelette.
+The <a href="installation.html">installation</a> page provides details.</p>
+<p>Note that Windows users may need to switch to its Linux subsytem (Windows 10+)
+for full benefit, especially when your book interior has images.</p>
+
+
+<a id="writing"></a>
+<h4>Writing/Editing Software</h4>
+<p>Novelette does not know, or care, what you use for writing. It may be a plain text editor,
+or a word processor. But your text must be saved (or exported) as <i>plain text,</i> with
+UTF-8 (Unicode) encoding, without BOM (byte order mark).</p>
+<p>Some programs allow you to save (or export) as LaTeX. Do not do that! It would add code
+that fails in Novelette.</p>
+
+
+<a id="gui"></a>
+<h4>LaTeX GUI Programs</h4>
+<p>Most LaTeX GUI programs (such as TeXshop, TeXstudio) are designed for creating academic
+papers with mathematics. They offer many things that Novelette cannot use, and fail to
+understand Novelette custom code. Avoid them.</p>
+<p>The very basic <i>TeXworks</i> GUI can be used. Or, no GUI at all.</p>
+
+
+<a id="pod"></a>
+<h4>Print-On-Demand (POD)</h4>
+<p>Novelette expects that your book will be printed and distributed as print-on-demand. It can
+directly produce <i>PDF/X&#8209;1a:2001</i> format, which is often requested by POD services.</p>
+<p>Since POD is notorious for lighter-than-expected text, Novelette's fonts are
+designed to take that into account.</p>
+
+
+<a id="packages"></a>
+<h4>Fonts and Packages</h4>
+<p>Novelette is self-contained. It has been created for its intended purpose only.
+You cannot add other fonts or packages.</p>
+<p>If Novelette cannot do what you want, then you don't need it. Seriously! The developer
+has spent many hours looking through the murder mystery, science fiction, and general
+fiction shelves at the public library. Novelette can do all but the most exotic of them.</p>
+<p>Some locations, such as the title page and chapter openers, can benefit from dramatic
+use of text. Novelette provides a few useful fonts for that purpose. Otherwise, use images.
+Since images are raster, you may use any fonts that your graphics program can read
+(and that you are licensed to use for that purpose), and you can add non-font decorations.</p>
+
+
+<a id="images"></a>
+<h4>Images</h4>
+<p>Images must be non-color <i>png</i> raster format. Details are provided
+<a href="png-graphics.html">elsewhere</a> in this documentation.</p>
+<p>If your book is very image-intensive (such as graphic novel), then do not use Novelette.
+For that, you need a page layout program. If your book contains photographs that must look
+like photographs (instead of vaguely like them), then you cannot use Novelette, because
+that requires a commercial print technology that Novelette does not support.</p>
+<p>Novelette cannot do color cover artwork. That's a job for your graphics program.</p>
+
+
+<a id="language"></a>
+<h4>Language Support</h4>
+<p>Novelette is optimized for English. It also supports most (not all) major Western European
+languages, but no Eastern European or other world languages. If your language is supported,
+but is not English, be sure to review <a href="language.html">Novelette's capabilities</a>
+before you write your book.</p>
+<p>If Novelette fonts have the characters you need, and the hyphenation pattern for your
+language, that is all you can expect. Many languages have specific typesetting rules.
+Although Novelette knows a few of them, you may need to manually solve language-specific
+typesetting problems yourself. The Novelette developer will not add code for language-specific
+problems.</p>
+
+
+<hr/>
+
+
+<a id="dev"></a>
+<h4>For Developers and Maintainers</h4>
+<p>If you are a developer or maintainer (not ordinary author),
+<a href="maintainer.html">look here</a> for notes.</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

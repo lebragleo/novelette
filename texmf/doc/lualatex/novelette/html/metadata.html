@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Metadata</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="index.html">INDEX</a>
+</div>
+
+<h2>Novelette Documentation - Metadata</h2>
+
+<div id="navbarb">
+<a href="#TOP">Overview</a> &nbsp;
+<a href="#allowed">Allowed Characters</a> &nbsp;
+<a href="#titsub">Title and Subtitle</a> &nbsp;
+<a href="#author">Author</a> &nbsp;
+<a href="#same">Same Everywhere</a> &nbsp;
+<a href="#verdoc">Version and Docdate</a> &nbsp;
+<a href="#pdfx">PDF/X</a> &nbsp;
+<a href="#xmp">XMP</a>
+</div>
+
+
+<h3>Overview</h3>
+<p><b>Important: </b>Novelette does not use the modern <code>\DocumentMetadata</code> setting.
+If you use it, an error results. This is not a bug. It is due to the difference between
+the needs for print-to-paper books, and assistive Ebooks.</p>
+<p>You must provide the book title and author. You may also provide a subtitle. If your book
+has more than one edition, or if you are concerned about version control, then you may
+set version and docdate.</p>
+<p>In draft mode, you may omit some or all metadata. Athough this is bad practice, it may be
+useful if you have not yet decided on the book's title, or other information. Novelette
+will provide generic defaults. But you cannot proceed to preview or final mode until you
+have set the title and author.</p>
+<p>In draft and preview modes, Novelette will automatically edit metadata, so that the PDF
+is not confused with the final result. This will also happen if you request final mode,
+but it is prevented by error or warning.
+<p>In final mode, when a PDF compiles without error or warning, it can be PDF/X-1a:2001 format.
+Even though this format is old, it is preferred by many print-on-demand services, because
+it is the closest to "digital paper" that PDF can provide.</p>
+<p>The PDF will always have an old-fashioned Info dictionary. You may choose whether or not
+it also has XMP metadata. If your book has a subtitle, you may choose whether the Info
+and XMP have a subtitle entry, or not. These choices may depend on the requirements
+of your print service.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="allowed"></a>
+<h4>Allowed Characters in Title, Subtitle, Author</h4>
+<p>All characters must be in the Latin-1 character set. No exceptions. Although some specialty
+distributors allow more, Novelette does not.</p>
+<p>This table shows allowed and disallowed Latin-1 characters.<br>
+Colors: <span class="okglyph">allowed</span>
+<span class="mayglyph">maybe</span>
+<span class="noglyph">forbidden</span></p>
+
+<p class="glyphtable">
+<span class="okglyph">&nbsp;!</span><span class="noglyph">"</span><!--
+--><span class="mayglyph">#</span><span class="noglyph">$</span><!--
+--><span class="noglyph">%</span><span class="mayglyph">&amp;</span><!--
+--><span class="okglyph">'()</span><span class="mayglyph">*</span><!--
+--><span class="noglyph">+</span><span class="okglyph">,-.</span><!--
+--><span class="mayglyph">/</span><br>
+<span class="okglyph">0123456789</span><!--
+--><span class="mayglyph">:;</span><span class="noglyph">&lt;=&gt;</span><!--
+--><span class="okglyph">?</span><br>
+<span class="mayglyph">@</span><span class="okglyph">ABCDEFGHIJKLMNO</span><br>
+<span class="okglyph">PQRSTUVWXYZ</span><span class="noglyph">[\]^_</span><br>
+<span class="noglyph">`</span><span class="okglyph">abcdefghijklmno</span><br>
+<span class="okglyph">pqrstuvwxyz</span><span class="noglyph">{|}~&nbsp;</span>
+</p>
+
+<p class="glyphtable">
+<span class="noglyph">&nbsp;</span><span class="okglyph">¡</span><!--
+--><span class="noglyph">¢£¤¥¦§¨©ª«¬-®¯</span><br>
+<span class="noglyph">°±²³´µ¶</span><span class="mayglyph">·</span><!--
+--><span class="noglyph">¸¹º»¼½¾</span><span class="okglyph">¿</span><br>
+<span class="okglyph">ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ</span><br>
+<span class="okglyph">ÐÑÒÓÔÕÖ</span><span class="noglyph">×</span><!--
+--><span class="okglyph">ØÙÚÛÜÝÞß</span><br>
+<span class="okglyph">àáâãäåæçèéêëìíîï</span><br>
+<span class="okglyph">ðñòóôõö</span><span class="noglyph">÷</span><!--
+--><span class="okglyph">øùúûüýþÿ</span>
+</p>
+
+<p class="noindent">Things to note:</p>
+<ul>
+<li><p>If you use any of # &amp; @ characters, they must be escaped by backslash:
+<code>\# \&amp; \@</code>. If you use these characters, then they must
+be consistently used wherever the title, subtitle, or author appear. If you register
+<i>The Three-Dollar Thief</i> as title, then you cannot print
+<i>The $3 Thief</i> on the cover, title or copyright pages,
+or page headers.</p></li>
+<li><p>Except as described above, you cannot use the backslash character for any purpose.
+No macros. No codes such as <code>\'E</code> for Eacute.</p></li>
+<li><p>The middot (periodcentered) character may only be used if necessary in Catalan,
+and only if your distributor allows it. Better practice: Only use words that do not require
+this character.</p></li>
+<li><p>Novelette disallows Monetary units and percent, even though some distributors allow them.
+In general, books with those symbols are nonfiction investment advice, which is not a Novelette
+genre. You may spell the words: <i>The Three-Dollar Thief</i>
+or <i>Eighty Percent Good</i>.</p></li>
+<li><p>The semicolon is allowed, but discouraged, as it is likely to cause confusion. The only
+well-known book with a semicolon in its title is <i>Moby-Dick; or, The Whale</i>.</p></li>
+<li><p>The asterisk is sometimes used as a trick for bad language:
+<i>Sh*tty Story</i>. The only well-known book with asterisk in its title
+(long before it became a TV series) is <i>M*A*S*H</i>.</p></li>
+<li><p>The colon is normally used only to separate title from subtitle, when they appear
+on the same line. If you use <i>This : That</i> as title, it may be interpreted as
+title <i>This</i> with subtitle <i>That</i>. Certain to cause confusion, if there is also
+a separate subtitle.</p></li>
+<li><p>The numbersign is normally used only to indicate books in a series, such as
+<i>The Blonk (Potboiler #5)</i>.</p></li>
+<li><p>The forward slash is sometimes used to indicate alternate titles, for example
+when there are two short books printed as one book. If the metadata needs a fraction,
+best practice is to spell it out: <i>Three-Fourths</i>, not <i>3/4</i>.</p></li>
+<li><p>If you use parentheses, they must (properly match).</p></li>
+<li><p>No quotes of any kind. The quotesingle character may be used only as an apostrophe,
+and that's a fact.</p></li>
+<li><p>You cannot use <code>--</code> or <code>---</code> to create dashes.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="titsub"></a>
+<h4>\title{Book Title} and \subtitle{Book Subtitle}</h4>
+<ul>
+<li><p>The subtitle is optional.</p></li>
+<li><p>Novelette restricts the total number of characters in title plus subtitle to about 200.
+That's a lot more than you need for popular fiction. Some distributors prefer that the
+total not exceed 75 characters.</p></li>
+<li><p>In draft mode, you may omit the title. Novelette provides a default. But in preview
+and final modes, you must provide the title.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="author"></a>
+<h4>\author{Real or Pseudonym}</h4>
+<ul>
+<li><p>The author name is as-spoken: <i>Jane Smith</i>, not <i>Smith, Jane</i>.</p></li>
+<li><p>Novelette has no provision for multiple authors, but you may write
+<i>Jane Smith and John Jones</i>.</p></li>
+<li><p><b>Important: </b> if you use a pseudonym, be sure to use your real name as copyright
+holder, on the copyright page. If the author is <i>Joe Fakename</i> and someone infringes the
+copyright, you will need to provide that you, <i>Jack Realname</i>, have the right to enforce
+that copyright. Yes, this can actually happen. Although the database can match the two names,
+that is an extra step, and extra trouble.</p></li>
+<li><p>A pseudonym will not conceal your real name from those who wish to know it.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="same"></a>
+<h4>Same title, subtitle, author everywhere</h4>
+<ul>
+<li><p>Print-on-demand requires that the title, subtitle, and author that you register with
+the distribution database, be the same as they appear anywhere in your book.</p>
+<p>If the title is <i>Twenty-Five Thousand Ways to Catch Crocodiles,</i> that is too long
+to print in page headers (even if it fits, it would be distracting). You cannot
+abbreviate it as <i>25000 Ways</i> or <i>Catching Crocs</i>.</p>
+<p>If the author is <i>Aloysius Presumptuous Morgenthanger,</i> the distributor might
+possibly allow you to use <i>A. P. Morgenthanger</i> in page headers and other places.
+But do not rely on this!</p></li>
+<li><p>For visual effect, you may change case. If the title is <i>Win Whenever,</i> you may
+show it as <i>WIN WHENEVER</i> in print. The database is case-insensitive.</p>
+<p>If page headers show the title, they do not need to show the subtitle. But if the title is
+<i>Magma</i>, subtitle <i>The Garnering</i>, then you might use
+<i>Magma : The Garnering</i> because it is short enough.</p></li>
+<li><p>If the distributor insists that you change something so that all of the metadata matches,
+do not complain. Obey.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="verdoc"></a>
+<h4>\version{text} and \docdate{yyyy-mm-dd}</h4>
+<p>These two settings are optional. They are not registered with the distribution database.
+Their only purpose is for your own version control, if you are trying different plot lines,
+or your book is being reprinted with changes.</p>
+<ul>
+<li><p>Every PDF contains two hex-code strings that serve as identifiers. In principle, the
+<i>unique identifier</i> remains unchanged, even when there are minor edits; the
+<i>per-instance</i> identifier changes whenever there are edits.</p></li>
+<li><p>But that is "in principle." In reality, depending on various factors, standard LaTeX may
+simply create two new hex strings, every time the LaTeX document is produced to PDF, even if
+nothing has changed. Then, the hex strings are useless for version control.</p></li>
+<li><p>Novelette creates the unique identifier from a hash of the title, subtitle, author,
+and docdate (but not the version). As long as those remain unchanged, the unique identifier
+will be the same.</p></li>
+<li><p>The per-instance identifier hashes all of the metadata, including version.</p></li>
+</ul>
+<p class="noindent">Syntax for <code>\version</code>:</p>
+<ul>
+<li><p><code>\version{<i>text</i>}</code> has no particular format for its text. It could
+be left empty (default), or be a number such as <i>1.4</i>, or a more elaborate string
+such as <i>After surfing on July 14</i>. As long as the characters
+are allowed, Novelette does not care.</p></li>
+<li><p>If your book has multiple editions, or is printed in several sizes, best practice is
+to set the version so that it describes the edition, such as
+<code>\version{Second Edition, B-Format, rev 6}.</code></p></li>
+</ul>
+<p class="noindent">Syntax for <code>\docdate</code>:</p>
+<ul>
+<li><p><code>\docdate{<i>yyyy-mm-dd</i>}</code> should be the date on which you began work
+on this document, not the current date. A book with docdate <i>2024-08-23</i> retains
+that date, even if it is not finished until months later.</p>
+<p>If you re-write a story that others have already seen, then change the docdate for
+the revision. That helps to identify which came first.</p></li>
+<li><p>There is no legal significance to the docdate. Novelette does not check its value,
+only its format as <i>yyyy-mm-dd</i>. A docdate of <i>2056-14-43</i> makes no sense,
+but will be allowed.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="pdfx"></a>
+<h4>PDF/X Format: \pdfx{<i>setting</i>}</h4>
+<p>Many print-on-demand services request <i>PDF/X-1a:2001</i> format. This requires everything
+that a printed book needs, and disallows anything that a printed book cannot use. Although it is
+useless for modern Ebooks, it is the closest to "digital paper" that PDF an provide.</p>
+<p>For example: If a PDF contains hyperlinks, your home or office printer will print it without
+complaint. But it will be rejected by your book print service, because hyperlinks serve
+no purpose in print, and different printers would render them differently.</p>
+<p>Novelette has built-in support for <i>PDF/X-1a:2001</i> format. It is automatically applied in
+final mode, when the document comples without error or warning. Otherwise, it is not applied.
+You may adjust its properties with the <code>\pdfx{<i>setting</i>}</code> command
+in Preamble:</p>
+<ul>
+<li><p><code>\pdfx{fogra}</code> is the default for all languages except American English.
+This sets the Output Intent to <i>FOGRA39</i>, a generic CMYK print condition.</p></li>
+<li><p><code>\pdfx{swop}</code> is the default for American English. This sets the Output
+Intent to <i>CGATS TR 001</i>, better known as <i>U.S. Web Coated (SWOP) v2.</i> This is
+a similar, generic CMYK print condition.</p></li>
+<li><p><code>\pdfx{off}</code> disables <i>PDF/X-1a:2001</i> format. Only use this when requested
+by the distributor.</p></li>
+<li><p>Although the print condition is CMYK, Novelette only uses black ink,
+<span class="nowrap">(0C 0M 0Y 100K).</span> If your book has grayscale images, the printer will
+emulate grays by raster dot patterns, not by gray ink.</p></li>
+<li><p>No color profile (*.icc) is attached or named.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="xmp"></a>
+<h4>XMP Metadata: \enable{xmp}</h4>
+<p>Modern Ebooks, and similar digital publications, place metadata in a special <i>XMP</i>
+block. This is human-readable, UTF8 encoded XML format, and is easily read by database search.
+It can contain much more useful information than the older PDF Info dictionary, which is not
+encoded as UTF8.</p>
+<p>Readers do not see your PDF file. The distribution database contains whatever is needed for
+search, using the terms that your provide when you register your book. Thus, <i>XMP</i>
+is not relevant for print. Also, the <i>PDF/X-1a:2001</i> format preceded the use of
+<i>XMP.</i></p>
+<p>If your distributor requests <i>XMP</i>, use <code>\enable{xmp}</code> in Preamble.
+This retains the Info dictionary (required) and adds the XMP metadata block.</p>
+<p>When distributors request "without metadata", they mean that you <i>must not</i> use XMP.</p>
+
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+</div><!-- end master -->
+</body>
+</html>

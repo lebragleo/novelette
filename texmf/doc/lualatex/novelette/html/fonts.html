@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Fonts</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">Home</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="intro.html">Tutorials and How-To</a>/FONTS &nbsp;
+<a href="index.html">Alphabetic Index</a>
+</div>
+
+<h2>Novelette Documentation - Fonts</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#size">Size and Skip</a> &nbsp;
+<a href="#mainfont">Main Font</a> &nbsp;
+<a href="#smallfont">Small Font</a> &nbsp;
+<a href="#otherfonts">Other Fonts</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+
+<p>Novelette comes with its own fonts They are custom&#8209;designed for the purpose
+of print&#8209;on&#8209;demand popular fiction, and have properties that are known to Novelette.
+You may not add any other fonts, but you may use other software to create <i>png</i> images
+with text in any font allowed by its license.</p>
+<p>All of the Novelette fonts, by Terry Lebragleo, carry the SIL Open Font License. They are
+free for commercial use. If someone else creates fonts with base name Novelette,
+they are unrelated, and may have a different license.</p>
+<p>Although you may use these fonts in a word processor or other LaTeX document class,
+that is not a good idea, because you will not have the benefit of font-Novelette interaction.</p>
+<p>Fonts are always subset-embedded in your PDF.</p>
+
+
+<a id="size"></a>
+<h4>Main (Normal) Font Size and Baseline Skip</h4>
+<ul>
+<li><p>Main font size is calculated from <code>\trimsize</code> and <code>\layout</code>.
+You do not directly choose the font size or baseline skip.</p>
+<ul>
+<li><p>The largest main font size is 12.05pt (12 PostScript points), typical for
+large trimsize.</p></li>
+<li><p>The smallest main font size is 10.7pt (10.66 PostScript points), for small trimsize
+and congested layout.</p></li>
+<li><p>For medium-size books (5.5in x 8.5in, or Demy 135mm x 216mm), using header or footer
+(but not both), main font size is typically 11.7pt (11.66 PostScript points). It can vary
+&plusmn;3% from that, depending on settings.</p></li>
+</ul></li>
+<li><p>Calculated baseline skip is never less than 1.2x the calculated font size. It will be more,
+when your trimsize is large, or there are few lines per page.</p></li>
+</ul>
+
+
+<a id="mainfont"></a>
+<h4>NoveletteSerif12</h4>
+<ul>
+<li><p>NoveletteSerif12 is the only font that is used in ordinary text. This book&#8209;weight
+font is designed for relaxed, continuous reading. It has Regular and Italic shapes, but not Bold
+or BoldItalic.</p></li>
+<li><p>It is vaguely in the same class as Garamond or Bembo, but is not a clone or historical
+reproduction of any font.</p></li>
+<li><p>It may also be used in page headers, block environments, and display zones.</p></li>
+<li><p>The Regular shape includes small caps, oldstyle and lining numerals, and some
+special&#8209;purpose characters.</p></li>
+<li><p>The Italic shape has oldstyle and lining numerals, but not small caps.</p></li>
+<li><p>Depending on trim size and layout, this font is set in the range 10.7 to 12.05pt.</p></li>
+</ul>
+
+
+<a id="smallfont"></a>
+<h4>NoveletteSerif10</h4>
+<ul>
+<li><p>NoveletteSerif10 is automatically substituted for NoveletteSerif12, in footnotes and in
+blocks with small text. You cannot select it manually.</p></li>
+<li><p>Except for some special characters, the character set and features are identical to
+NoveletteSerif12, for the Regular and Italic shapes.</p></li>
+<li><p>This font is very slightly heavier than NoveletteSerif12, but it looks correct at its
+smaller size, which is 87.5% main font size. That is comparable to using 10.5pt for small text,
+when main text is 12pt.</p></li>
+<li><p>At the smallest font size, this font is set to 9.1pt. Its readability should be
+comparable to fonts such as Aptos, Calibri, or Times New Roman at 8.1pt, or Adobe Garamond
+Pro at 9.5pt.</p></li>
+</ul>
+
+
+<a id="otherfonts"></a>
+<h4>NoveletteSans and NoveletteDeco Fonts</h4>
+<ul>
+<li><p>These are several fonts, which may be used for decorative purposes,
+only in certain locations.</p></li>
+<li><p>Font samples:</p>
+<p class="center"><img width="50%" src="images/sans-slender.png" alt=""/></p>
+<p class="center"><img width="50%" src="images/sans-dark.png" alt=""/></p>
+<p class="center"><img width="50%" src="images/sans-heavy.png" alt=""/></p>
+<p class="center"><img width="50%" src="images/sans-wide.png" alt=""/></p>
+</li>
+<li><p>There are no Italics, although some of the fonts are naturally slanted.  Numerals are
+always lining. Many of these fonts do not have lowercase letters
+(if you type lowercase, you see uppercase).</p></li>
+<li><p>These fonts may be used in page header/footer, the <code>\name</code> and
+<code>\subname</code> commands. They may not be used anywhere else.</p></li>
+<li><p>If you need different decorative fonts, you cannot use them in Novelette.
+But you can create <i>png</i> raster images, using any fonts that are licensed for
+your purpose.</p></li>
+<li><p>The Sans fonts are original designs. The Deco fonts are modified from fonts designed
+by others, using the Open Font License.</p></li>
+<li><p>These fonts do not contain characters, even in ASCII and Latin-1, that would not
+normally be used in places such as chapter titles and page headers.</p></li>
+</ul>
+
+
+</div><!-- end master -->
+</body>
+</html>
+

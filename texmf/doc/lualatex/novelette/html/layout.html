@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Trimsize and Layout</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">Home</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="intro.html">Tutorials and How-To</a>&nbsp;
+<a href="index.html">Alphabetic Index</a>
+</div>
+
+<h2>Novelette Documentation - Trimsize and Layout</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#trimsize">Trim Size</a> &nbsp;
+<a href="#layout">Page Layout:</a>
+<a href="#lpp">lines per page</a>
+<a href="#pagestyle">page style</a>
+<a href="#glue">glue strip</a>
+<a href="#cpl">characters per line</a> &nbsp;
+<a href="#bestlayout">Best Choices</a> &nbsp;
+<a href="#nochoice">Unavailable Settings</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+<p>The <i>trim size</i> is the physical width and height of book interior pages, regardless
+of what those pages contain. <i>Page layout</i> refers to general appearance of most pages,
+particularly the number of lines in the main textblock, and whether space is reserved at
+top and bottom for header and footer.</p>
+<p>Unlike other LaTeX document classes, Novelette does not allow you to set margins,
+font size, or line separation. These are automatically calculated, based on trim size and
+layout. The values are those that fit well for print-on-demand popular fiction, according
+to the requirements of most services.</p>
+<p>All values have defaults, which may be determined by other defaults and settings.
+If in doubt, allow the defaults.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="trimsize"></a>
+<h4>Trim Size: \trimsize{<i>width=W,height=H</i>}</h4>
+<p>This command is used at most once, in Preamble. Values <i>W</i> and <i>H</i> are lengths,
+which must have units of either <code>in</code> (inches) or <code>mm</code> (millimeters).
+Default is <code>width=5.5in,height=8.5in</code>, a frequent choice in the USA.</p>
+<p>If you set one of width or height, then you must also set the other. The same units must
+be used for both.</p>
+<p>Novelette limits the size. Height must always exceed width by a certain amount. The smallest
+dimensions will accomodate US 5x7 or British B-format. The largest dimensions will accomodate
+US 6x9 or British Royal. Width may range from 5in to 6in. Height may range from
+7.7in to 9in. The most attractive layouts will be in the middle, US 5.5x8.5 or British Demy.</p>
+<p>Note that the small "mass market" size cannot be used in Novelette. Large textbook and
+business sizes cannot be used.</p>
+<p>When selecting a trim size, be sure to choose one of the standards (lower cost).
+Also be sure to choose <span class="nowrap">off&#8209;white</span> paper, usually called
+<i>cream</i> or <i>creme</i>. Never choose white for popular fiction.</p>
+<p>The distributor may ask whether you want "extended distribution" or something similar.
+Don't do it. That allows booksellers to stock copies without payment unless they are sold.
+When they do not sell, the copies are shredded, and <i>you</i> pay the cost.</p>
+<p>If your book will be printed in more than one trim size, each size is treated as a separate
+book, with its own ISBN code.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="layout"></a>
+<h4>\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</h4>
+<p>This command may be used only once, in Preamble. You may set all of the values, or only some
+of them. Anything you do not set, will retain its default value.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+<a id="lpp"></a>
+<p class="noindent" style="margin-top:.5em"><code><b>lines=<i>L</i></b></code></p>
+<p class="noindent">This sets the integer number of lines per page, in the main textblock of
+running text. It does not count header or footer.</p>
+<ul>
+<li><p>Minimum 26, maximum 35. Default 35.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+<a id="pagestyle"></a>
+<p class="noindent" style="margin-top:.5em"><code><b>pagestyle=<i>P</i></b></code></p>
+<p class="noindent">This sets whether or not pages have a header, a footer, or both. The content
+of headers may not exceed one line. No line is drawn beneath headers.</p>
+<ul>
+<li><p>There will be some pages in the book that do not print the header or footer, but the areas
+for header and footer are still reserved.</p></li>
+<li><p>Other commands are used for setting <a href="#headertext">text in page headers,</a>
+the <a href="#headstyle">font style of the text and numbers,</a> and the
+<a href="#headstyle">page number decoration.</a></p></li>
+<li><p>Choices for <i>P</i> are: <code>marcen plain split center margin</code>.</p>
+<ul>
+<li style="margin-top:12px">
+<p><code>pagestyle=marcen</code> is the default. It provides header, no footer. Page number is at
+outside margin. Decoration, if used, appears near page number. Text of header is centered.</p>
+<p class="center" style="margin:6px;">
+<img src="images/layout-marcen-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-marcen-recto.jpg" width="46%" alt=""/><br>
+<small><i>textblock below header</i></small></p></li>
+<li style="margin-top:12px">
+<p><code>pagestyle=plain</code> provides footer, no header. Page number is centered
+in the footer. Decoration, if used, appears on both sides of page number.</p>
+<p class="center" style="margin:6px;">
+<small><i>textblock above footer</i></small><br>
+<img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+<li style="margin-top:12px">
+<p><code>pagestyle=split</code> provides header and footer. Centered text in header. Centered page
+number in footer. Decoration, if used, appears on both sides of page number</p>
+<p class="center" style="margin:6px;">
+<img src="images/layout-split-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-split-recto.jpg" width="46%" alt=""/>
+</p>
+<p class="center">
+<small><i>textblock between header and footer</i></small></p>
+<p class="center" style="margin:6px;">
+<img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+<li style="margin-top:12px">
+<p><code>pagestyle=center</code> provides header, no footer. Text, decoration (if used),
+and page number are centered in the header. Page number closest to outside.
+Note: If no decoration, a slash will separate text from page number.</p>
+<p class="center" style="margin:6px;">
+<img src="images/layout-center-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-center-recto.jpg" width="46%" alt=""/><br>
+<small><i>textblock below header</i></small></p></li>
+<li style="margin-top:12px">
+<p><code>pagestyle=margin</code> provides header, no footer. Page number at outside margin,
+decoration (if used), text of header. Mirrored verso/recto.</p>
+<p class="center" style="margin:6px;">
+<img src="images/layout-margin-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+<img src="images/layout-margin-recto.jpg" width="46%" alt=""/><br>
+<small><i>textblock below header</i></small></p></li>
+</ul></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+<a id="glue"></a>
+<p class="noindent" style="margin-top:.5em"><code><b>glue=<i>G</i></b></code></p>
+<p class="noindent">The <i>glue strip</i> is the extra margin at the spine. This is where glue
+will be applied during binding, so this area is not visible to the reader.</p>
+<ul>
+<li><p><code>glue=normal</code> is default. It sets glue width at 0.125in (3.2mm), suitable
+for books that do not exceed some page count, usually 300, specified by the printer.</p></li>
+<li><p><code>glue=wide</code> sets glue width 50% wider than normal. This is needed for
+books with large page count.</p></li>
+<li><p>Novelette does not automatically adjust normal/wide. You must do it yourself.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+<a id="cpl"></a>
+<p class="noindent" style="margin-top:.5em"><code><b>cpl=<i>C</i></b></code></p>
+<p class="noindent">Various studies suggest that popular fiction is most easily read, when the
+line width, and number of characters per line, are within certain ranges. Novelette calculates
+the ine width and font size, so that they sit in this range.</p>
+<p>You may slightly adjust the average number of characters per line. This is only an estimate,
+because the number will vary from line to line. If you have a lot to say, or your language
+requires many long words, you may benefit from a larger number. If you have little to say, and
+your language has many short words, you may benefit from a smaller number.</p>
+<ul>
+<li><p>Default <code>cpl=66</code> is optimized for ordinary English. It is likely to be
+useful for other Western Euopean languages.</p></li> 
+<li><p>Range of <code>cpl=C</code> allows 52 <= C <= 72. May be decimal.</p></li>
+<li><p>If in doubt, allow the default.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="bestlayout"></a>
+<h4>Layout Combinations</h4>
+<p>Novelette can produce your book with any combination of the layout settings, at any trim size
+within its allowed size range.</p>
+<p>Some combinations look better than others:</p>
+<p>The "small" sizes 5in x 8in, 129mm x 198mm (B-format), will look best when the layout
+does not use pagestyle=split, when lines=33 or less, and when cpl does not exceed 68.</p>
+<p>The "large" sizes 6in x 9in, 156mm x 234mm (Royal) will look best when pagestyle=split,
+lines=35.</p>
+<p>The "medium" sizes 5.5in x 8.5in, 135mm x 216mm (Demy) are best.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="nochoice"></a>
+<h4>No Settings for Margins, Main Font, or Font Size</h4>
+<p>Surprise! You cannot set the margins. You cannot choose the main font (for normal text).
+You cannot set the font point size, or baseline skip (line&#8209;to&#8209;line space).</p>
+<p>Novelette requires you to use its own fonts. The point size, baseline skip, and margins
+are calculated from your <code>\trimsize</code> and <code>\layout</code> settings. The values
+are optimized for readability in popular fiction, within the constraints imposed by
+print&#8209;on&#8209;demand.</p>
+<p>Why not allow you to over-ride Novelette's calculations? It is unlikely that you would
+manually select better values. Write your story!</p>
+
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+</div><!-- end master -->
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Installation</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<u>Installation</u> &nbsp;
+<a href="intro-00.html">Creating&nbsp;Your&nbsp;Book</a> &nbsp;
+<a href="intro-99.html">INDEX</a>
+</div>
+
+
+<h2>Novelette Documentation - Installation</h2>
+
+
+<div id="navbarb">
+<a href="#overview">Overview</a> &nbsp;
+<a href="#required">Required&nbsp;Software</a> &nbsp;
+<a href="#testtex">TeX&nbsp;Test&nbsp;File</a> &nbsp;
+<a href="#novelette">Installing&nbsp;Novelette</a> &nbsp;
+<a href="#testnovelette">Novelette&nbsp;Test&nbsp;File</a>
+</div>
+
+
+<a id="overview"></a>
+<h3>Overview</h3>
+<p>To use Novelette, you will need a only a small part of the enormous TeXlive software.
+You will need a program that can view PDF. If the book interior has images, you will need
+software for creating <i>png</i> images, and will probably need the ImageMagick program.</p>
+
+
+<h4>Writing</h4>
+<p>The content of your book, for processing by Novelette, must be plain text. That is,
+the text must not contain program-specific markup from word processors. The text must be encoded
+as Unicode <span class="nowrap">utf&#8209;8</span>, without byte order mark (no BOM).</p>
+<ul>
+<li><p>If you already wrote your book (with a word processor), do not depair. Simply load your
+files into the software, and export them as plain text, <span class="nowrap">utf&#8209;8</span>,
+no BOM. Any modern word processor can do that.</p></li>
+<li><p>The machine that you use for writing your text, and the machine that you use for
+processing it with Novelette, may use different operating systems. However, best results
+require you to edit your text after it has been processed, so be sure that you know how
+to do that on any machine.</p></li>
+<li><p>If your operating system is Windows, do not use Notepad. A good plain text editor is
+the free <i>Notepad++</i> software. Be sure it is configured for
+<span class="nowrap">utf&#8209;8</span> encoding, without BOM.</p></li>
+<li><p>On Linux, the Novelette developer uses the <i>nano</i> text editor.</p></li>
+<li><p>Caution: If you use a word processor, be sure that your text is saved/exported as
+<i>plain text,</i> not as LaTeX. You do not want the software to add its own LaTeX code!</p></li>
+</ul>
+
+
+<a id="required"></a>
+<h4>Required Software</h4>
+<p>You need a working installation of TeX version 2024 or later. It must have:</p>
+<ul>
+<li><p>Essential programs and files,</p></li>
+<li><p>LaTeX fundamental packages,</p></li>
+<li><p>LuaTeX packages,</p></li>
+<li><p>US and UK English,</p></li>
+<li><p>Your language package (if not English).</p></li>
+<li><p>If your operating system is Windows, is must be Windows 10 or later. Not MinGW.
+If your book has any images (not including the cover), then you may need to use the
+Linux subsytem for processing image files.</p></li>
+</ul>
+<p class="noindent">That is not a lot! It occupies less than 200Mb on the developer's storage,
+which is less than 5% of all TeXlive. So if you are new to TeX, be sure to install only what
+you need.</p>
+<p>Linux users may obtain TeXlive from the <a href="">TeX Users Group (TUG)</a> or sometimes
+it can be installed from your Linux distribution.</p>
+<p>Mac OS/X users can install <a href="">MacTeX</a>.</p>
+<p>Windows 10+ users can probably use MiKTeX (not tested), but if you are familiar with the
+Linux subsystem and know how to configure it for GUI, do it this way.</p>
+<p>If your operating system is Android, do not despair! Install the
+<a href="https://f-droid.org/en/packages/com.termux/">Termux app from F-Droid</a>.
+It does not require root privilege. Install <i>xfce4</i> and <i>tigervnc</i> into Termux.
+The <i>RealVNC</i> app can display results as GUI. Detailed configuration instructions are online.
+You may then <a href="https://wiki.termux.com/wiki/TeX_Live">install TeXlive into Termux</a>,
+and reboot Termux when done. This is the setup used by the Novelette developer!</p></li>
+<p>In addition to TeX, you will need a PDF reader (do not read PDF in a web browser).
+If possible, use a PDF reader that can dynamically update the display of an open file, if the
+content of the file changes. <i>Evince,</i> and some others, can do that, at least
+on Linux.</p>
+<p>You may compile your documents from Terminal command line, or from the <i>TeXworks</i> GUI.
+TeXworks may be part of TeXlive, or you may need to install it separately. Do not use any other
+GUI, such as TeXshop or TeXstudio. Those other GUI programs are optimized for academic math,
+which is not what Novelette does.</p>
+<p>If your book has interior images, you will need the ImageMagick command line program.
+Linux users can get it from their Linux distribution. Android/Termux users can get it from Termux.
+OS/X has it in bew. Windows users should install it into the Linux subsystem, if possible.
+Although ImageMagick is available for Windows, Novelette's shell scripts are not in the syntax
+used by Windows scripting host.</p>
+
+
+<a id ="testtex"></a>
+<h4>TeX Test File</h4>
+<p>After satisfactory TeX installation, copy this code, and paste it into a plain text
+editor. Save the file as <code>test.tex</code> in your home directory:</p>
+<div class="code"><!-- Copy code from the web browser, not from this html file. -->
+<code>%!TeX program = lualatex<br>
+%!TeX encoding = UTF-8<br>
+\documentclass{article}<br>
+\ifdefined\directlua\else\typeout{Wrong compiler!}\fi<br>
+\RequirePackage{luahyphenrules}<br>
+\HyphenRules{british}<br>
+\begin{document}<br>
+Hello, World.\par<br>
+Look for the year in this banner:\par<br>
+\luatexbanner\par<br>
+It must be 2024 or later. If not, bad news.\par<br>
+\end{document}</code>
+</div>
+<p>Then compile it. If you are using a GUI (such as TeXworks), simply open the file there,
+and process it. The top two lines, beginning with <code>%!</code>, are "magic comments"
+that tell the GUI what to do. But if you are compiling via command line:</p>
+<div class="code"><code>lualatex test</code></div>
+<p>If your TeX installation is new, its internal housekeeping will cause some delay,
+while it generates formats, locates fonts, and so forth. This only happens once.</p>
+<p>When that succeeds, a PDF is produced. Open it in a PDF reader. Be sure to check
+the year in the banner. If it is not 2024 or later, your TeXlive is too old. If you cannot
+compile the test file, be sure that you correctly copied the test code, and that you are
+launching TeX from the directory where you placed that file.</p>
+<p>If you cannot make that work, then you cannot install Novelette.</p>
+
+
+<a id ="novelette"></a>
+<h4>Installing Novelette</h4>
+<p>If Novelette can be installed from TeXlive, do it that way.
+Its package name will be <code>novelette</code>. But to avoid possible confusion, be sure that
+its documentation is (essentially) what you see now.</p>
+<p>However, there are no immediate plans to upload
+Novelette to CTAN (where TeXlive gets its stuff). It may never happen. In that case, you must
+manually install the files. Here's how:</p>
+<p>Your TeX setup has a folder known to TeX as TEXMFHOME. Its actual name is usually
+something else. To find it, run this shell command:</p>
+<div class="code"><code>kpsewhich -var-value=TEXMFHOME</code></div>
+<p>Sometimes that folder does not yet exist, or it may be hidden. It it does not exist, create it.
+All of Novelette will be placed into that folder.</p>
+<p>Get the Novelette code from its project page at GitHub. Enter the Novelette <code>texmf</code>
+folder, and copy everything (with its folder structure) into your TEXMFHOME. Do not copy anything
+that is not within the <code>texmf</code> folder.</p>
+<p>So if <code>TEXMFHOME</code> happens to be
+<code>/home/.texmf</code>, then you now have file
+<code>/home/.texmf/tex/lualatex/novelette/novelette.cls</code> and all
+the other files living in their proper places.</p>
+<p>That's all you need to do. The next time you run TeX, it will automatically find Novelette.
+There will be a short delay while it incorporates the new files into its system.</p>
+<p>If you have multiple devices with different user names, and different locations for
+<code>TEXMFHOME</code>, no problem. You can move your writing from place to place, because
+your own files do not know or care where TeX and Novelette reside.</p>
+<p>If, at some future time, Novelette becomes part of TeXlive, then your installation in
+<code>TEXMFHOME</code> will over-ride anything installed by the TeX package manager.
+You will have to decide whether to remove Novelette from <code>TEXMFHOME</code>, or not.</p>
+
+
+<a id="testnovelette"></a>
+<h4>Novelette Test File</h4>
+<p>Novelette has a built-in test file. From your home folder or desktop (not anywhere
+within Novelette's folders) command:</p>
+<div class="code"><code>lualatex novelette-test</code></div>
+<p>It may take a moment, while TeX locates the Novelette files and initializes its fonts.
+After the first time, that delay will not be repeated.</p>
+<p>The PDF is two pages long, even though its content is only one page. Novelette ensures that
+each PDF has an even number of pages, and that the final page is entirely blank. This feature
+can be disabled for individual documents.</p>
+
+<p>&nbsp;</p>
+<p>All good? Then <a href="intro.html">start creating your book.</a></p>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

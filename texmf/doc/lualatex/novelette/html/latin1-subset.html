@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Characters Allowed in Metadata</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="index.html">INDEX</a>
+</div>
+
+<h2>Novelette Documentation - Characters Allowed in Metadata</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#table">Character Table</a> &nbsp;
+<a href="#special">Special Cases</a>
+</div>
+
+
+<h3>Overview</h3>
+<p>The metadata settings are <code>\title \subtitle \author \version \docdate</code>.
+The characters allowed in these settings are a subset of Latin&#8209;1.</p>
+
+
+<p><a id="table"></a>&nbsp;</p>
+<h4>Character Table</h4>
+<p>Colors: <span class="okglyph">allowed</span>
+<span class="mayglyph">maybe</span>
+<span class="noglyph">forbidden</span></p>
+
+<p class="glyphtable">
+<span class="okglyph">&nbsp;!</span><span class="noglyph">"</span><!--
+--><span class="mayglyph">#</span><span class="noglyph">$</span><!--
+--><span class="noglyph">%</span><span class="mayglyph">&amp;</span><!--
+--><span class="okglyph">'()</span><span class="mayglyph">*</span><!--
+--><span class="noglyph">+</span><span class="okglyph">,-.</span><!--
+--><span class="mayglyph">/</span><br>
+<span class="okglyph">0123456789</span><!--
+--><span class="mayglyph">:;</span><span class="noglyph">&lt;=&gt;</span><!--
+--><span class="okglyph">?</span><br>
+<span class="mayglyph">@</span><span class="okglyph">ABCDEFGHIJKLMNO</span><br>
+<span class="okglyph">PQRSTUVWXYZ</span><span class="noglyph">[\]^_</span><br>
+<span class="noglyph">`</span><span class="okglyph">abcdefghijklmno</span><br>
+<span class="okglyph">pqrstuvwxyz</span><span class="noglyph">{|}~&nbsp;</span>
+</p>
+
+<p class="glyphtable">
+<span class="noglyph">&nbsp;</span><span class="okglyph">¡</span><!--
+--><span class="noglyph">¢£¤¥¦§¨©ª«¬-®¯</span><br>
+<span class="noglyph">°±²³´µ¶</span><span class="mayglyph">·</span><!--
+--><span class="noglyph">¸¹º»¼½¾</span><span class="okglyph">¿</span><br>
+<span class="okglyph">ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ</span><br>
+<span class="okglyph">ÐÑÒÓÔÕÖ</span><span class="noglyph">×</span><!--
+--><span class="okglyph">ØÙÚÛÜÝÞß</span><br>
+<span class="okglyph">àáâãäåæçèéêëìíîï</span><br>
+<span class="okglyph">ðñòóôõö</span><span class="noglyph">÷</span><!--
+--><span class="okglyph">øùúûüýþÿ</span>
+</p>
+
+
+<p><a id="special"></a>&nbsp;</p>
+<h4 class="section">Special Cases</h4><h4 class="link"><a href="#top">^TOP</a></h4>
+<p>What Novelette allows, what book services allow, and what you <i>should</i> do,
+may not perfectly agree. Here are some rules and suggestions:</p>
+<ul>
+<li><p>If you use any of # &amp; @ characters, they must be escaped by backslash:
+<code>\# \&amp; \@</code>. If you use these characters, then they must
+be consistently used wherever the title, subtitle, or author appear. If you register
+<i>The Three-Dollar Thief</i> as title, then you cannot print
+<i>The $3 Thief</i> on the cover, title or copyright pages,
+or page headers.</p></li>
+<li><p>Except as described above, you cannot use the backslash character for any purpose.
+No macros. No codes such as <code>\'E</code> for Eacute.</p></li>
+<li><p>The middot (periodcentered) character may only be used if necessary in Catalan,
+and only if your distributor allows it. Avoid this character, if possible.</p></li>
+<li><p>Novelette disallows monetary units and percent, even though some distributors allow them.
+In general, books with those symbols are nonfiction investment advice, which is not a Novelette
+genre. You may spell the words: <i>The Three-Dollar Thief</i>
+or <i>Eighty Percent Good</i>.</p></li>
+<li><p>The semicolon is allowed, but discouraged, as it is likely to cause confusion. The only
+well-known book with a semicolon in its title is <i>Moby-Dick; or, The Whale</i>.</p></li>
+<li><p>The asterisk is sometimes used as a trick for bad language:
+<i>Sh*tty Story</i>. The only well-known book with asterisk in its title
+(long before it became a TV series) is <i>M*A*S*H</i>.</p></li>
+<li><p>The colon is normally used only to separate title from subtitle, when they appear
+on the same line. If you use <i>This : That</i> as title, it may be interpreted as
+title <i>This</i> with subtitle <i>That</i>. Certain to cause confusion, if there is also
+a separate subtitle.</p></li>
+<li><p>The numbersign is normally used only to indicate books in a series, such as
+<i>The Blonk (Potboiler #5)</i>.</p></li>
+<li><p>The forward slash is sometimes used to indicate alternate titles, for example
+when there are two short books printed as one book. If the metadata needs a fraction,
+best practice is to spell it out: <i>Three-Fourths</i>, not <i>3/4</i>.</p></li>
+<li><p>If you use parentheses, they must (properly match).</p></li>
+<li><p>No quotes of any kind. The quotesingle character may be used only as an apostrophe,
+and that's a fact.</p></li>
+<li><p>No guillemets.</p></li>
+<li><p>You cannot use <code>--</code> or <code>---</code> to create dashes.</p></li>
+<li><p>For inverted exclamation and question marks, paste the characters from a Unicode
+character map. Do not LaTeX codes.</p></li>
+<li><p>The Novelette developer does not know whether a French book titled <i>Zut!</i>
+should use <i>Zut!</i> or <i>Zut&nbsp;!</i> in metadata. If you must provide space, use the
+ordinary space character, not a non&#8209;breaking space.</p></li>
+</ul>
+
+
+<h4 class="section">&nbsp;</h4><h4 class="link""><a href="#top">^TOP</a></h4>
+<p>&nbsp;</p>
+
+</div><!-- end master -->
+</body>
+</html>

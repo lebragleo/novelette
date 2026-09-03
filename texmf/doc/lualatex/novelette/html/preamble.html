@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Preamble</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="index.html">INDEX</a>
+</div>
+
+<h2>Novelette Documentation - Preamble</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+
+<p>A minimal Preamble contains nothing but <code>\title{Book Title}</code> and
+<code>\author{Author Name}</code>. In draft mode (default), you do not even need those!
+Novelette will use defaults for everything, optimized for a book in English, with trim width
+5.5in and trim height 8.5in.</p>
+<p>If your language is English, better results will be obtained if you choose either
+<code>en&#8209;US</code> or <code>en&#8209;UK</code>.
+If not English, then you must set the language, or hyphenation will be wrong.</p>
+
+<p>Even a large Preamble will not contain many lines. Click on a command to see its syntax and
+possible settings:</p>
+
+<p class="noindent codelink" style="margin-left:2em; margin-top:1em; margin-bottom:1em">
+<a href="#documentclass">\documentclass{novelette}</a><br>
+<a href="#mode">\mode{<i>choice</i>}</a><br>
+<a href="#metadata">\title{<i>Book Title</i>}</a><br>
+<a href="#metadata">\subtitle{<i>Optional Subtitle</i>}</a><br>
+<a href="#metadata">\author{<i>Author Name</i>}</a><br>
+<a href="#metadata">\version{<i>Optional Version String</i>}</a><br>
+<a href="#metadata">\docdate{<i>yyyy/mm/dd</i>}</a><br>
+<a href="#language">\language{<i>code</i>}</a><br>
+<a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a><br>
+<a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a><br>
+<a href="#pdfx">\pdfx{<i>choice</i>}</a><br>
+<a href="#styles">\headstyle{...}</a><br>
+<a href="#styles">\namestyle{...}</a><br>
+<a href="#styles">\subnamestyle{...}</a><br>
+<a href="#styles">\scenestyle{...}</a><br>
+<a href="#styles">\footnotestyle{...}</a><br>
+<a href="#loadfont">\loadfont{<i>comma,separated,choices</i>}</a><br>
+<a href="#enable">\enable{<i>comma,separated,choices</i>}</a><br>
+<a href="#disable">\disable{<i>comma,separated,choices</i>}</a><br>
+<a href="#examine">\examine{<i>0|1</i>}</a><br>
+% <a href="#margins">No settings for margins and font size!</a><br>
+% <a href="#packages">No added packages!</a><br>
+<a href="#begindocument">\begin{document}</a>
+</p>
+
+<hr/>
+
+
+<p><a id="documentclass"></a>&nbsp;</p>
+<h4 class="section">\documentclass{novelette}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>There are no class options! All configuration is performed by commands in Preamble.</p>
+
+
+<p><a id="mode"></a>&nbsp;</p>
+<h4 class="section">\mode{<i>choice</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Choices: <code>draft preview final</code>. Default <code>draft</code>.</p>
+<p>The purpose of modes is to allow faster compiling while you are writing and editing your book,
+and avoid confusion between good and bad results.</p>
+<ul>
+<li><p>Whichever mode you choose, the typesetting (line breaks, page breaks)
+will be the same.</p></li>
+<li><p>In draft mode, placeholder rectangles appear instead of images. They will occupy the
+same space and float position. See <a href="visuals.html">this page</a> for details.</p></li>
+<li><p>In draft and preview modes, the metadata is changed, so that the PDF cannot be mistaken
+for your final product.</p></li>
+<li><p>If the compiler issues any warning, error, or bad box, then the mode
+reverts to draft.</p></li>
+<li><p>Use preview mode for privately sending the PDF to a reviewer or editor.</p></li>
+<li><p>Use final mode when you are ready to upload the PDF to your print service.</p></li>
+<li><p>There are also hidden mode choices, for use by developers.</p></li>
+</ul>
+
+
+<p><a id="metadata"></a>&nbsp;</p>
+<h4 class="section">Metadata: \title{<i>Book Title</i>} etc.</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Metadata settings are <code>\title \subtitle \author \version \docdate</code>.</p>
+<p><b>Important: </b> Novelette does not use the <code>\DocumentMetadata</code> command.</p>
+<ul>
+<li><p>In preview and final modes, you must provide the title and author. In draft mode,
+you may omit them; Novelette provides generic defaults.</p></li>
+<li><p>Not every book has a subtitle. Use it if necessary.</p></li>
+<li><p>If title+subtitle+author has a large number of characters (about 200), Novelette
+will complain. Actual fiction books use much less than that.</p></li>
+<li><p>The title, subtitle, and author must exactly match the data that your provide when
+you register your book with the print service. For example, if the registered title is
+<i>This and That</i>, it cannot appear in metadata as <i>This \& That</i>.</p></li>
+<li><p>The author name is as-spoken: John Smith. Not Smith, John.</p></li>
+<li><p>The version and docdate are for your own use as version control. You may omit them.
+If used, they adjust some PDF internal hash codes, so that PDFs with different content can
+be distinguished without reading the text.</p>
+<ul>
+<li><p>The version string has no particular format. It may be as simple as <code>1.6</code>
+or as elaborate as <code>After surfing 13:25 Tuesday</code>. This information is not listed
+in the book search database.</p></li>
+<li><p>The docdate string must use format <code>yyyy/mm/dd</code>. As long as it fits that
+format, its numbers are not sanity checked. The docdate should be set to when you began work
+on the book (or on a later edition), not the current date of edits.</p></li>
+<li><p>Explanation: The PDF Info dictionary (required by this technology) has two hash IDs.
+One is supposed to be unique to the document (even with minor revision), and the other
+is supposed to change with revisions. If all metadata entries are unchanged, the unique ID
+will remain fixed, even if you edit. But for this to apply, you must set both version
+and docdate. In all cases, the revision ID changes each time you compile, with or without
+edits.</p></li>
+</ul></li>
+</ul>
+<p>Each metadata setting must obey these rules:</p>
+<ul>
+<li><p>All characters must be in a
+<a href="latin1-subset.html">subset of Latin&#8209;1</a>.</p></li>
+<li><p>If you use any of <code>@ # &</code> characters, they must be escaped with backslash:
+<code>\@ \# \&</code>.</p></li>
+<li><p>Otherwise, you may not use the backslash for any purpose. In particular, you may not
+use codes such as <code>\'E</code> for Eacute. Instead, you must paste the actual characters
+from a Unicode character map.</p></li>
+<li><p>Novelette tests your metadata for compliance. Fatal error if bad characters.</p></li>
+</ul>
+
+
+<p><a id="language"></a>&nbsp;</p>
+<h4 class="section">\language{<i>code</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette does not load the <i>babel</i> or <i>polyglossia</i> packages.</p>
+<ul>
+<li><p>The <code>\language{<i>code</i>}</code> setting only selects hyphenation patterns.
+It does not select spelling, date/time format, or anything else.</p></li>
+<li><p>Available languages are Western European. There are no plans to extend Novelette to other
+world languages.</p></li>
+<li><p>The language codes are <a href="language.html">listed here</a>. Some languages have special
+tricks, so be sure to read that page.</p></li>
+<li><p>Novelette is monolingual. Only one hyphenation pattern is used throughout. Your text may
+contain words and phrases in any language supported by the fonts, but it will be hyphenated
+(badly) according to the language setting.</p></li>
+<li><p>If you do not set the language, Novelette provides generic American English. But this
+is not best, even if you are American. Choose the correct <code>en-US</code>
+or <code>en-GB</code> setting, for better hyphenation.</p></li>
+</ul>
+
+
+<p><a id="trimsize"></a>&nbsp;</p>
+<h4 class="section">\trimsize{width=<i>W</i>,height=<i>H</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Trim size is the physical, finished size of book interior pages. Print&#8209;on&#8209;demand
+softcover uses the "Prefect Print" process, which exactly fits the cover to the interior.
+Traditional hardcover binding uses a slightly larger cover.</p>
+<ul>
+<li><p>The width and height are measured with units of inches or millimeters. The same units
+must be used for both. Use <code>in</code> for inches, <code>mm</code> for millimeters.</p></li>
+<li><p>Use only standard sizes offered by your print service, with off&#8208;white
+(cream, creme) paper. Never use white paper for popular fiction.</p></li>
+<li><p>Avoid "extended distribution" (whatever it is named). You do not want booksellers to be
+ordering copies at <i>your</i> cost if they are unsold.</p></li>
+<li><p>Height must exceed width by a certain amount.</p></li>
+<li><p>Among the American stadard sizes, the smallest allowed by Novelette is
+<code>width=5in,height=8in</code> and the largest is <code>width=6in,height=9in</code>.</p></li>
+<li><p>Among the British standard sizes, the smallest allowed by Novelette is
+<code>width=XXXXX,height=XXXXX</code> (B-format), and the largest is
+<code>width=XXXXX,height=XXXXX</code> (Royal).</p></li>
+<li><p>American print services often list width before height, but British print services often
+list height before width. In the <code>\trimsize</code> command, the order does
+not matter.</p></li>
+<li><p>No cheating! Novelette fails if you attempt to use a trim size outside its limits.</p></li>
+<li><p>Default trim size is <code>width=5.5in,height=8.5in</code>, which is often used for
+such books in the USA. If you are American, this is probably your best choice. The closest
+British size is <code>width=XXXXX,height=XXXXX</code> (Demy).</p></li>
+</ul>
+
+
+<p><a id="layout"></a>&nbsp;</p>
+<h4 class="section">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>This determines the general layout of page headers/footers and main text. Novelette
+automatically sets the margins and main font size; you cannot set them manually.</p>
+<ul>
+
+<li><p>Lines per page in main textblock: <code>lines=<i>L</i></code></p>
+<ul>
+<li><p><i>L</i> is an integer from 28 to 35. Default 35.</p></li>
+</ul></li>
+
+<li><p>Headers/Footers: <code>pagestyle=<i>P</i></code></p>
+<ul>
+<li><p><i>P</i> is one of <code>plain split center margin marcen</code>. Default marcen.</p></li>
+<li><p>This determines whether layout has page header, footers, or both. See the
+<a href="running-headers.html">header/footer layouts</a> for illustrations.</p></li>
+</ul></li>
+
+<li><p>Glue strip width: <code>glue=<i>G</i></code></p>
+<ul>
+<li><p><i>G</i> is either <code>normal</code> or <code>wide</code>. Default normal.</p></li>
+<li><p>Normally, Novelette reserves an extra width of 0.125in (3.2mm) at the spine margin,
+for binding glue. If your book has many pages (such as 300), the wide setting will make
+the reserved area 50% wider.</p>
+</ul></li>
+
+<li><p>Average characters per line: <code>cpl=<i>C</i></code></p>
+<ul>
+<li><p><i>C</i> is a number from 62 to 72. May be decimal. Default 66.</p></li>
+<li><p>In English, and probably most other Western European languages, flowing text
+is most readable when the lines do not contain too many or too few characters.</p>
+<p>This sets the average number of characters per line. It is an estimate. Only change
+the value if your writing style must accomodate many long words, or if you need to print
+more or fewer pages. If in doubt, do not set it.</p></li>
+</ul></li>
+</ul>
+
+
+<p><a id="pdfx"></a>&nbsp;</p>
+<h4 class="section">PDF/X-1a:2001 Format: \pdfx{<i>choice</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette has built-in capability for PDF/X-1a:2001 format. This is preferred by many
+print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
+<ul>
+<li><p>The <i>choice</i> is one of <code>fogra swop off</code>, known as
+<i>Output Intent</i>.</p></li>
+<li><p>If your language is American English (default, or <code>en-US</code>) then the
+default choice is <code>swop</code>. For all other languages, including British English,
+the default choice is <code>fogra</code>.</p></li>
+<li><p><code>swop</code> refers to <i>CGATS TR 001</i>, better known as
+"U.S. Web Coated (SWOP) v2".</p></li>
+<li><p><code>fogra</code> refers to FOGRA39.</p></li>
+<li><p><code>off</code> disables PDF/X, by omitting its required metadata. Otherwise,
+it prints the same.</p></li>
+<li><p>The PDF/X-1a:2001 specification was created for use in color offset printing.
+The Output intent (swop or fogra) is irrelevant for your purposes, and will be ignored by the
+print service. But since it is part of the spec, it must be provided, unless you do not
+want PDF/X-1a:2001.</p></li>
+<li><p>Novelette does not name or attach an <i>icc</i> color profile.
+Ink is 100K (black) only.</p></li>
+</ul>
+
+
+<p><a id="styles"></a>&nbsp;</p>
+<h4 class="section">Default Style Settings</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette provides defaults for all styling commands. You may globally change the defaults.</p>
+<ul>
+<li><p><code>\headstyle{...}</code></p>
+  <ul>
+  <li><p>...</p></li>
+  </ul></li>
+<li><p><code>\namestyle{...}</code></p>
+  <ul>
+  <li><p>...</p></li>
+  </ul></li>
+<li><p><code>\subnamestyle{...}</code></p>
+  <ul>
+  <li><p>...</p></li>
+  </ul></li>
+<li><p><code>\scenestyle{...}</code></p>
+  <ul>
+  <li><p>...</p></li>
+  </ul></li>
+<li><p><code>\footnotestyle{indent=<i>I</i>}</code></p>
+  <p>This will be used globally, without allowing local changes.</p>
+  <ul>
+  <li><p>...</p></li>
+  </ul></li>
+</ul>
+
+
+<p><a id="loadfont"></a>&nbsp;</p>
+<h4 class="section">\loadfont{<i>comma,separated,choices</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette always loads the NoveletteSerif fonts. It only loads its other fonts, upon request.
+This saves time ans space.</p>
+<p>If you choose fonts in any of the above-listed styling commands, then Novelette will
+automatically load those fonts.</p>
+<p>If your book will use a font that is <i>not</i> NoveletteSerif and is <i>not</i>
+among the fonts loaded by style settings, then you must tell Novelette to load them,
+so that they are available for later use.</p>
+
+
+<p><a id="enable"></a>&nbsp;</p>
+<h4 class="section">\enable{<i>comma,separated,choices</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette automatically loads several behaviors that are most likely to be what you need.
+But if you do not want one or more of them, they can be disabled.</p>
+
+
+<p><a id="disable"></a>&nbsp;</p>
+<h4 class="section">\disable{<i>comma,separated,choices</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette does not automatically load several behaviors that are unlikely to be what you need.
+But if you want one or more of them, they can be enabled.</p>
+
+
+<p><a id="examine"></a>&nbsp;</p>
+<h4 class="section">\examine{<i>0 or 1</i>}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>The wonderful <i>lua-typo</i> code, by Daniel Flipo, can inspect each PDF page after it has
+been typeset, looking for <i>typographic flaws</i>. Those are not errors. They are places where
+something is not as good-looking is it should be.</p>
+<p>Novelette has a modified version of that code. This capability is off, by default. You may
+turn it on with <code>\examine{1}</code>. Details of what it does, and why you should care,
+are <a href="typoflaws.html">described here</a>.</p>
+
+
+<p><a id="margins"></a>&nbsp;</p>
+<h4 class="section">No Margins?! No Font Size?!</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>There are no settings for margins or font size! Novelette automatically calculates them,
+for best appearance with your chosen (or deful) trim size and page layout.</p>
+<p>The smallest available sizes have margins at least 0.375in (10mm) plus 0.125in (3.2mm)
+extra at the spine, for glue. The medium to large trim sizes increase the margins to at least
+0.5in (13mm), plus spine glue. These values are acceptable to nearly all print services.</p>
+<p>If your book must have at least 0.5in margins (plus spine glue), then choose a trim size
+that is at least US 5.5in wide, 8.5in high, or British Demy 138mm wide, 216mm high.</p>
+<p>The calculated main font size will vary with trim size, layout, and possibly some other
+settings.</p>
+
+
+<p><a id="packages"></a>&nbsp;</p>
+<h4 class="section">No Packages?!</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette is self-contained. You cannot add any packages.</p>
+<p>There is a close interaction between Novelette LaTeX code, its Lua support, and its fonts.
+Anything else is likely to cause problems.</p>
+<p>Novelette does what you need to do, for its intended genres. It is for writers,
+not programmers.</p>
+
+
+<p><a id="begindocument"></a>&nbsp;</p>
+<h4 class="section">\begin{document}</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>Novelette does many things with this command.</p>
+<p>When you write various settings in Preamble, most of them have no immediate effect.
+Your typing is checked for syntax and sanity, then the values are stored.</p>
+<p>When the document body begins, Novelette calculates margins and font sizes, based on
+your settings and defaults. It loads the fonts. It sets a number of internal variables
+that will be needed later.</p>
+<p>This behavior differs from other LaTeX document classes, which read many settings
+as a class option, and uses packages to load fonts.</p>
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">^TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>
