@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Language</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/> HOME</a> &nbsp;
+<a href="installation.html">Installation</a> &nbsp;
+<a href="index.html">INDEX</a>
+</p></div>
+
+<h2>Novelette Documentation - Language</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#list">List of Codes</a> &nbsp;
+<a href="notes">Language-Specific Notes</a>
+</div>
+
+
+<h4>Overview</h4>
+<p>The <code>\lang{<i>code</i>}</code> setting chooses hyphenation patterns. It does not
+perform other language&#8209;specific functions, such as time and date formats.</p>
+<p>Novelette was developed for English. The inclusion of other languages should be considered
+experimental; the fonts have the necessary characters, and the hyphenation patterns are
+available in TeX. But neither <i>babel</i> nor <i>polglossia</i> is loaded. If you need more
+language&#8209;related features, then you should use something other than Novelette.</p> 
+
+
+<p><a id="list"></a>&nbsp;</p>
+<h4 class="section">List of Codes for \lang{<i>code</i>}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>These codes are case-insensitive: <code>en-US</code> and <code>en-us</code> are the same.</p>
+<ul>
+<li><p><code>en-US</code> -> American English. Red is a "color".</p></li>
+<li><p><code>en-UK</code> -> British English. Red is a "colour". Also en-GB.</p></li>
+<li><p><code>de&nbsp;&nbsp;&nbsp;</code> -> Post-1996 German (Germany, Austria).</p></li>
+<li><p><code>de-CH</code> -> Swiss German.</p></li>
+<li><p><code>nn&nbsp;&nbsp;&nbsp;</code> -> Nowegian nynorsk.</p></li>
+<li><p><code>no&nbsp;&nbsp;&nbsp;</code> -> Norwegian bokmal.</p></li>
+<li><p><code>nb&nbsp;&nbsp;&nbsp;</code> -> Norwegian bokmal.</p></li>
+<li><p><code>fr&nbsp;&nbsp;&nbsp;</code> -> French (any).</p></li>
+<li><p><code>pt&nbsp;&nbsp;&nbsp;</code> -> Portuguese (any).</p></li>
+<li><p><code>ca&nbsp;&nbsp;&nbsp;</code> -> Catalan.</p></li>
+<li><p><code>eu&nbsp;&nbsp;&nbsp;</code> -> Basque.</p></li>
+<li><p><code>es&nbsp;&nbsp;&nbsp;</code> -> Spanish (any).</p></li>
+<li><p><code>it&nbsp;&nbsp;&nbsp;</code> -> Italian.</p></li>
+<li><p><code>nl&nbsp;&nbsp;&nbsp;</code> -> Dutch (Netherlands).</p></li>
+<li><p><code>sv&nbsp;&nbsp;&nbsp;</code> -> Swedish.</p></li>
+<li><p><code>da&nbsp;&nbsp;&nbsp;</code> -> Danish.</p></li>
+<li><p><code>fi&nbsp;&nbsp;&nbsp;</code> -> Finnish.</p></li>
+<li><p><code>ga&nbsp;&nbsp;&nbsp;</code> -> Irish (modern).</p></li>
+<li><p><code>cy&nbsp;&nbsp;&nbsp;</code> -> Welsh.</p></li>
+<li><p><code>is&nbsp;&nbsp;&nbsp;</code> -> Icelandic.</p></li>
+<li><p><code>gd&nbsp;&nbsp;&nbsp;</code> -> Scottish (modern).</p></li>
+<li><p><code>la&nbsp;&nbsp;&nbsp;</code> -> Latin (modern).</p></li>
+</ul>
+
+
+<p><a id="list"></a>&nbsp;</p>
+<h4 class="section">Language-Specific Notes</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>If no <code>\lang</code> is specified, or if <code>\lang{en}</code> unmodified by US or UK,
+then a generic American English pattern is used. Better to specify <code>en-US</code>
+or <code>en-UK</code>.</p>
+<ul>
+<li><p>German: Pre-1996 German (of Germany) is not available. If you type the eszett, you get it;
+but the word may be incorrectly hyphenated. The Novelette fonts use short-arm <code>f</code>,
+so that there is no issue with incorrect ligatures.</p></li>
+<li><p>For French punctuation, which requires nonbreaking space before or after certain symbols:
+Use <code>~</code> (asciitilde) there. In Novelette, it is a reduced width nonbreaking space.
+Example: <code>Zut~!</code></p></li>
+<li><p>Portuguese: If you need to place a hyphen at the end of a line, and at the beginning of
+the following line, try this: <code>\--</code> for the hyphen. That inserts a soft hyphen
+followed by an ordinary hyphen. Mid-line, only one of them prints.</p></li>
+<li><p> Catalan: The ele geminada is available. You may type the actual middot character
+(not period) between two L. Use <code>{\Lgem}</code> or <code>{\lgem}</code> to print all three
+characters (two L with middot between). Works uppercase, lowercase, small caps.
+Although you may use the Ldot character, this is not best practice.</p></li>
+<li><p>Dutch: <code>{\IJacute}</code> and <code>{\ijacute}</code> place the acute over both
+characters. This is the only method available in Novelette. If you try
+<code>I\'J</code> it will fail.</p></li>
+<li><p>Finnish: Be sure that the characters you need are in the fonts.</p></li>
+<li><p>Irish: The Tironian et (agus) is available. Use <code>{\agus}</code> for that.
+Only modern Irish is supported.</p></li>
+<li><p>Latin: Only modern Latin is supported.</p></li>
+<li><p>Hawai'ian: Hyphenation for this language is unavailable, but the necessary characters
+are in the fonts (vowels with macron, okina). Use <code>{\okina}</code> for that.</p></li>
+</ul>
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

@@ -8,21 +8,21 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">HOME</a> &nbsp;
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/> HOME</a> &nbsp;
 <a href="installation.html">Installation</a> &nbsp;
 <a href="index.html">INDEX</a>
-</div>
+</p></div>
 
 <h2>Novelette Documentation - Preamble</h2>
 
 <div id="navbarb">
 <a href="#top">Overview</a> &nbsp;
+<a href="#all">All Possible Settings</a>
 </div>
 
 
 <h3>Overview</h3>
-
 <p>A minimal Preamble contains nothing but <code>\title{Book Title}</code> and
 <code>\author{Author Name}</code>. In draft mode (default), you do not even need those!
 Novelette will use defaults for everything, optimized for a book in English, with trim width
@@ -31,6 +31,9 @@ Novelette will use defaults for everything, optimized for a book in English, wit
 <code>en&#8209;US</code> or <code>en&#8209;UK</code>.
 If not English, then you must set the language, or hyphenation will be wrong.</p>
 
+
+<p><a id="all"></a>&nbsp;</p>
+<h4>All Possible Settings</h4>
 <p>Even a large Preamble will not contain many lines. Click on a command to see its syntax and
 possible settings:</p>
 
@@ -42,7 +45,7 @@ possible settings:</p>
 <a href="#metadata">\author{<i>Author Name</i>}</a><br>
 <a href="#metadata">\version{<i>Optional Version String</i>}</a><br>
 <a href="#metadata">\docdate{<i>yyyy/mm/dd</i>}</a><br>
-<a href="#language">\language{<i>code</i>}</a><br>
+<a href="#language">\lang{<i>code</i>}</a><br>
 <a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a><br>
 <a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a><br>
 <a href="#pdfx">\pdfx{<i>choice</i>}</a><br>
@@ -65,13 +68,15 @@ possible settings:</p>
 
 <p><a id="documentclass"></a>&nbsp;</p>
 <h4 class="section">\documentclass{novelette}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>There are no class options! All configuration is performed by commands in Preamble.</p>
 
 
 <p><a id="mode"></a>&nbsp;</p>
 <h4 class="section">\mode{<i>choice</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Choices: <code>draft preview final</code>. Default <code>draft</code>.</p>
 <p>The purpose of modes is to allow faster compiling while you are writing and editing your book,
 and avoid confusion between good and bad results.</p>
@@ -92,7 +97,8 @@ reverts to draft.</p></li>
 
 <p><a id="metadata"></a>&nbsp;</p>
 <h4 class="section">Metadata: \title{<i>Book Title</i>} etc.</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Metadata settings are <code>\title \subtitle \author \version \docdate</code>.</p>
 <p><b>Important: </b> Novelette does not use the <code>\DocumentMetadata</code> command.</p>
 <ul>
@@ -137,28 +143,30 @@ from a Unicode character map.</p></li>
 
 
 <p><a id="language"></a>&nbsp;</p>
-<h4 class="section">\language{<i>code</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="section">Hyphenation Language: \lang{<i>code</i>}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette does not load the <i>babel</i> or <i>polyglossia</i> packages.</p>
 <ul>
-<li><p>The <code>\language{<i>code</i>}</code> setting only selects hyphenation patterns.
+<li><p>The <code>\lang{<i>code</i>}</code> setting only selects hyphenation patterns.
 It does not select spelling, date/time format, or anything else.</p></li>
 <li><p>Available languages are Western European. There are no plans to extend Novelette to other
 world languages.</p></li>
-<li><p>The language codes are <a href="language.html">listed here</a>. Some languages have special
+<li><p>The language codes are <a href="lang.html">listed here</a>. Some languages have special
 tricks, so be sure to read that page.</p></li>
 <li><p>Novelette is monolingual. Only one hyphenation pattern is used throughout. Your text may
 contain words and phrases in any language supported by the fonts, but it will be hyphenated
 (badly) according to the language setting.</p></li>
 <li><p>If you do not set the language, Novelette provides generic American English. But this
 is not best, even if you are American. Choose the correct <code>en-US</code>
-or <code>en-GB</code> setting, for better hyphenation.</p></li>
+or <code>en-UK</code> setting, for better hyphenation.</p></li>
 </ul>
 
 
 <p><a id="trimsize"></a>&nbsp;</p>
 <h4 class="section">\trimsize{width=<i>W</i>,height=<i>H</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Trim size is the physical, finished size of book interior pages. Print&#8209;on&#8209;demand
 softcover uses the "Prefect Print" process, which exactly fits the cover to the interior.
 Traditional hardcover binding uses a slightly larger cover.</p>
@@ -187,7 +195,8 @@ British size is <code>width=XXXXX,height=XXXXX</code> (Demy).</p></li>
 
 <p><a id="layout"></a>&nbsp;</p>
 <h4 class="section">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>This determines the general layout of page headers/footers and main text. Novelette
 automatically sets the margins and main font size; you cannot set them manually.</p>
 <ul>
@@ -226,7 +235,8 @@ more or fewer pages. If in doubt, do not set it.</p></li>
 
 <p><a id="pdfx"></a>&nbsp;</p>
 <h4 class="section">PDF/X-1a:2001 Format: \pdfx{<i>choice</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette has built-in capability for PDF/X-1a:2001 format. This is preferred by many
 print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
 <ul>
@@ -251,7 +261,8 @@ Ink is 100K (black) only.</p></li>
 
 <p><a id="styles"></a>&nbsp;</p>
 <h4 class="section">Default Style Settings</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette provides defaults for all styling commands. You may globally change the defaults.</p>
 <ul>
 <li><p><code>\headstyle{...}</code></p>
@@ -280,7 +291,8 @@ Ink is 100K (black) only.</p></li>
 
 <p><a id="loadfont"></a>&nbsp;</p>
 <h4 class="section">\loadfont{<i>comma,separated,choices</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette always loads the NoveletteSerif fonts. It only loads its other fonts, upon request.
 This saves time ans space.</p>
 <p>If you choose fonts in any of the above-listed styling commands, then Novelette will
@@ -292,21 +304,24 @@ so that they are available for later use.</p>
 
 <p><a id="enable"></a>&nbsp;</p>
 <h4 class="section">\enable{<i>comma,separated,choices</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette automatically loads several behaviors that are most likely to be what you need.
 But if you do not want one or more of them, they can be disabled.</p>
 
 
 <p><a id="disable"></a>&nbsp;</p>
 <h4 class="section">\disable{<i>comma,separated,choices</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette does not automatically load several behaviors that are unlikely to be what you need.
 But if you want one or more of them, they can be enabled.</p>
 
 
 <p><a id="examine"></a>&nbsp;</p>
 <h4 class="section">\examine{<i>0 or 1</i>}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>The wonderful <i>lua-typo</i> code, by Daniel Flipo, can inspect each PDF page after it has
 been typeset, looking for <i>typographic flaws</i>. Those are not errors. They are places where
 something is not as good-looking is it should be.</p>
@@ -317,7 +332,8 @@ are <a href="typoflaws.html">described here</a>.</p>
 
 <p><a id="margins"></a>&nbsp;</p>
 <h4 class="section">No Margins?! No Font Size?!</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>There are no settings for margins or font size! Novelette automatically calculates them,
 for best appearance with your chosen (or deful) trim size and page layout.</p>
 <p>The smallest available sizes have margins at least 0.375in (10mm) plus 0.125in (3.2mm)
@@ -331,7 +347,8 @@ settings.</p>
 
 <p><a id="packages"></a>&nbsp;</p>
 <h4 class="section">No Packages?!</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette is self-contained. You cannot add any packages.</p>
 <p>There is a close interaction between Novelette LaTeX code, its Lua support, and its fonts.
 Anything else is likely to cause problems.</p>
@@ -341,7 +358,8 @@ not programmers.</p>
 
 <p><a id="begindocument"></a>&nbsp;</p>
 <h4 class="section">\begin{document}</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>Novelette does many things with this command.</p>
 <p>When you write various settings in Preamble, most of them have no immediate effect.
 Your typing is checked for syntax and sanity, then the values are stored.</p>
@@ -353,7 +371,8 @@ as a class option, and uses packages to load fonts.</p>
 
 
 <h4 class="section">&nbsp;</h4>
-<h4 class="link"><a href="#top">^TOP</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>&nbsp;</p>
 
 

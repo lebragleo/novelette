@@ -1,13 +1,17 @@
 
-body {font-family:serif; background:#cccccc url(cbkg.png); line-height:1.4}
+html {font-size:100%}
 
-#master {max-width:40em; position: relative; margin-left:auto; margin-right:auto;
+body {font-family:serif; background:#cccccc url(images/cbkg.png); line-height:1.4}
+
+#master {max-width:40em; position: relative;
+         margin-left:auto; margin-right:auto; margin-top:2rem; margin-bottom:2rem;
          background:#f0f0f0 none; border: 1px solid black; padding:0px 1rem 2rem 1rem;}
 
 #navbara {
-  font-size:88%; border:1px solid black; background:#dddddd none;
+  border:1px solid black; background:#dddddd none;
   margin-top:.5rem; margin-bottom:.5rem; padding:.25rem;
 }
+#navbara img {height:1.5rem; width:auto; vertical-align:bottom;}
 
 #navbarb {
   font-size:88%; border:1px solid black; background:#dddddd none;
@@ -24,7 +28,7 @@ code {
   font-family:monospace, monospace; color:#660000; white-space:nowrap;
 }
 
-ul {margin:0px; padding-left:1rem;}
+ul {margin:0px; padding-left:2rem;}
 li p {padding-left:0px;}
 li p:first-child {text-indent:0px;}
 
@@ -42,11 +46,20 @@ h3 {margin:1.5rem 0px .5rem 0px}
 h3 + p {text-indent:0px}
 
 h4 {margin:1.5rem 0px .5rem 0px}
-h4 + p {text-indent:0px}
+h4 + p {text-indent:0px; clear:both;}
+h4.section {float:left;}
+h4.section img {height:1.4rem; width:auto; vertical-align:bottom;}
+h4.link {float:right; text-align:right; font-weight:normal;}
+h4.link a {text-decoration:none;}
+h4.link img {vertical-align:middle;}
+
+
 
 a {white-space:nowrap}
+*.codelink a {text-decoration: none;}
+a.sectid {padding-bottom:.5rem;}
 i {white-space:nowrap}
-i.wrap {white-space: inherit} /* check this */
+i.wrap {white-space: normal}
 
 *.nowrap {white-space:nowrap;}
 *.center {text-indent:0px; text-align:center}
