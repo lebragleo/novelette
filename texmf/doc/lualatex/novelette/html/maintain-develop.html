@@ -3,157 +3,126 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="novelette.css">
-<title>Novelette Documentation - Metadata</title>
+<title>Novelette Documentation - Developer/Maintainer Notes</title>
 </head>
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">HOME</a> &nbsp;
-<a href="installation.html">Installation</a> &nbsp;
-<a href="index.html">INDEX</a>
-</div>
 
-<h2>Novelette Documentation<br>
-Notes for Maintainers and Developers</h2>
+<h4>Novelette Documentation</h4>
 
-<div id="navbarb">
-<a href="#top">Overview</a> &nbsp;
-<a href="#allowed">Allowed Characters</a> &nbsp;
-<a href="#titsub">Title and Subtitle</a> &nbsp;
-<a href="#author">Author</a> &nbsp;
-<a href="#same">Same Everywhere</a> &nbsp;
-<a href="#verdoc">Version and Docdate</a> &nbsp;
-<a href="#pdfx">PDF/X</a> &nbsp;
-<a href="#xmp">XMP</a>
-</div>
+<div id="navbara"><p class="noindent">
+<a href="../novelette.html">Documentation Cover Page</a>
+</p></div>
+
+<h2>Developer/Maintainer Notes</h2>
 
 
-<h3>Overview</h3>
+<h4>Overview</h4>
 <p>If you are an ordinary user, writing a book, then you do not need to know anything here.
 These notes are for future maintainers and developers, who know what they are doing.</p>
 
 
-What, No Expl3 Syntax?
-
-Novelette only uses Expl3 syntax in code that is copied/modified from standard LaTex.
-All original Novelette code uses ordinary LaTeX and Lua.
-
-Expl3 is great for resolving most catcode and expansion issues. But because Novelette is
+<h4>What, No Expl3 Syntax?</h4>
+<p>Novelette only uses Expl3 syntax in code that is copied/modified from standard LaTex.
+All original Novelette code uses ordinary LaTeX and Lua.</p>
+<p>Expl3 is great for resolving most catcode and expansion issues. But because Novelette is
 self-contained, its original developer wrote code that does not need those capabilities.
 The LaTeX and Lua code have been written in a manner that is self-documenting, and much
-easier to read.
-
-If you maintain Novelette, or develop new code for it, please adhere to these principles.
+easier to read.</p>
+<p>If you maintain Novelette, or develop new code for it, please adhere to these principles.
 Remember that the end users know little or no TeX of any kind. Although they should never need
 to look into the LaTeX or Lua code, they are more likely to self-solve issues if the code
-is plain to read.
+is plain to read.</p>
+<p>Did Charles Dickens use Expl3? No! Did Victor Hugo use Expl3? No!</p>
 
-Did Charles Dickens use Expl3? No! Did Victor Hugo use Expl3? No!
 
-
-What, No Added Packages?
-
-Novelette does what is necessary. There is no need for writers to waste time and effort
-trying to do more advanced things. They should be writing!
-
-The original developer has looked through a large number of books in the fiction shelves of
+<h4>What, No Added Packages?</h4>
+<p>Novelette does what is necessary. There is no need for writers to waste time and effort
+trying to do more advanced things. They should be writing!</p>
+<p>The original developer has looked through a large number of books in the fiction shelves of
 the public library. Without the need to add any packages, Novelette can do almost everything
-those books have. The few exceptions are often amateur books that try to use special effect
-to compensate for bad writing.
+those books have. The few exceptions are often amateur books that try to use special effects
+to compensate for bad writing.</p>
+<p>Did Nikolai Gogol add packages? No! Did Rabelais add packages? No!</p>
 
-Did Nikolai Gogol add packages? No! Did Rabelais add packages? No!
 
-
-What, No Global Language Support?
-
-Novelette lives within the limits of its developer's grasp. If you wish to write murder
+<h4>What, No Global Language Support?</h4>
+<p>Novelette lives within the limits of its developer's grasp. If you wish to write murder
 mysteries in Greek, or Science Fiction in Sanskrit, do it yourself. And if you wish to abuse
-Novelette by transofrming it into another academic class, please go away. Quickly.
+Novelette by transforming it into another academic class, please go away. Quickly.</p>
+<p>Did Albert Einstein write Hebrew, Greek, German, and English? Actually, maybe he did.
+But he did not write murder mysteries. He did read them, so if I were you, I'd start writing.</p>
 
-Did Albert Einstein write Hebrew, Greek, German, and English? Actually, maybe he did. But he did
-not write murder mysteries. He did read them, so if I were you, I'd start writing.
 
-
-About the Fonts
-
-All fonts were edited using FontForge. They are OpenType format with PostScript (cubic)
+<h4>About the Fonts</h4>
+<p>All fonts were edited using FontForge. They are OpenType format with PostScript (cubic)
 outlines at 1000 grid units per em. If you need to edit the fonts, any good font editor
-should be able to do it.
-
-The maximum height of any glyph cannot exceeed 840 grid units above baseline. The maximum
-glyph depth cannot be beneath 230 units below baseline.
-
-Observe that the weight of glyphs is slightly heavier than commonly seen in other fonts.
+should be able to do it.</p>
+<p>The maximum height of any glyph cannot exceeed 840 grid units above baseline. The maximum
+glyph depth cannot be beneath 230 units below baseline. Exception: If it is a decorative glyph
+that would never be used in metadata, it can extend 26o grid units below baseline.</p>
+<p>Observe that the weight of glyphs is slightly heavier than commonly seen in other fonts.
 This is especially noticeable where the shapes are thin. Modern digital printing, especially
 with print-on-demand, tends to produce lighter text than users expect from offset presses.
-The fonts are designed to account for this.
-
-Novelette fonts have features that interact with its LaTeX code. If you add or edit characters,
-be sure that they are included in whichever OpenType features are appropriate.
-
-If you modify any font, remove the "Manufacturer" font info. Its default is "tlbrnvt" for
-the ordinal fonts. You may change it to your own setting. The purpose is to (hopefully) ensure
-that original fonts are not confused with modified substitutes.
+The fonts are designed to account for this.</p>
+<p>Novelette fonts have features that interact with its LaTeX code. If you add or edit characters,
+be sure that they are included in whichever OpenType features are appropriate.</p>
+<p>If you modify any font, remove the "Manufacturer" font info. Its default is "tlbrnvt" for
+the original fonts. You may change it to your own setting. The purpose is to (hopefully) ensure
+that original fonts are not confused with modified substitutes.</p>
 
 
-About PDF Version 1.3 and PDF/X
-
-PDF/X-1a:2001 is the format preferred by many print-on-demand services. It is the closest to
-"digital paper" that PDF provides. It is based on PDF version 1.3.
-
-Modern digital Ebooks use PDF 1.7 or later. But this adds nothing useful to paper print,
+<h4>About PDF Version 1.3 and PDF/X</h4>
+<p>PDF/X-1a:2001 is the format preferred by many print-on-demand services. It is the closest to
+"digital paper" that PDF provides. It is based on PDF version 1.3.</p>
+<p>Modern digital Ebooks use PDF 1.7 or later. But this adds nothing useful to paper print,
 and possibly adds useless code that commercial printers will reject. Your own home or office
 printer is smart enough to discard unnecessary code. But print-on-demand assumes that your book
-may be printed by any number of shops in any number of places, smart or not.
+may be printed by any number of shops in any number of places, smart or not.</p>
 
 
-About PDF/X Output Intent
-
-The PDF/X specifications were originally written for the convenience of document exchange
+<h4>About PDF/X Output Intent</h4>
+<p>The PDF/X specifications were originally written for the convenience of document exchange
 between content providers and color-critical publications such as magazines. The specs,
-then and now, require that the PDF declare the kind of printing process that is expected
-(or, digital display for Ebooks). In principle, the content provider used hardware and
-software that could emulate that kind of printer. Then, the colors seen by the content provider,
-would match the colors in print.
-
-That is irrelevant for black-ink book interiors. Nevertheless, an Output Intent must be
+then and now, require that the PDF declare the kind of printing process that is expected.
+In principle, the content provider used hardware and software that could emulate that kind
+of printer. Then, the colors seen by the content provider, would match the colors in print.</p>
+<p>That is irrelevant for black-ink book interiors. Nevertheless, an Output Intent must be
 declared, because it is part of the spec. The generic Output Intents are FOGRA39 and U.S. Web
 Coated (SWOP) v2. Rest assured that the actual printer will ignore the Output Intent, because
 its process is nothing like that. Does not matter for black-ink only book interior, but
-could be a minor issue for color cover artwork.
+could be a minor issue for color cover artwork.</p>
+<p>Novelette does not state or attach a color profile, becuase it might trigger a printer into
+using color inks, when only black is used.</p>
 
-Novelette does not state or attach a color profile. That might trigger a printer into using
-color inks, when only black is used.
 
-
-Why So Much Lua Code?
-
-Lua is not hard to understand. It is particularly effective with if-and-else constructions,
+<h4>Why So Much Lua Code?</h4>
+<p>Lua is not hard to understand. It is particularly effective with if-then-else constructions,
 which may use logical and/or/not, and parentheses for grouping. Also, TeX catcodes do not
-matter (Lua has its own special characters).
-
-In general, LaTeX gathers information (such as settings), then passes it to Lua for
+matter (Lua has its own special characters).</p>
+<p>In general, LaTeX gathers information (such as settings), then passes it to Lua for
 interpretation. The results are passed back to LaTeX as per-macro temporary variables,
-which laTeX then cconverts to its own syntax.
+which laTeX then cconverts to its own syntax.</p>
 
 
-Why Not Automatic Chapter Numbering?
-
-Normally, LaTeX requires two compiler passes for automatic numbering. The first pass gathers
+<h4>Why Not Automatic Chapter Numbering?</h4>
+<p>Normally, LaTeX requires two compiler passes for automatic numbering. The first pass gathers
 the information, and saves it an auxiliary file. The second pass reads that information,
-and writes it into the document.
-
-But Novelette assumes that the writer will actively exchange with an editor who does not
+and writes it into the document.</p>
+<p>But Novelette assumes that the writer will actively exchange with an editor who does not
 know much about TeX. Even if the editor has TeX, a problem will arise if someone does
 a double-compile while the other does not. It gets worse if (as usual) the editor is
-not using TeX.
+not using TeX.</p>
+<p>So, do the numbering yourself. Did Plato have automatic numbering? No! Did Cervantes have
+automatic numbering? No!</p>
 
-So, do the numbering yourself. Did Plato have automatic numbering? No! Did Cervantes have
-automatic numbering? No!
 
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
 
-<p class="toplink"><a href="#top">^TOP</a></p>
 
 </div><!-- end master -->
 </body>
