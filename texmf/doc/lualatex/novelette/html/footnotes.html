@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Footnotes</title>
+</head>
+<body>
+<div id="master">
+
+<div id="navbara">
+<a href="home.html">HOME</a> &nbsp;
+<a href="installation.html">&bull;Installation</a> &nbsp;
+<a href="tutorials.html">&bull;Tutorials</a> &nbsp;
+<a href="methods.html">&bull;How-To</a> &nbsp;
+<a href="index.html">&bull;Alphabetic Index</a>
+</div>
+
+<h2>Novelette Documentation - Footnotes</h2>
+
+
+<div id="navbarb">
+<a href="#overview">Overview</a> &nbsp;
+<a href="#where">Where Allowed</a> &nbsp;
+<a href="#markers">Markers/Labels</a> &nbsp;
+<a href="#style">Footnote Style</a> &nbsp;
+<a href="#footnote">Creating a Footnote</a> &nbsp;
+<a href="#endnote">End Notes</a> &nbsp;
+</div>
+
+
+<a id="overview"></a>
+<h3>Overview</h3>
+<p>Novelette is intended for popular fiction, where footnotes are very rare. When used,
+the occasional footnote is a brief remark from the author, rather than an academic citation.</p>
+<p>Here are some examples: (1) The story is a historical romance, with a volcanic eruption in
+Chapter 12. A brief footnote might simply say that there really was an eruption at that
+place and time. (2) The story is an “unearthed manuscript.” Occasional footnotes indicate
+that portions were damaged, and hard to read.</p>
+<p>Footnotes are marked by symbols (asterisk, etc.), not numbers. If you need many footnotes,
+or if they must be numbered, or if they are lengthy, then Novelette is not for you.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="where"></a>
+<h4>Where Footnotes Allowed</h4>
+<p>You may not write a footnote anywhere in frontmatter or backmatter. You may not write
+a footnote in a component with the <code>[single]</code> or <code>[legal]</code> option.
+And (obviously) you may not write a footnote in page headers, or nest one footnote
+within another.</p>
+<p>Otherwise (in mainmatter) you may write footnotes in display zones, in main text,
+and in block environments. No matter where you write them, the footnote text appears
+at page bottom (or the bottom of a following page).</p>
+<p>You may not place an image within a footnote.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="markers"></id>
+<h4>Markers and Labels</h4>
+<p>The <i>marker</i> is a raised symbol that is placed in the text. Different nations have
+different typographic rules, regarding how the marker is placed relative to punctuation.
+Novelette does not know or care; it places the marker where you write the <code>\footnote</code>
+command. Proper placement is up to you.</p>
+<p>The <i>label</i> is the symbol that appears just before the footnote itself,
+at the bottom of the page.</p>
+<p>Novelette does not use fake labels or markers. All of them use symbols that were designed
+for the purpose, in Novelette fonts.</p>
+<p>Markers and labels are always upright, even if the nearby text is Italic. This is standard
+book design practice.</p>
+<p>If you write a footnote within a display zone, it does not print a marker, and the footnote
+text does not have a label. This is standard book design practice. Such footnotes are meant
+to apply to the whole chapter, rather than to a particular sentence. For example,
+if Chapter 5 is named <i>Myron and Roseanne</i>, a footnote might say that its theme is based on
+<i>Romeo and Juliet</i>.</p>
+<p>The order of symbols: * † ‡ § ** †† ‡‡ §§ then recycle to *.</p>
+<p>Upon leaving a display zone and entering <code>\maintext</code>, the footnote count
+is reset (asterisk).</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="style"></a>
+<h4>\footnotestyle{setting}</h4>
+<p>The text of a footnote may contain more than one paragraph. You have a choice of how to print
+the start of the footnote, where is label appears. This is a global setting, without local
+modification. If the footnote contains more than one paragraph, each additional paragraph
+is indented as usual.</p>
+<p>In Preamble, you may write this command:</p>
+<div class="code"><code>\footnotestyle{indent=<i>I</i>}</code></div>
+<p>Choices for <i>I</i> are: <code>near away both none</code> (default is <code>near</code>).</p>
+<ul>
+<li><p><code>near</code> starts the first line of footnote text at the indent, with its
+label and space just before it (sitting within the indent).</p></li>
+<li><p><code>away</code> starts the first line of footnote text at the indent, but with
+its label at the left margin (then the space is larger).</p></li>
+<li><p><code>both</code> places the label at the indent, then space, then text.</p></li>
+<li><p><code>none</code> places the label at left margin, then space, then text. This is
+not quite the same as <code>away</code>.</p></li>
+</ul>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="footnote"></a>
+<h4>Creating a Footnote: \footnote{text}</h4>
+<p>The text of a footnote may contain one or more paragraphs, separated by <code>\par</code>.
+You do not need <code>\par</code> at the end.</p>
+<p>The text may contain Italics. But it may not contain small caps, or other text styles.</p>
+<p>The text size, and line spacing, is smaller than main text. The font is specially designed
+for this purpose, rather than scaling the main font.</p>
+<p>In standard LaTeX, the <code>\footnote</code> command allows an option. Novelette does not.
+If you write an option, it will be silently ignored.</p>
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+
+<a id="endnote"></a>
+<h4>End Notes</h4>
+<p>Novelette has no provision for end notes. If your book must have them, write footnotes
+that say “See endnote 5” or something similar. Then design your own end notes, and place them
+wherever you wish. Novelette does not know, and does not care.</p>
+
+
+<p class="toplink"><a href="#top">^TOP</a></p>
+
+</div><!-- end master -->
+</body>
+</html>

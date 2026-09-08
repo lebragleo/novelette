@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Quotes</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Components &gt; Text Styles &gt; Quotes</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+If you are already familiar with LaTeX, you know that certain characters and character
+combinations are automatically converted to something else. These are known as
+"TeX ligatures" although some of them are simple substitutions, rather than ligatures.</p>
+<p>Novelette uses <i>most</i> TeX ligatures, But not all!</p>
+
+
+<h4>The Exception: quotedbl (").</h4>
+<p>Standard LaTeX converts the &quot; character to right curly quotes. But this is a problem,
+because those who use word processors expect that those characters will be converted to left or
+right curly quotes, depending on context (smart quotes). Worse, the fonts used for many
+text editors, and on-screen PDF, make it hard to distinguish left from right. But in print,
+the flaw is easily noticed.</p>
+<p>Novelette leaves &quot; as-is. After typesetting, Lua inspects each page for the presence of
+that character. If seen, it is a problem, and your document is demoted to draft mode.</p>
+<p>What if you really need the &quot; character? Use <code>\real{&quot;}</code>. That hides
+the character from Lua inspection.</p>
+
+<h4>The Usual Quotes</h4>
+<p>Other TeX ligatures remain the same:</p>
+<ul>
+<li><p><code>``</code> (two grave) become left curly double quotes.</p></li>
+<li><p><code>''</code> (two quotesingle) become right curly double quotes.</p></li>
+<li><p><code>`</code> (isolated grave) becomes left curly single quote.</p></li>
+<li><p><code>'</code> (isolated quotesingle) becomes right curly single quote, also used
+as the apostophe.</p></li>
+<li><p>The comma may be use for German base9 single quote. If you need that actual character,
+which looks exactly like comma, you may paste it from a Unicode character map.</p></li>
+<li><p><code>,,</code> (two comma) is converted to German base9 double quote.</p></li>
+<li><p>&lt;&lt;</code> (two less) is converted to left double guillemet.</p></li>
+<li><p>&gt;&gt;</code> (two greater) is converted to right double guillemet</p></li>
+<li><p>If you need single guillemets, paste them from a Unicode character map</p></li>
+</ul>
+
+
+<h4>Resolving Triplets</h4>
+<p>Standard LaTeX has a problem with triple characters <code>```</code> and <code>'''</code>.
+No problem with Novelette!</p>
+<p>Default behavior: Three consecutive <code>```</code> and three consecutive <code>'''</code>
+are interpeted American-style. Double quotes are on the outside, separated by narrow
+nonbreaking space from single quotes on the inside. This is also used for many British books.</p>
+<p>If you must have it the other way (single outside, double inside), thenuse
+<code>\enable{britq}</code> in preamble. The is a global setting.</p>
+
+
+<h4>Other Ligatures</h4>
+<p>Novelette uses short-arm <code>f</code>. There is no need for ligatures with following
+characters.</p>
+<p>Other ligatures:</p>
+<ul>
+<li><code>---</code> (three hyhen) converts to emdash.</p></li>
+<li><code>--</code> (two hyphen) converts to en dash.</p></li>
+<li><p>Word processors often convert <code>--<code> to emdash. If novelette sees an emdash
+followed by a hyphen, it assumes that a word processor was involved, and converts the combination
+to a single emdash.</p></li>
+<li><p><code>!`</code> (exclam grave) and <code>?`</code> (question grave) are converted to
+their Spanish inversions. If the reult is higher or lower than you need, use
+<code>\up{!`} \up{?`}</code> or <code>\dn{!`} \dn{?`}</code> to adjust the vertical
+position.</p></li>
+</ul>
+
+
+<h4>French Punctuation Spacing</h4>
+<p><i>Zut!</i> Or should I say, <i>Zut !</i></p>
+<p>Ordinary LaTeX uses the asciitilde (~) as nonbreaking space. In Novelette, it is a narrow
+nonbreaking space, suitable for use when you need it for French punctuation spacing.</p>
+<p><code>Zut~!</code></p>
+<p<code><<~Alors, je commence scriber.~>></code><p>
+
+
+<h4>\real{<i>content</i>}</h4>
+<p>The <code>\real{<i>content</i>}</code> command turns off TeX ligatures in its content.
+Thus, <code>\real{`} prints the grave, instead of left curly single quote, and
+<code>\real{<<}</code> prints two less-than symbols, instead of left double guillemet.</p>
+<p>hen you use <code>\real</code>, it hides its content from Lua flaw inspection.
+Don't use it, unless you need it.</p>
+<p>Something like <code>\real{tomato} prints tomato. Can't get more real than that!</p>
+
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

@@ -3,7 +3,7 @@
 %% VERSIONS PRIOR TO 1.0 ARE UNFINISHED !!!
 %%
 %%
-%% Copyright 2026 Terry Lebragleo (anagram for original developer's real name).
+%% Copyright 2026 Terry Lebragleo.
 %% Project Page: github.com/lebragleo/novelette. Contact via 'issues' there.
 %%
 %% LICENSES
@@ -194,8 +194,8 @@
 \newif\ifnvt@wantthin
 \newif\ifnvt@wantsrir
 \newif\ifnvt@wantgero
-\newif\ifnvt@wanticel
 \newif\ifnvt@wantplas
+\newif\ifnvt@wantcrge
 \let\nvt@par\par\relax %% For local \par tweaks.
 \let\nvt@brk\\\relax %% For break tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
@@ -255,7 +255,7 @@
 \AddToHook{begindocument/end}{%%
   \AddToHook{shipout/before}{\stepcounter{nvt@bookpage}}
   \nvt@defineindent%% Set normal paragraph indent.
-  \def\forceindent{\hspace*{\nvt@parindent}}%% May be useful when parindent=0pt.
+  \def\fakepar{\ifhmode\\\fi\hspace*{\nvt@parindent}}%% Useful for \dcap, or when parindent=0pt.
   \ifnvt@dev\nvt@devshade\fi%% Developer-mode shading.
   \nvt@definepagestyles%% In novelette-layout.sty.
   \@nameuse{ps@\nvt@pagestyle}%% Chooses the page style.

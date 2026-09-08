@@ -8,15 +8,19 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-HOME &nbsp;
-<a href="installation.html">&bull;Installation</a> &nbsp;
-<a href="tutorials.html">&bull;Tutorials</a> &nbsp;
-<a href="methods.html">&bull;How-To</a> &nbsp;
-<a href="index.html">&bull;Alphabetic Index</a>
-</div>
+<h4>Novelette Documentation</h4>
 
-<h2>Novelette Documentation - Home</h2>
+<div id="navbara"><p class="noindent">
+<img src="images/home.svg" width="16px" height="16px" alt=""/>HOME &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index-alphabetical.html"><!--
+--><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Home</h2>
 
 <div id="navbarb">
 <a href="#overview">Overview</a> &nbsp;
@@ -46,10 +50,11 @@ And, do not look at online LaTeX how-to pages; they do not correspond to Novelet
 
 <a id="platform"></a>
 <h4>Platform Support</h4>
-<p>If you can install TeXlive with LuaTeX support, then you can use Novelette.
-The <a href="installation.html">installation</a> page provides details.</p>
-<p>Note that Windows users may need to switch to its Linux subsytem (Windows 10+)
-for full benefit, especially when your book interior has images.</p>
+<p>If you can install TeXlive 2025 or later, with LuaTeX support, then you can use Novelette.
+The <a href="install.html">installation</a> page provides details.</p>
+<p>If your platform is Windows, and your book has images, then you may need to use
+its Linux subsytem (Windows 10+) for full benefit. This is explained on the
+<a href="graphics.html">graphics</a> page.</p>
 
 
 <a id="writing"></a>
@@ -63,7 +68,7 @@ that fails in Novelette.</p>
 
 <a id="gui"></a>
 <h4>LaTeX GUI Programs</h4>
-<p>Most LaTeX GUI programs (such as TeXshop, TeXstudio) are designed for creating academic
+<p>Most LaTeX GUI programs (such as <i>TeXshop, TeXstudio</i>) are designed for creating academic
 papers with mathematics. They offer many things that Novelette cannot use, and fail to
 understand Novelette custom code. Avoid them.</p>
 <p>The very basic <i>TeXworks</i> GUI can be used. Or, no GUI at all.</p>
@@ -93,7 +98,7 @@ Since images are raster, you may use any fonts that your graphics program can re
 <a id="images"></a>
 <h4>Images</h4>
 <p>Images must be non-color <i>png</i> raster format. Details are provided
-<a href="png-graphics.html">elsewhere</a> in this documentation.</p>
+on the <a href="graphics.html">graphics page</a>.</p>
 <p>If your book is very image-intensive (such as graphic novel), then do not use Novelette.
 For that, you need a page layout program. If your book contains photographs that must look
 like photographs (instead of vaguely like them), then you cannot use Novelette, because
@@ -110,8 +115,7 @@ before you write your book.</p>
 <p>If Novelette fonts have the characters you need, and the hyphenation pattern for your
 language, that is all you can expect. Many languages have specific typesetting rules.
 Although Novelette knows a few of them, you may need to manually solve language-specific
-typesetting problems yourself. The Novelette developer will not add code for language-specific
-problems.</p>
+typesetting problems yourself. The Novelette developer will not solve them for you.</p>
 
 
 <hr/>
@@ -120,7 +124,8 @@ problems.</p>
 <a id="dev"></a>
 <h4>For Developers and Maintainers</h4>
 <p>If you are a developer or maintainer (not ordinary author),
-<a href="maintainer.html">look here</a> for notes.</p>
+see the <a href="maintainer.html">maintainer notes</a>.</p>
+
 
 
 </div><!-- end master -->

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Sub-Documents</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="installation.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<img src="images/tutorial.svg" width="16px" height="16px" alt=""/>TUTORIAL &nbsp;
+<a href="index-alphabetical.html"><!--
+--><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Sub-Documents</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#structure">Sub-Document File Structure</a> &nbsp;
+<a href="#calling">Calling a Sub-Document</a> &nbsp;
+<a href="#compiling">Compiling a Sub-Document</a>
+</div>
+
+
+
+<h3>Overview</h3>
+<p>Best practice is to break your book into a number of files, rather than one large file.
+The single <i>main document</i> contains the preamble with settings, and calls for the
+content of its <i>sub-documents</i>.</p>
+<p>Standard LaTeX has packages such as <i>standalone</i>, <i>subfiles</i>, and
+<i>includeonly</i>, that can help you break a large document into manageable pieces.
+Novelette does not use them, but instead has built-in commands. You will never use
+the <code>\include</code> command, and will only use <code>\input</code> once per
+sub-document, as described below.</p>
+
+
+<p><a id="structure"></a>&nbsp;</p>
+<h4 class="section">Sub-Document File Structure</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>Every sub-document is a <i>*.tex</i> file. It must be located in the same folder as the
+main document, or (better) in a subfolder relative to the main document.</p>
+<ul>
+<li><p>The top four lines of a sub-document must follow a specific format:</p>
+<pre class="code">%!TeX program = lualatex
+%!TeX encoding = UTF-8
+\def\thisdoc{M:PathFromMainDocumentTo/SubdocFilename.tex}
+\input{PathFromSubdocTo/MainDocument.tex}</pre></li>
+<ul>
+<li><p>Above, <code>M</code> is one of <code>frontmatter mainmatter backmatter</code>.
+Do not use backslash. This must match where the sub-document will appear, when it is called
+by the main document. Its purpose it to let the sub-document know where it belongs,
+when compiled alone. Note that a colon follows.</p></li>
+<li><p><code>\def\thisdoc</code> tells the compiler how the main document will find this file.
+The path is <i>relative to the main document</i>, whether this sub-document is directly called
+by the main document, or called by another sub-document.</p>
+<p>When compiling the main document, <code>\thisdoc</code> is ignored. when compiling
+a sub-document, it ignores <code>\thisdoc</code> in its own sub-documents.</p>
+</li>
+<li><p><code>\input</code> tells the compiler where to find the main document, when compiling
+just the sub-document. This command is ignored when compiling the main document; it does not
+re-input itself!</p></li>
+</ul>
+<li><p>If a sub-document calls another sub-document, there does not need to be any particular
+relationship in the folder tree. As long as all files are within the same folder as the
+main document, or in levels beneath it, all paths are relative to the main document.</p></li>
+<li><p>A sub-document has no <code>\documentclass</code>, no preamble settings, no
+<code>\begin{document}</code>, no <code>\end{document}</code>.</p></li>
+<li><p>After the required top four lines, the remainder of the sub-document consists of
+material within <code>component</code> environments, or calls to other sub-documents.</p></li>
+<li>You do not need to write any command to close a sub-document. You may write
+<code>\endinput</code> if you wish. If you do that, anything beneath it (in the same file)
+will be ignored by the compiler. This is a useful way to make notes to yourself.</p>
+<li><p>Novelette performs a detailed sanity check on sub-document syntax.</p></li>
+</ul>
+
+
+<p><a id="calling"></a>&nbsp;</p>
+<h4 class="section">Calling a Sub-Document</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>A sub-document is included in the main document, or in another sub-document, by a simple
+command:</p>
+<pre class="code">\subdoc{PathFromMainDocumentTo/SubdocFilename.tex}</pre>
+<p>You cannot use the same sub-document more than once. This prevents recursion.
+If some content is repeated in your book, use multiple files.</p>
+
+
+<p><a id="compiling"></a>&nbsp;</p>
+<h4 class="section">Compiling a Sub-Document</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>To compile a sub-document, do the same thing that you would do for the main document.
+For example, if the subdocument is <i>subdocs/chapters/chapter-1.tex</i> relative to the
+main document, you would navigate to the <i>subdocs/chapters</i> folder, then command:</p>
+<pre class="code">lualatex chapter-1</pre>
+<p class="noindent">When you compile a sub-document:</p>
+<ul>
+<li>The compiler reads the preamble of the main document, and executes routines
+to the end of <code>\begin{document}</code>. Then it transfers to the sub-document, and
+prints its content. Finally, it executes code in the main <code>\end{document}</code>.</p</li>
+<li><p>The PDF and log file will appear in the current working directory,
+which is usually the same as the sub-document folder.</p></li>
+<li><p>The metadata will be altered, so that it is not identical to the metadata of
+the complete book.</p></li>
+<li><p>The result will not be PDF/X-1a:2001 format.</p></li>
+<li><p>The sub-document cannot know what its page numbers will be. It will print
+zzz (if roman) or 000 (if arabic) where page numbers would print.</p>
+<li><p>In most cases, the sub-document cannot know whether it will begin recto or verso.
+The side-margin glue strip will be split, so that the content does not shift from side
+to side.</p>
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+</div><!-- end master -->
+</body>
+</html>

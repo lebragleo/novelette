@@ -96,7 +96,9 @@
 %% The following line is not indented.
 \def\dinkus{%%
   \par\noindent%%
-  \nvt@center\strut\upshape\char"204E\hspace{2em}\char"204E\hspace{2em}\char"204E\par\nvt@endcenter%%
+  \nvt@center%%
+  \strut\upshape\char"204E\hspace{2em}\char"204E\hspace{2em}\char"204E\par%%
+  \nvt@endcenter%%
   \@afterindentfalse\@afterheading%%
 }%%
 %%
@@ -113,6 +115,7 @@
 %% paragraph indent, write \blockline{\indent line of text} there.
 %%   The blockline text does not print. If you write that text in the block (the usual situation),
 %% it will not necessarily appear on a single line, unless it is the first line.
+%%   This is ignored if a block uses [text=mono] due to monospace.
 \def\nvt@blockline{} %% Default empty.
 \def\nvt@sterr{%%
   \nvt@err{Bad \string\blockline. Only one line: no wrap or \noexpand\\ or \string\par.}%%
@@ -152,10 +155,11 @@
   \fi%%
   \vspace*{-\nvt@bls}\strut\par\rule{0pt}{\nvt@blh}%%
   \ifnum\tmpt=1\relax\def\nvt@tmpt{1}\nvt@small\else\def\nvt@tmpt{0}\fi%%
-  \ifnum\tmpt=2\relax%%
+  \ifnum\tmpt=2\relax\def\nvt@tmpt{2}\nvt@mono\else\def\nvt@tmpt{0}\fi%% %%%%%
+  \ifnum\tmpt=-2\relax%% %%%%%
     \nvt@warn{Block option [small] cannot be used outside display zone. Ignored.}%%
   \fi%%
-  \def\tmptest{s}\ifx\tmpl\tmptest%%
+  \def\tmptest{s}\ifx\tmpl\tmptest%% %%%%% ignored blockine with monospace
     \sbox0{\nvt@blockline}%%
     \edef\tmpz{\fpeval{((\textwidth-\wd0)<(2*\nvt@parindent))+(\wd0<4*\nvt@parindent)}}%%
     \ifnum\tmpz>0\relax%%
@@ -172,7 +176,7 @@
 %%    tex.sprint('\\setlength\\parindent{0pt}')
 %%    tex.sprint('\\hyphenpenalty 1000\\relax\\exhyphenpenalty 1000\\relax')
 %%    tex.sprint('\\doublehyphendemerits 10000\\relax\\finalhyphendemerits 10000\\relax{}')
-  \ifnum\tmpreturn=0\relax%%
+  \ifnum\tmpreturn=0\relax%% %%%%% what about centering ? with monospace?
     \nvt@err{Bad option for block. Unknown settings or bad side margins.^^J%%
       \spii Format: [offset=L/R,align=A,text=T,indent=I]^^J%%
       \spiv L/R may both be numbers (prefer integers), or s/s, or s/0. Default 2/0.^^J%%
@@ -182,13 +186,14 @@
       \spix s/s -> Block width is width of blockline. Symmetrical offsets.^^J%%
       \spix s/0 -> Block width is width of blockline. All ofset at left.^^J%%
       \spix There is no 0/s. For that effect, manually break lines.^^J%%
-      \spiv T -> normal small. Default normal.^^J%%
+      \spiv T -> normal small. Default normal.^^J%% %%%%%
       \spix If small, reduced text size and baselineskip.^^J%%
-      \spix Only display zone allows choice of small or normal.^^J%%
+      \spix Cannot use small outside display zone..^^J%%
       \spiv A -> center left right justify. Default justify.^^J%%
       \spix Text alignment relative to block offsets.^^J%%
       \spix If not justify, hyphenation disabled.^^J%%
-      \spiv I -> 0 or 1. Default 1, normal paragraph indent. 0 means no indent.}%%
+      \spiv I -> normal none. Paragraph indent.^^J%%
+      \spix You may use \string\noindent, and \string\indent, per-paragraph.}%%
   \fi%%
   \setlength{\leftmargin}{\tmplind}%%
   \setlength{\rightmargin}{\tmprind}%%
@@ -252,8 +257,9 @@
       \ifnum\tmpfn=6\relax\def\tmpfont{\nvt@gero}\fi%%
       \ifnum\tmpfn=7\relax\def\tmpfont{\nvt@black}\fi%%
       \ifnum\tmpfn=8\relax\def\tmpfont{\nvt@thin}\fi%%
-      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@icel}\fi%%
+      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@berg}\fi%%
       \ifnum\tmpfn=10\relax\def\tmpfont{\nvt@plas}\fi%%
+      \ifnum\tmpfn=11\relax\def\tmpfont{\nvt@crge}\fi%%
       \ifx\tmptrack\@empty\edef\tmptrack{\nvt@nametrack}\fi%%
       \ifnum\tmpalign=-1\relax\def\tmpleft{\nvt@namel}\def\tmpright{\nvt@namer}\fi%%
       \ifnum\tmpalign=0\relax\def\tmpleft{1}\def\tmpright{1}\fi%%
@@ -278,7 +284,8 @@
     \else%%
       \nvt@err{Bad option for \string\name.^^J%%
         \spii Format: \string\name[font=F,scale=S,track=T,align=A,case=C]{content}^^J%%
-        \spiv F -> main dark thick heavy black wide thin icel gero plas. Default \nvt@namefn.^^J%%
+        \spiv F -> main dark thick heavy black wide thin berg gero plas crge.^^J%% %%%%%
+        \spix Default \nvt@namefn.^^J%%
         \spiv S -> Number 1<=S<=4. May be decimal. Default \nvt@namescale.^^J%%
         \spix If followed by a, will auto-adjust slightly over-wide content.^^J%%
         \spiv T -> Integer 0-9. Tracking, tight to very loose. Default \nvt@nametrack.^^J%%
@@ -292,7 +299,7 @@
     \fi%%
     \ifx\tmpnofont\@empty\else%%
       \nvt@err{Requested font '\tmpnofont' but did not load it.^^J%%
-      \spii Fix: In Preamble, write \string\loadfont{\tmpnofont}.}%%
+      \spii How to fix: In Preamble, write \string\loadfont{\tmpnofont}.}%%
       \def\tmpfont{\nvt@namefont}\def\tmpsp{\nvt@namesp}%%
     \fi%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
@@ -369,8 +376,9 @@
       \ifnum\tmpfn=6\relax\def\tmpfont{\nvt@gero}\fi%%
       \ifnum\tmpfn=7\relax\def\tmpfont{\nvt@black}\fi%%
       \ifnum\tmpfn=8\relax\def\tmpfont{\nvt@thin}\fi%%
-      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@icel}\fi%%
+      \ifnum\tmpfn=9\relax\def\tmpfont{\nvt@berg}\fi%%
       \ifnum\tmpfn=10\relax\def\tmpfont{\nvt@plas}\fi%%
+      \ifnum\tmpfn=11\relax\def\tmpfont{\nvt@crge}\fi%%
       \ifx\tmptrack\@empty\edef\tmptrack{\nvt@subtrack}\fi%%
       \ifnum\tmpalign=-1\relax\def\tmpleft{\nvt@subl}\def\tmpright{\nvt@subr}\fi%%
       \ifnum\tmpalign=0\relax\def\tmpleft{1}\def\tmpright{1}\fi%%
@@ -393,7 +401,8 @@
     \else%%
       \nvt@err{Bad option for \string\subname.^^J%%
         \spii Format: \string\subname[font=F,scale=S,track=T,align=A,case=C]{content}^^J%%
-        \spiv F -> main dark thick heavy black wide thin icel gero plas. Default \nvt@subfn.^^J%%
+        \spiv F -> main dark thick heavy black wide thin berg gero plas crge.^^J%%
+        \spix Default \nvt@subfn.^^J%%
         \spiv S -> Number 1<=S<=4. May be decimal. Default \nvt@subscale.^^J%%
         \spix If followed by a, will auto-adjust slightly over-wide content.^^J%%
         \spiv T -> Integer 0-9. Tracking, tight to very loose. Default \nvt@subtrack.^^J%%
@@ -579,11 +588,10 @@
 %%   The unstarred \dcap spaces both lines equally (they vertically align) whether or not the
 %% drop cap is a one-letter word. The starred \dcap* brings the immediately following text closer,
 %% unless the drop cap is a one-letter word; in that case, the space serves to align vertically.
-%%   Best practice is to follow the drop cap with some text in small caps. Not the whole line.
-%% That is for you to decide.
 %%   Except in display zones, Novelette scales horizontal by em, vertical by baselineskip.
 %% Thus, different scales are applied to the dcap letter; its aspect ratio changes with layout.
 %% The numbers apply aspect ratio 1 for smallest baselineskip, h/w>1 for taller baselineskip.
+%%   If the first line is a paragraph, do not end it with \par. Use \fakepar instead.
 \DeclareDocumentCommand\dcap{sm}{%%
   \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%%
   \def\tmptest{1}\ifx\nvt@initscale\tmptest\relax\def\tmpok{0}\fi%%
@@ -629,7 +637,7 @@
 %% number is necessary. If any \next remains, you cannot move to preview or final mode.
 \newif\ifnvt@didnext %% Become true if 1 or more \next used.
 \def\next{%%
-  \#\#%%
+  \char"2188%% Two ## placed at this Unicode slot.
   \global\nvt@didnexttrue\directlua{nvt.countnext=nvt.countnext+1}%%
   \obeyspaces%%
 }%%

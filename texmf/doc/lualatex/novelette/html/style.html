@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Text Styles</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Components &gt; Text Styles</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+<p>This page describes commands and environments that can change the font, position, and size
+of text. The various styles cannot be used everywhere; most of them are specific to document
+location (front/main/back matter), or to inside/outside a display zone.</p>
+<p>Standard LaTeX commands, such as <code>\large</code> and <code>\raggedright</code>,
+do not work in Novelette. Instead, you must use Novelette's own commands and options.
+This provides a consistent interaction between the code and the fonts.</p>
+<p>Remember that Novelette is for printed, popular fiction. If the Novelette styles cannot
+do what you want, then either use some other document class, or reduce <i>what you want</i>
+to <i>what you need</i>.</p>
+
+
+<h4>\name[<i>option</i>]{<i>text</i>}, \subname[<i>option</i>]{<i>text</i>}</h4>
+<p>These commands apply a variety of styles to a line of text. They are typically used for such
+purposes as chapter titles and subtitles.</p>
+<ul>
+<li><p>They may only be used within a <code>display zone</code>, but not within a <i>block</i>
+environment.</p></li>
+<li><p>They may not be nested.</p></li>
+<li><p>They have no particular meaning or hierarchy. All they do is style text.</p></li>
+<li><p>You may repeat <code>\name</code> and <code>\subname</code> in any order,
+in any <i>display zone</i>.</p></li>
+<li>The styled text must fit on one line, without wrap.</p></li>
+<li>The global default options are set in preamble by
+<a href="preamble.html#namestyle"><code>\namestyle</code></a> and
+<a href="preamble.html.#subnamestyle"><code>\subnamestyle</code></a>.
+The local options for <code>\name</code> and <code>\subname</code> use the same syntax,
+but only apply per-instance.</p></li>
+</ul>
+
+
+<h4>Inital Letter of Main Text</h4>
+<p>When main text is the start of a chapter, most book designs apply a special style to its
+first letter. Novelette has <code>\init{<i>letter</i>}</code> for that purpose. It styles its
+<i>letter</i> with the main font, but at double the normal size. The baseline is the same
+as normal baseline, so the top of <i>letter</i> rises above the other text on the first line.</p>
+<p>This command may only be used at the very start of main text, immediately after the
+<code>\maintext</code> command. If you place anything (even (<code>\blankline</code>)
+between <code>\maintext</code> and the <code>\init</code> or <code>\dcap</code>, then the
+code will fail.</p>
+<p><code>\init{<i>letter</i>}</code> usage:</p>
+<ul>
+<li><p>Code such as <code>\'E</code> is treated as a single letter.</p></li>
+<li><p>If the text begins with quotation marks, guillemets, or Spanish inverted marks,
+place them within the command, along with the first letter. The punctuation will be automatically
+adjusted for best appearance.</p></li>
+<li><p>Avoid using more than one letter. But Novelette does not enforce this rule.</p></li>
+<li><p>Do not put a space after this command, unless the initial letter is a word.</p></li>
+<li><p>Often, the next few letters (whole words) look best with small caps:</p>
+<p><code>\init{I}\smcp{t was dark.} The heavy gloom...</code></p>
+<p>In the above example, note that <code>I</code> is not repeated in small caps, because
+it is already printed as the initial letter.</p></li>
+</ul>
+
+
+<h4>Drop Cap</h4>
+<p>Instead of <code>\init</code>, you may use a <i>drop cap</i> for the first letter of main text.
+This is an enlarged letter occupying the first two lines, with other text wrapped around it.</p>
+<p>Popular fiction almost never uses drop caps. They only look good when the opening paragraphs
+have enough lines to surround them, without excessive white space. But popular fiction usually has
+short paragraphs (sometimes one line), dialog with punctuation, and other text that interferes
+with good-looking drop caps.</p>
+<p>If you use <code>\dcap</code>, it must immediately follow <code>\maintext</code>. But you
+should use <code>\init</code> instead. Most actual books do it this way. But if you
+are determined to use drop caps, here is how:</p> 
+<p class="noindent"><code>\dcap{<i>letter</i>}</code>, <code>\dcap*{<i>letter</i>}</code></p>
+<ul>
+<li><p>This prints the <i>letter</i> as a "drop cap".</p></li>
+<li><p>Do not place punctuation. If necessary, re-write your text, so that
+the sentence does not begin with quotation marks, guillemets, or Spanish inverted marks.
+Or, omit the marks there. If you cannot do that consistently, then avoid drop caps.</p></li>
+<li><p>Code such as <code>\'E</code> is treated as a single letter.</p></code>
+<li><p>The drop cap occupies two lines. No more, no less.</p></li>
+<li><p>The top of the letter (without diacritical) is at the top of normal uppercase in the
+first line. The baseline of the letter is at the baseline of the second normal line.</p></li>
+<li><p>If a diacritical above the letter, it will appear higher.</p></li>
+<li><p>Letters J, Q, and Ccedilla are specially shaped to fit.</p></li>
+<li><p>Unstarred <code>\dcap</code> spaces both lines equally (they vertically align) whether
+or not the drop cap is a one-letter word. Starred <code>\dcap*</code> affects the first line;
+it brings the immediately following text closer to the drop cap. But if the drop cap is a
+one-letter word, a space restores vertical alignment.</p></li>
+<li>If the first paragraph occupies only one line, do not end it with <code>\par</code>.
+Use <code>\fakepar</code> instead.</p></li>
+</ul>
+
+
+<h4>Block Environment</h4>
+<p>The <i>block</i> environment can do many things. It can set the left/right offsets of the block,
+measured as multiples of normal paragraph indent (1em). Alternatively, it can measure the width of
+a previously-defined line of text, then calculate the offsets for best appearance of that
+width. It can set the justification of text within the block. It can set whether paragraphs
+within the block are indented, or not. And, if the block is within a <i>display zone</i>,
+it can reduce the font size and lineskip of its text.</p>
+<p>Use the block environment for block quotes, epigraphs, poetry (verse), and other places where
+a block of text needs special treatment. If you need centered text, put it in a <i>block</i>,
+because Novelette disables the <i>center</i> environment and <code>\centering</code> command.</p>
+<p class="code"><code>\begin{block}[<i>option</i>]</code></p>
+<p class="code"><i>contents</i><p>
+<p class="code"><code>\end{block}</code></p>
+<ul>
+<l1><p>You may <i>not</i> use <i>block</i> inside other styling commands. The parent element of
+<i>block</i> must be the <i>component</i> environment, before or after
+<code>\maintext</code>.</p></li>
+<li><p>You may <i>not</i> use <i>block</i> in a legal component, or in footnotes.</p>
+<li><p>You may <i>not</p> nest one <i>block</i> within another. If you need that effect, end one
+<i>block</i> before beginning a new <i>block</i>.</p></li>
+</ul>
+
+
+<h4>Block Option</h4>
+<p>Read this carefully:</p>
+
+
+
+<h4>\blockline{<i>text</i>}</h4>
+<p>This command is needed when a subsequent <i>block</i> has option <code>s/0</code>
+or <code>s/s</code>. The <i>text</i> is always in the main font.</p>
+<ul>
+<li><p>The <i>text</i> may be styled with Italics, small caps, oldstyle.</p></li>
+<li><p>The parent element of <code>\blockline</code> must be a <i>component</i> environment,
+before or after <code>\maintext</code>.</p></li>
+<li><p>The width of <i>text</i> is measured, when needed by a following <i>block</i>.
+It may be normal size, or small, depending on the <i>block</i> option.</p></li>
+<li><p>Only the width is used for calculations. The <i>text</i> is not printed.
+It may or may not appear in any <i>block</i>.</p></li>
+<li><p>The width may not exceed the textblock width, less two normal paragraph indents.
+It may not wrap.</p></li>
+<li><p>The measurement is made without paragraph indent. If you need it to be measured with indent,
+write <code>\blockline{\indent <i>text</i>}</code>.</p></li>
+<li><p>The width of <i>text</i> is a global value that remains in effect, until changed by
+a subsequent <code>\blockline</code>.</p></li>
+</ul>
+
+
+<h4>Scenes</h4>
+<p>In general, use <code>\blankline</code> one or more times, to separate scenes. Do not use
+<code>\null</code>.</p>
+<p>If the blank line happens to fall at the last or first line of a page, use
+<code>\dinkus</code> instead. Yes, that is its name in typography. It prints three spaced
+asterisks, so that the gap is more noticeable.</p>
+<p>You may use an <code>\image</code> between scenes. Trick: If the image is prominent
+(perhaps using bold or heavy text), make it medium grayscale instead of monochrome. That prints
+a nice balance: distinctive, but not overly distracting.</p>
+<p>Novelette provides the <code>\scene{text}</code> command. The text must fit on one line,
+and not exceed the textblock width, less two normal paragraph indents. The appearance of
+this text is set by <a href="preamble.html#scenestyle"><code>\scenestyle</code></a> in preamble.
+There are no local options, but you may place a <code>\blankline</code> above and/or below.</p>
+<p>Scenes are not numbered automatically. If your scenes need numbers, use the placeholder
+<code>\next</code> command, until you know their numbers.</p>
+
+
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

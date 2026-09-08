@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Tutorial</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="installation.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<img src="images/tutorial.svg" width="16px" height="16px" alt=""/>TUTORIAL &nbsp;
+<a href="index-alphabetical.html"><!--
+--><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+<a href="#structure">File/Folder Structure</a> &nbsp; 
+<a href="#maindoc">Main Document</a> &nbsp;
+<a href="#subdocs">Sub-Documents</a> &nbsp;
+<a href="#graphics">Graphics</a> &nbsp;
+<a href="#gallery">Gallery</a>
+</div>
+
+
+<h4>Overview</h4>
+<p>You will partition your text into a single <i>main document</i> file, containing all global
+settings in its <i>Preamble</i>, and a number of <i>sub-document</i> files. The sub-documents
+may be as short as one page, or as long as a chapter (or more). After its Preamble,
+the <i>body</i> of the main document will call the sub-documents in order, to create
+the whole book. Sub-documents may contain other sub-documents.</p>
+<p>You may compile an individual sub-document. It will read settings from the main document
+Preamble, then typeset its own content, with the content of its own sub-documents.</p>
+<p>Instead of a hierarchical structure of chapters and sections, Novelette regards all
+content areas as <i>components</i> with no particular purpose; their meanings are determined
+by what you write. A component may be as short as one page (such as the title page),
+or very long (one or more chapters). You decide.</p>
+
+
+<p><a id="structure"></a>&nbsp;</p>
+<h4 class="section">File and Folder Structure</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>All content must be kept in a single <i>main folder</i>, which has the main document.</p>
+<ul>
+<li><p>You may use sub-folders for the various sub-documents and images, but they do not need
+to be in hierarchical order, because every path is relative to the main document.</p></li>
+<li><p>No content may be included, unless it is within the same folder as the main document,
+or in a subfolder beneath the main document. This restriction ensures that when you copy
+or archive the folder containing the main document, you will have all content.</p></li>
+<li><p>A typical folder structure looks like this:</p>
+<pre>
+MurderAtWhereville (main folder)
+|- murder-at-whereville.tex (main document)
+|- subdocs (folder)
+   |- frontmatter (folder}
+      |- title-copyright.tex (subdoc)
+      |- epigraph.tex (subdoc)
+   |- early-material (folder)
+      |- history.tex (subdoc, chapter 1)
+      |- family.tex (subdoc, chapter 2)
+   |- crime-scene (folder)
+      |- discovery.tex (subdoc, subdoc, chapter 3)
+      |- investigation.tex (subdoc, chapter 4)
+   |- suspects (folder)
+      |- tom.tex (subdoc, chapter 5)
+      |- dick.tex (subdoc, chapter 6)
+      |- harry.tex (subdoc, chapter 7)
+   |- solution (folder)
+      |- evidence.tex (subdoc, chapter 8)
+      |- accusation.tex (subdoc, chapter 9)
+|- images (folder)
+   |- map-of-whereville.png (image)
+   |- title-page-artwork.png (image)
+|- storage (optional folder: backup files, etc.)
+</pre></li>
+</ul>
+
+
+<p><a id="maindoc"></a>&nbsp;</p>
+<h4 class="section">Main Document</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>The <a href="preamble.html">preamble</a> and <a href="document-body.html">document body</a>
+pages describe this in detail.</p>
+<ul>
+<li><p>A typical main document looks like this, with any number of sub-documents:</p>
+<pre class="code">
+%!TeX program = lualatex
+%!TeX encoding = UTF-8
+\documentclass{novelette} % Preamble follows:
+\title{Book Title}
+\author{The Author}
+% other preamble settings
+\begin{document} % Document body follows:
+\frontmatter
+\subdoc{path/filexname.tex}
+\subdoc{path/filename.tex}
+\mainmatter
+\subdoc{path/filename.tex}
+\subdoc{path/filename.tex}
+\backmatter
+\subdoc{path/filename.tex}
+\end{document} % Closes document body.
+</pre></li>
+</ul>
+
+
+<p><a id="subdocs"></a>&nbsp;</p>
+<h4 class="section">Sub-Documents</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>Full discussion: <a href="sub-documents.html">sub-documents</a>.</p>
+<ul>
+<li><p>A typical sub-document looks like this:</p>
+<pre class="code">
+%!TeX program = lualatex
+%!TeX encoding = UTF-8
+\def\thisdoc{M:PathFromMainDoc/ThisSubdoc.tex}
+\input{PathFromSubdocTo/MainDocument.tex}
+\begin{component}[option]
+Content goes here.
+\end{component}
+\begin{component}[option]
+More content.
+\end{component}
+\subdoc{path/filename.tex} % Path from main document.
+</pre>
+</ul>
+
+
+<p><a id="components"></a>&nbsp;</p>
+<h4 class="section">Components</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>Full discussion: <a href="components.html">components</a>.</p>
+<p>All printable content must be contained within a <code>component</code> environment.
+Above, the example sub-document has two components of its own. It also includes
+a subdoc, which will introduce at least one more component.</p>
+<p>Non-printing commands, such as <code>\frontmatter</code>, sit outside components.</p>
+
+
+<p><a id="graphics"></a>&nbsp;</p>
+<h4 class="section">Graphics</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>The <a href="graphics.html">full discussion of graphics</a> is on another page.
+In general:</p>
+<p>Novelette disallows vector drawings. No TiKz, no EPS, no including other PDF. All graphics
+must be <code>png</code> raster images, with certain specifications.</p>
+<p>Why so restrictive? In user forums, print-on-demand authors often wail about print services
+rejecting their PDFs, due to graphics issues. This is not caused by TeX; it can happen with any
+software. Professionals have programs that post-process PDFs to remove those problems,
+but that requires graphics expertise (and expensive software). So, Novelette will not let you
+do anything that is likely to cause those issues.</p>
+
+
+<p><a id="paths"></a>&nbsp;</p>
+<h4 class="section">File Paths</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>All file paths must follow these rules:</p>
+<ul>
+<li><p>All paths are <i>relative to the main document<i> no matter which file calls
+another file.</p></li>
+<li><p>Absolute paths, and symbolic links, are prohibited.</p></li>
+<li><p>Paths and filenames may not contain spaces.</p>
+<li><p>Paths and filenames may not contain the asciitilde (~) or backslash, and may not contain
+any character that is not universally accepted as valid by Linux, OS/X, and Windows 10+.</p></li> 
+<li><p>Paths and filenames may contain hyphen and underscore.</p></li>
+<li><p>Paths and filenames may not contain commands,
+such as <code>\chapterfolder<code>/chapter-1.tex.</p></li>
+<li><p>You cannot customize the path rules. There is no equivalent to LaTeX
+<code>\graphicspath</code> or similar settings.</p></li>
+
+
+<p><a id="gallery"></a>&nbsp;</p>
+<h4 class="section">Gallery of Sample Files</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>In the Novelette documentation folder, the <i>gallery</i> folder contains documents that
+you can compile with Novelette, and compare the PDF to the code.</p>
+<p>You may learn more useful information by reading that code, and imitating it, than
+you will learn by reading these tutorial pages!</p>
+
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

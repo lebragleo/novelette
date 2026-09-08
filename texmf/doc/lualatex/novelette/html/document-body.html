@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Document Body</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Document Body</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h4>Overview</h4>
+<p>The <i>document body</i> contains all printable content. In principle, you could write the
+entire story in one very large main document, containing a single, very large component.
+In practice, the document body is split into numerous sub-documents, each of which contains
+one or more small components.</p>
+
+
+<h4>Structure of Document Body</h4>
+<p>Between <code>\begin{document}</code> and <code>\end{document</code>, the document body
+will have this general structure:</p>
+<pre class="code">\frontmatter
+\subdoc{<i>path/filename.tex</i>}
+\subdoc{<i>path/filename.tex</i>}
+\mainmatter
+\subdoc{<i>path/filename.tex</i>}
+\subdoc{<i>path/filename.tex</i>}
+\subdoc{<i>path/filename.tex</i>}
+\subdoc{<i>path/filename.tex</i>}
+\backmatter
+\subdoc{<i>path/filename.tex</i>}</pre>
+
+
+<h4>Front, Main, and Back Matter</h4>
+<p>The <code>\frontmatter</code> command must immediately follow <code>\begin{document}</code>.
+After front matter, <code>\mainmatter</code> must be placed before the start of your story.
+If there is anything after the story ends, use <code>\backmatter</code>.<p>
+<p>The purpose and design of <a href="frontmatter.html">front matter</a>,
+<a href="mainmatter.html">main matter</a>, and  <a href="backmatter.html">>back matter</a> are
+described on other pages.</p>
+
+
+<h4>Sub-Documents</h4>
+<p>Divide your book into numerous <a href="sub-documents.html">sub-document</a> files.
+That allows you to work on small portions, and compile them individually.</p>
+<p>Novelette does not use <code>\include</code>, <code>\includeonly</code>, or similar commands.
+Use sub-documents instead.</p>
+<p>Each sub-document must contain at least one <i>component</i></p>
+<p>You may nest one sub-document within another. However, any sub-document file may only
+be used once, in the entire book. A nested sub-document must be between components,
+not in the middle of a component.</p>
+
+
+<h4>Components</h4>
+<p>All printable content must be within <a href="component.html">component environments<a>.
+A sub-document must contain at least one component. You may not nest one component within another.
+A component may be a short as one page, such as the title page. Or, it may be as long as
+several chapters. The important rule is that each component begins and ends with a new page.
+You cannot splice the end of one component, to the beginning of another component,
+in the middle of a page.</p>
+<p>You may nest a component within another
+<p>Every sub-document contains one or more components. You may also write components
+directly in the main document. 
+
+
+
+
+
+
+
+<h4 class="section"><a href="tutorial.html"><!--
+--><img src="images/tutorial.svg"width="16px" height="16px" alt=""/>Tutorial</a></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

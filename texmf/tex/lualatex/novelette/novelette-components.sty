@@ -63,12 +63,12 @@
   \ifnvt@infrontmatter\def\tmptps{empty}\fi%%
   \ifnvt@inbackmatter\def\tmptps{empty}\fi%%
   \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\the\c@page}')}%% %%%%%
-  \nvt@test{\tmptps}{max}{}{\@specialpagetrue}%%
+  \nvt@test{\tmptps}{layout}{}{\@specialpagetrue}%%
   \nvt@test{\tmptps}{empty}{\nvt@thispagestyle{empty}}{}%%
   \nvt@test{\tmptps}{plain}{%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
   }{}%%
-  \nvt@test{\tmptps}{fakeplain}{%%
+  \nvt@test{\tmptps}{drop}{%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
   }{%%
     \blankline%%
@@ -76,30 +76,29 @@
   \ifnum\tmpsingle=1\relax\nvt@compsingletrue\fi%%
   \ifnum\tmprecto=1\relax\ifodd\c@page\else\nvt@blankverso\fi\fi%%
   \ifnum\tmpreturn=0\relax%%
-    \nvt@err{Bad component [option]. Format: [thispagestyle=P,guide=G,keywords]^^J%%
-    \spii Normally, first page of component does not print page header,^^J%%
-    \spii but may print page footer if normal pagestyle is plain or split.^^J%%
-    \spii [thispagestyle=P] over-rides for first component page. Choices for P:^^J%%
-    \spiv empty -> Does not print header or footer.^^J%%
-    \spiv plain -> Prints footer, only if normal pagestyle is plain or split.^^J%%
-    \spix Default empty in frontmatter and backmatter, plain in mainmatter.^^J%%
-    \spiv fakeplain -> Same as plain, if normal pagestyle is plain or split.^^J%%
-    \spix Otherwise, reduces text height, and creates fake footer beneath.^^J%%
-    \spiv max -> Prints header and/or footer, according to normal pagestyle.^^J%%
-    \spix Note that max is unusual, not normal, for first component page.^^J%%
-    \spii [guide=G] over-rides global guide setting.^^J%%
-    \spiv G -> Integer 0 to lines per page. If 0, no guide.^^J%%
-    \spii Comma-separated keywords:^^J%%
-    \spiv single -> Warns if component does not fit on a single page.^^J%%
-    \spiv recto -> If necessary, inserts preceding blank verso, to make this recto.^^J%%
-    \spiv legal -> Single verso page, with special formats.^^J%%
-    \spix When legal, all other options are silently ignored.}%%
+    \nvt@err{Bad component [option]. Format: [style=S,guide=G,keywords]^^J%%
+    \spiv keywords -> single recto legal. Default is none of those.^^J%%
+    \spix single -> Issues warning if entire component does not fit on one page.^^J%%
+    \spix recto -> Issues warning if page is not recto.^^J%%
+    \spix\spiv Combination single,recto is allowed.^^J%%
+    \spix legal -> Special formats for copyright page. See Novelette docs.^^J%%
+    \spix\spiv Issues warning if page is not single verso.^^J%%
+    \spix\spiv Ignores other keywords, style, and guide options.^^J%%
+    \spiv S -> normal empty plain drop layout. Default normal.^^J%%
+    \spix\spiv Applied only at first page of component.^^J%%
+    \spix empty -> Does not print header or footer.^^J%%
+    \spix plain -> Prints footer, only if layout pagestyle is plain/split.^^J%%
+    \spix drop -> Same as plain, if layout pagestyle is plain or split.^^J%%
+    \spix\spiv Else reduces text height, creates fake footer beneath.^^J%%
+    \spix layout -> Prints both header/footer, if in layout pagestyle.^^J%%
+    \spiv G -> Integer 0 to lines per page. Over-rides global guide setting.}%%
   \fi%%
   \ifnum\tmplegal=1\relax%%
     \def\init##1{##1}\def\maintext{}\setlength\parindent{0pt}%%
     \setlength\parskip{\nvt@bls}\nvt@aff{RawFeature={+ss19}}%%
     \hyphenpenalty=10000\relax\exhyphenpenalty=10000\relax%%
     \char"0020\char"00A0\par\vfil%% Some machine-readers like to know space advance width.
+    \begin{nvt@center}%%
   \else%%
     \ifnvt@preview\def\tmpok{0}\else\def\tmpok{1}\fi%%
     \ifnvt@final\def\tmpok{0}\fi%%
@@ -109,23 +108,22 @@
       \xdef\tmpthisguide{\tmpguide}%%
     \fi%%
     \ifnvt@hasguide\else\def\tmpok{0}\fi%%
+    \ifnvt@noguide\def\tmpok{0}\fi%%
+    \ifnum\tmpok=0\relax\def\tmpthisguide{0}\fi%%
     \ifnum\tmpthisguide=0\relax\else%%
       \AddToHookNext{shipout/background}{%% Print guide marker.
         \xdef\tmpgput{\fpeval{1in+\topmargin+\headheight+\headsep+(\tmpthisguide*\nvt@bls)}pt}%%
         \ifodd\c@page%%
-          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){%%
-            {\upshape\normalfont\nvt@aff{RawFeature={+cv07}}\char"2023}%%
-        }%%
+          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){{\upshape\normalfont\char"21AC}}%%
         \else%%
-          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){%%
-            {\upshape\normalfont\nvt@aff{RawFeature={+cv07}}\char"2023}%%
-          }%%
+          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){{\upshape\normalfont\char"21AC}}%%
         \fi%%
       }%%
     \fi%%
   \fi%%
 }{%%
   \par%%
+  \ifnum\tmplegal=1\relax\end{nvt@center}\fi%%
   \clearpage%%
   \setcounter{nvt@expectpage}{\the\c@page}%%
   \ifnvt@compsingle%% End page, check fit.
@@ -147,7 +145,7 @@
 %%   After \maintext, \name and \subname are disallowed, and the block environment only allows
 %% normal text.
 %%   The first paragraph after \maintext is not indented, then normal indent resumes.
-%% The \init or \dropcap command may be used at the start of the first paragraph. Footnotes
+%% The \init or \dcap command may be used at the start of the first paragraph. Footnotes
 %% will have markers.
 %%   Warning if duplicate \maintext within a component.
 \newif\ifnvt@didmaintext %% True when \maintext appears, until next component.
@@ -170,10 +168,6 @@
         \edef\tmpb{\fpeval{ceil(\tmpa - 1)- \tmpa +1}}%%
         \edef\tmpc{\fpeval{\tmpb*\nvt@bls}pt}%%
         \vspace{\tmpc}%% Restores text to line grid.
-        \ifnvt@dev%%
-          \noindent\strut\hspace{-\nvt@em}%%
-            \smash{\raisebox{-\nvt@bls}{{\nvt@aff{RawFeature={+cv13}}\char"2023}}}\par%%
-        \fi%%
         \@afterindentfalse\@nobreaktrue\gdef\nvt@initscale{2}%%
         \everypar{%%
           \if@nobreak%%
@@ -196,12 +190,12 @@
 %%
 
 
-%% FAKE FOOTER: via component option [thispagestyle=fakeplain].
+%% FAKE FOOTER: via component option [style=drop].
 %%   The word "folio" has several meanings. In this context it is the page number. A "drop folio"
 %% is page number in or just above the bottom margin. Pagestyles plain and both use drop folio.
 %% Other pagestyles do not.
 %%   The first page of a component normally does not show header. If normal pagestyle is not plain
-%% or both, then no page number prints there. But fakeplain allows plain, temporarily converts
+%% or both, then no page number prints there. But drop allows plain, temporarily converts
 %% split to plain, and fakes it for other pagestyles, so that a page number prints at bottom.
 %%   The fake method shortens the textheight by one line. Where the last line would have been,
 %% a centered page number prints at reduced size, dropped slightly so it is as low as possible.

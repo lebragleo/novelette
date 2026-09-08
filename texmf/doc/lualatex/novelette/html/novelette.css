@@ -3,6 +3,8 @@ html {font-size:100%}
 
 body {font-family:serif; background:#cccccc url(images/cbkg.png); line-height:1.4}
 
+img {vertical-align:middle;}
+
 #master {max-width:40em; position: relative;
          margin-left:auto; margin-right:auto; margin-top:2rem; margin-bottom:2rem;
          background:#f0f0f0 none; border: 1px solid black; padding:0px 1rem 2rem 1rem;}
@@ -11,48 +13,53 @@ body {font-family:serif; background:#cccccc url(images/cbkg.png); line-height:1.
   border:1px solid black; background:#dddddd none;
   margin-top:.5rem; margin-bottom:.5rem; padding:.25rem;
 }
-#navbara img {height:1.5rem; width:auto; vertical-align:bottom;}
+#navbara img {vertical-align:middle;}
 
 #navbarb {
   font-size:88%; border:1px solid black; background:#dddddd none;
   margin-bottom:.5rem; padding:.25rem;
 }
+#navbarb img {vertical-align:middle;}
 
 p {margin:0px; text-indent:1rem;}
 p.noindent {text-indent:0px}
 p.toplink {text-align:right; margin-top:.5em; margin-bottom:1em}
+p img {height:1rem; width:auto;}
 
 div.code {text-indent:0px; margin-left:2rem; margin-top:.5rem; margin-bottom:.5rem;}
-
-code {
-  font-family:monospace, monospace; color:#660000; white-space:nowrap;
-}
+code {color:#660000}
+pre.code {color:#660000;}
+pre.code a {text-decoration:none}
 
 ul {margin:0px; padding-left:2rem;}
 li p {padding-left:0px;}
 li p:first-child {text-indent:0px;}
+li p img {height:1rem; width:auto;}
 
 hr {margin-top:2rem; margin-bottom:2rem}
 
 h1, h2, h3, h4 {font-family:sans-serif}
 
-h1 {margin:1.5rem 0px .5rem 0px}
+h1 {font-size:2rem; margin:1.5rem 0px .5rem 0px}
 h1 + p {text-indent:0px}
+h1 img {height:2rem; width: auto;}
 
-h2 {margin:1.5rem 0px .5rem 0px}
+h2 {font-size:1.4rem; margin:1.5rem 0px .5rem 0px}
 h2 + p {text-indent:0px}
+h2 img {height: 1.7rem; width:auto;}
 
-h3 {margin:1.5rem 0px .5rem 0px}
+h3 {font-size:1.2rem; margin:1.5rem 0px .5rem 0px}
 h3 + p {text-indent:0px}
+h3 img {height:1.7rem; width:auto;}
 
-h4 {margin:1.5rem 0px .5rem 0px}
+h4 {font-size:1rem; margin:1.5rem 0px .5rem 0px}
 h4 + p {text-indent:0px; clear:both;}
+h4 img {height:1rem; width:auto; vertical-align:middle;}
 h4.section {float:left;}
-h4.section img {height:1.4rem; width:auto; vertical-align:bottom;}
-h4.link {float:right; text-align:right; font-weight:normal;}
-h4.link a {text-decoration:none;}
-h4.link img {vertical-align:middle;}
-
+h4.section img {}
+h4.link {float:right; text-align:right;}
+h4.link a {text-decoration:none; font-size:.8rem; font-weight:normal;}
+h4.link img {vertical-align:baseline;}
 
 
 a {white-space:nowrap}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Components</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Components</h2>
+
+<div id="navbarb">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+<h3>Overview</h3>
+<p>Novelette has no commands or environments for part, chapter, section, or similar divisions.
+If you try to use those standard LaTeX methods, an error results.</p>
+<p>Instead, Novelette thinks of the document body as divided into numerous components,
+which have no pre-defined meaning. There is no rank, no hierarchy, no sub-component.</p>
+
+
+<p><a id="environment"></a>&nbsp;</p>
+<h4 class="section">Component Environment</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>With the exception of page headers/footers, all printed content must be contained
+within a <i>component</i> environment:</p>
+<div class="code">
+<code>\begin{component}[<i>option</i>]</code><br>
+(content of display zone)<br>
+<code>\maintext</code><br>
+(content of main text)<br>
+<code>\end{component}</code>
+</div>
+<ul>
+<li><p> The contents of the environment may be as short as one page, or extend for many pages.
+In all cases, the component begins with a new page, and ends with a new page.</p></li>
+<li><p>When a component begins, it creates a <i>display zone</i>, which allows effects
+that are not available in main text.</p></li>
+<li><p>Command <code>\maintext</code> exits the display zone. Do not confuse this command
+with <code>\mainmatter</code>.</p></li>
+<li><p>Commands <code>\frontmatter \mainmatter \backmatter</code> may only be used between
+components, never within a component. One of those commands (usually <code>\frontmatter</code>)
+must precede the first component in the document body.</p></li>
+<li><p>A component may not contain a sub-document, and may not contain another component.</p></li>
+<li><p>You may use <code>\newpage</code> and <code>\clearpage</code> within a component.</p></li>
+<li><p>A component is often used as a chapter, but there is no automatic chapter numbering.
+Use placeholder <code>\next</code> until you know the numbers.</p></li>
+</ul>
+
+
+<h4>Display Zone</h4>
+<p>Each component begins with a <i>display zone</i>. It may be empty, but that is unusual.
+It may occupy the entire component, which is typical for the title page and other special
+pages.</p>
+<p>Most often, the display zone occupies part of the component's first page, followed by
+main text lower on that page. Then, the main text continues to additional pages. This is
+typical for chapters.</p>
+<p>Within the display zone, you may:</p>
+<ul>
+<li><p>Use the <code>\name</code> and <code>\subname</code> commands, described below.</p></li>
+<li><p>Place <i>non-floating</i> images.</p></li>
+<li><p>Use <code>\footnote</code> where allowed, but it will not print a marker.</p></li>
+<li><p>Place the <i>block</i> environment, with normal or small text.</p></li>
+<li><p>Write ordinary text, but <i>not</i> the text of your story.</p></li>
+</ul>
+
+
+<h4>Main Text</h4>
+<p>The <code>\maintext</code> command ends the display zone. It adds a blank line, then returns
+text to the line grid, if (as usual) display material was off&#8209;grid. If the display occupies
+the entire component, do not write <code>\maintext</code>.</p>
+<p>Following <code>\maintext</code>, you may:</p>
+<ul>
+<li><p>Use <code>\init</code> or <code>\dcap</code> commands, where allowed.</p></li>
+<li><p>Place images. They may float, where allowed.</p></li>
+<li><p>Use <code>\footnote</code> where allowed. Its marker prints.</p></li>
+<li><p>Use <code>\scene</code> where allowed.</p></li>
+<li><p>Place the <i>block</i> environment, but it must have normal text, not small.</p></li>
+<li><p>Write ordinary text. Usually (not always) this is the text of your story.</p></li>
+</ul>
+
+
+<h4>Component Option</h4>
+<p>Most components do not need an option.</p>
+<p><code>\begin{component}[class=<i>C</i>,style=<i>S</i>,guide=<i>G</i>]</code></p>
+<ul>
+<li><p><i>C</i> -> Choices: normal single legal. Default normal.</p>
+<ul>
+<li><p>normal -> Content may extend for one or more pages.</p></li>
+<li><p>single -> Allows image at full textblock height. Warns if content exceeds one page.</p></li>
+<li><p>legal -> Warns if content exceeds one page. Warns if page is not verso.
+Applies special rules to content (see below). Useful for copyright page.</p></li>
+</ul></li>
+<li><p><i>S</i> -> Choices: normal plain empty drop layout. Default normal. Applies only to
+first page of the component.</p></li>
+<ul>
+<li><p>normal -> Becomes <i>plain</i> or <i>empty</i>, depending on location.</p></li>
+<li><p>plain -> Header does not print. If layout has footer, it prints.
+This is the default in mainmatter.</p></li>
+<li><p>empty -> No header or footer prints. This is the default in frontmatter and
+backmatter.</p></li>
+<li><p>drop -> Known as <i>drop folio</i> (not <i>drop cap</i>). Header does not print.
+If layout has footer, it prints. If layout does not have footer, then the height of the
+textblock is reduced by one line, and a fake footer (page number) prints where the
+last line would ordinarily be located.</p>
+<p>Only use this option when necessary. That might be the case if your book is a collection
+of short stories, listed by page number.</p></li>
+<li><p>layout -> Forces page style set by <code>\layout</code>, even if header/footer
+would normally be empty on the first page.</p>
+<p>This might be useful if the component is a single page in mainmatter, containing only
+an image.</p></li>
+</ul></li>
+<li><p><i>G</i> -> Integer 0 - lines per page. Over&#8209;rides the default set
+by <code>\layout</code></p></li>
+</ul>
+
+
+<h4>Component [class=legal]</h4>
+<p>This is a special case. The content of the component is neither display nor main text,
+but has its own set of rules, optimized for showing basic legal information.</p>
+<p>Using <code>[class=legal]</code> is recommended, but not mandatory, for the copyright page.
+Unless you have a better design method, use it there. You may also use it elsewhere,
+but that is unusual.</p> 
+<p>A legal page sets page style and text format, but it does not communicate with
+PDF metadata. It is your responsibility to ensure that the information matches.</p>
+<p>Behavior of a legal page:</p>
+<ul>
+<li><p>A warning is issued if the legal content does not fit on one page.</p</li>
+<li><p>If the page is recto, then a warning is issued. This does not apply when compiling
+a sub-document, because its page numbers are unknown.</p></li>
+<li><p>The <code>\maintext</code> command, if used, will be ignored.</p></li>
+<li><p>You may use Italics and small caps.<p></li>
+<li><p>You may <i>not</i> use the <i>block</i> environment.</p></li>
+<li><p>You may <i>not</i> use any of <code>\name \subname \scene \init \dcap</code>.</p></li>
+<li><p>Numerals will always be lining. Requests for oldstyle will be ignored.</p></li>
+<li><p>You may use <i>non-floating</i> images. Do not write essential copyright information
+as images; it must be machine&#8209;readable ordinary text. Only use images for such small things
+as a publisher's logo.</p></li>
+<li><p>The <code>[style=S]</code> option is disabled. Page style will always be empty.</p></li>
+<li><p>The <code>[guide=G]</code> option is disabled. No guide.</p></li>
+<li><p>Paragraphs are not indented. There will be a one-line gap between paragraphs.</p></li>
+<li><p>Hyphenation is disabled.</p></li>
+<li><p>The entire content will be horizontally and vertically centered.</p></li>
+<li><p>You must use line breaks <code>\\</code> so that the width of each line is much less
+than the full textwidth. Do not allow lines to wrap!</p></li>
+</ul>
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

@@ -373,8 +373,9 @@
   \ifnum\tmpfn=6\relax\gdef\nvt@headfn{gero}\gdef\nvt@headfont{\nvt@gero}\fi
   \ifnum\tmpfn=7\relax\gdef\nvt@headfn{black}\gdef\nvt@headfont{\nvt@black}\fi
   \ifnum\tmpfn=8\relax\gdef\nvt@headfn{thin}\gdef\nvt@headfont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\gdef\nvt@headfn{icel}\gdef\nvt@headfont{\nvt@icel}\fi
+  \ifnum\tmpfn=9\relax\fi %% unused
   \ifnum\tmpfn=10\relax\gdef\nvt@headfn{plas}\gdef\nvt@headfont{\nvt@plas}\fi
+  \ifnum\tmpfn=11\relax\gdef\nvt@headfn{crge}\gdef\nvt@headfont{\nvt@crge}\fi
   \ifx\tmpscale\@empty\else\xdef\nvt@headscale{\tmpscale}\fi
   \ifx\tmptrack\@empty\else\xdef\nvt@headtrack{\tmptrack}\fi
   \xdef\nvt@headsp{\fpeval{\nvt@headscale*(\tmpsp + .02*\nvt@headtrack)}em}
@@ -394,7 +395,8 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\headstyle.^^J%%
       \spii Format: \headstyle{font=F,scale=S,track=T,deco=D,case=C}^^J%%
-      \spiv F -> main dark thick heavy black thin srir gero icel plas. Default main.^^J%%
+      \spiv F -> main dark thick heavy black thin srir gero plas crge.^^J%%
+      \spix Default main.^^J%%
       \spiv S -> Decimal number 0.83-1. Default 0.93.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
       \spiv D -> bar bullet square lozenge dash none. Default none.^^J%%
@@ -427,8 +429,9 @@
   \ifnum\tmpfn=6\relax\gdef\nvt@namefn{gero}\gdef\nvt@namefont{\nvt@gero}\fi
   \ifnum\tmpfn=7\relax\gdef\nvt@namefn{black}\gdef\nvt@namefont{\nvt@black}\fi
   \ifnum\tmpfn=8\relax\gdef\nvt@namefn{thin}\gdef\nvt@namefont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\gdef\nvt@namefn{icel}\gdef\nvt@namefont{\nvt@icel}\fi
+  \ifnum\tmpfn=9\relax\fi %% unused
   \ifnum\tmpfn=10\relax\gdef\nvt@namefn{plas}\gdef\nvt@namefont{\nvt@plas}\fi
+  \ifnum\tmpfn=11\relax\gdef\nvt@namefn{crge}\gdef\nvt@namefont{\nvt@crge}\fi
   \ifx\tmpsp\@empty\else\xdef\nvt@namesp{\tmpsp}\fi
   \ifnum\tmpauto=0\relax\gdef\nvt@nameauto{0}\fi
   \ifnum\tmpauto=1\relax\gdef\nvt@nameauto{1}\fi
@@ -445,7 +448,8 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\namestyle.^^J%%
       \spii Format: \namestyle{font=F,scale=S,track=T,align=A,case=C}^^J%%
-      \spiv F -> main dark thick heavy black wide thin icel gero plas. Default main.^^J%%
+      \spiv F -> main dark thick heavy black wide thin gero plas crge.^^J%%
+      \spix Default main.^^J%%
       \spiv S -> Decimal number 1-4. Default 2.^^J%%
       \spix If followed by a (such as 2.7a) will auto-adjust wide content.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
@@ -455,7 +459,9 @@
       \spix titl -> Lowercase letters become titling caps.^^J%%
       \spix smcp -> Lowercase letters become small caps.^^J%%
       \spix onum -> Numerals become oldstyle.^^J%%
-      \spix smon -> Combines smcp and onum.}%%
+      \spix smon -> Combines smcp and onum.^^J%%
+      \spiv L -> none above below both. Default none.^^J%%
+      \spix Prints decorative line(s) above/below text, at its width.}%%
   \fi
   \global\nvt@didnamestyletrue
   \endgroup
@@ -479,8 +485,9 @@
   \ifnum\tmpfn=6\relax\gdef\nvt@subfn{gero}\gdef\nvt@subfont{\nvt@gero}\fi
   \ifnum\tmpfn=7\relax\gdef\nvt@subfn{black}\gdef\nvt@subfont{\nvt@black}\fi
   \ifnum\tmpfn=8\relax\gdef\nvt@subfn{thin}\gdef\nvt@subfont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\gdef\nvt@subfn{icel}\gdef\nvt@subfont{\nvt@icel}\fi
+  \ifnum\tmpfn=9\relax\fi %% unused
   \ifnum\tmpfn=10\relax\gdef\nvt@subfn{plas}\gdef\nvt@subfont{\nvt@plas}\fi
+  \ifnum\tmpfn=11\relax\gdef\nvt@subfn{crge}\gdef\nvt@subfont{\nvt@crge}\fi
   \ifx\tmpsp\@empty\else\xdef\nvt@subsp{\tmpsp}\fi
   \ifnum\tmpauto=0\relax\gdef\nvt@subauto{0}\fi
   \ifnum\tmpauto=1\relax\gdef\nvt@subauto{1}\fi
@@ -497,7 +504,8 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\subnamestyle.^^J%%
       \spii Format: \subnamestyle{font=F,scale=S,track=T,align=A,case=C}^^J%%
-      \spiv F -> main dark thick heavy black wide thin icel gero plas. Default main.^^J%%
+      \spiv F -> main dark thick heavy black wide thin gero plas crge.^^J%%
+      \spix Default main.^^J%%
       \spiv S -> Decimal number 1-4. Default 2.^^J%%
       \spix If followed by a (such as 2.7a) will auto-adjust wide content.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
@@ -507,7 +515,9 @@
       \spix titl -> Lowercase letters become titling caps.^^J%%
       \spix smcp -> Lowercase letters become small caps.^^J%%
       \spix onum -> Numerals become oldstyle.^^J%%
-      \spix smon -> Combines smcp and onum.}%%
+      \spix smon -> Combines smcp and onum.^^J%%
+      \spiv L -> none above below both. Default none.^^J%%
+      \spix Prints decorative line(s) above/below text, at its width.}%%
   \fi
   \global\nvt@didsubstyletrue
   \endgroup
@@ -576,7 +586,7 @@
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\loadfont.^^J%%
       \spii Format: \string\loadfont{comma,separated,codes}^^J%%
-      \spii Codes: dark thick heavy wide black thin icel srir gero plas.^^J%%
+      \spii Codes: dark thick heavy wide black thin srir gero plas crge.^^J%%
       \spii For all of them: all.}%%
   \fi
 }%%
@@ -676,6 +686,7 @@
 %%     \disable{autodeco} does not insert the page.
 %%   metasub -> Normally, non-empty subtitle has custom Info dictionary entry. If using xmp,
 %%     it is written there (prism namespace). \disable(metasub) omits these entries.
+%%   guide -> Any global or local guide=N setting is ignored.
 \newif\ifnvt@diddisable
 \newif\ifnvt@noblankend
 \newif\ifnvt@norenumber
@@ -683,11 +694,12 @@
 \newif\ifnvt@nooldstyle
 \newif\ifnvt@noautodeco
 \newif\ifnvt@nometasub
+\newif\ifnvt@noguide
 \def\disable#1{%%
   \ifnvt@diddisable\nvt@duplicatesettingtrue\fi
   \begingroup
   \def\tmpnoblankend{0}\def\tmpnorenumber{0}\def\tmpnooldstyle{0}
-  \def\tmpnopageflip{0}\def\tmpnoautodeco{0}\def\tmpnometasub{0}
+  \def\tmpnopageflip{0}\def\tmpnoautodeco{0}\def\tmpnometasub{0}\def\tmpnoguide{0}
   \directlua{nvt.parsedisable('\luaescapestring{#1}')}
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\disable.^^J%%
@@ -700,6 +712,7 @@
   \ifnum\tmpnooldstyle=1\relax\global\nvt@nooldstyletrue\fi
   \ifnum\tmpnoautodeco=1\relax\global\nvt@noautodecotrue\fi
   \ifnum\tmpnometasub=1\relax\global\nvt@nometasubtrue\fi
+  \ifnum\tmpnoguide=1\relax\global\nvt@noguidetrue\fi
   \endgroup
   \nvt@diddisabletrue
 }%%
@@ -713,9 +726,16 @@
 %% until you are near completion. 
 \newif\ifnvt@examine
 \newif\ifnvt@didexamine
-\def\examine{%%
+\DeclareDocumentCommand\examine{m}{%% Choice 1 or 0 (on/off).
   \ifnvt@didexamine\nvt@duplicatesettingtrue\fi
-  \directlua{nvt.examine=true}\nvt@examinetrue\nvt@didexaminetrue
+  \def\tmpex{0}\def\tmpreturn{1}
+  \directlua{parseexamine('\luaescapestring{#1}')}
+  \ifnum\tmpreturn=1\relax
+    \ifnum\tmpex=1\relax\global\nvt@examinetrue\fi
+  \else
+    \nvt@err{Bad choice for \string\examine{choice}. Either 1 or 0. Default 0.}
+  \fi
+  \nvt@didexaminetrue
 }%%
 \@onlypreamble\examine
 %%
@@ -820,6 +840,7 @@
 }%%
 \let\endcenter\par
 \let\centering\par %%%%% Maybe allow ?
+\def\underline#1{#1} %% No underline!
 %% End general settings.
 
 

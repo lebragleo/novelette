@@ -179,9 +179,9 @@
 
 
 %% Novelette never uses a monospace (tt) font. Since LaTeX expects a mono font, Novelette cheats!
-%% The 'mono' font will be whichever non-mono font was requested for page headers/numbers.
+%% The 'mono' font is the main font.
 \nvt@setmonofont[]{NoveletteSerif12}[\tmpfeat]
-\def\setmonofont{\nvt@fatal{Sorry, you cannot \string\setmonofont. It is set automatically.}}
+\def\setmonofont{\nvt@fatal{Sorry, you cannot \string\setmonofont.}}
 \let\nvt@ttfamily\ttfamily
 \let\ttfamily\relax
 
@@ -197,8 +197,8 @@
 %%
 \ifnvt@wantsrir\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}\fi
 \ifnvt@wantgero\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}\fi
-\ifnvt@wanticel\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}\fi
 \ifnvt@wantplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
+\ifnvt@wantcrge\nvt@newfontface\nvt@crge{NoveletteDeco-Crge}\fi
 %%
 \def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
 %%
@@ -426,7 +426,7 @@
 %% Combinations ``` and ''' become "' '" or reversed when \enable{britq}.
 %% \real{~} is equivalent to \textasciitilde.
 \newif\ifnvt@real
-\def\real#1{{\nvt@realtrue\nvt@aff{RawFeature={+ss19}}#1}}
+\def\real#1{{\nvt@realtrue\nvt@aff{RawFeature={+ssty}}#1}}
 %% \TODO{memo} prints a placeholder glyph, with non-printing memo:
 \def\TODO#1{\char"FFFC}
 \let\ToDo\TODO\relax\let\todo\TODO\relax\let\Todo\TODO\relax
