@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Typesetting Flaws</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+
+<h4 class="pagepath"><a href="home.html">Home</a><span class="downtree"></span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree"></span><!--
+--><a href="preamble.html">Preamble</a><span class="downtree"></span><!--
+--><a href="preamble.html#examine">\examine</a><span class="downtree"></span></h4>
+<h1 class="pagename">Typo Flaws</h1>
+
+
+<div id="navbarb"><p class="noindent">
+<a href="#top">Overview</a> &nbsp;
+<a href="#whatare">What Are Typo Flaws?</a> &nbsp;
+<a href="#report">Typo Report</a> &nbsp;
+<a href="#fix">How to Fix Flaws</a> &nbsp;
+<a href="#autoflaw">Automatic Flaw Prevention</a> &nbsp;
+<a href="#flawlist">List of Flaws</a>
+</p></div>
+
+
+<h4>Overview</h4>
+<p>In preamble, <code>\examine{1}</code> activates typographic flaw detection.
+The default <code>\examine{0}</code> does not detect them.</p>
+<p>Regardless of the setting, the examination is not performed in preview or final mode.
+You should finish editing before you attempt these modes.</p>
+<p>When detection is activated, each page will be inspected by Lua after typesetting.
+It will find and report "typo flaws". This is time-consuming, so best practice
+is to wait until your writing is nearly done.</>
+<p>The examination is performed by Lua, using a customized version of code from the
+wonderful <i>lua-typo</i> package by Daniel Flipo.</p>
+
+
+
+<p><a id="whatare"></a>&nbsp;</p>
+<h4 class="section">What Are Typo Flaws?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>Typo flaws are places where the typeset text does not look as good as it should.
+They are not errors; they do not prevent you from compiling in final mode. But they
+are areas where re&#8209;write can improve appearance.</p>
+<p>Typesetting flaws have nothing to do with spelling or grammar. They are places where
+the typeset text does not look very good, regardless of whether it makes sense.</p>
+<p>Novelette cannot detect poor book design. That's a matter of human judgement.</p>
+
+
+<p><a id="report"></a>&nbsp;</p>
+<h4 class="section">Typo Report</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>As flaws are detected, a report is prepared. It has the same filename as your
+document (main or sub), but with <code>typo</code> file extension.</p>
+<p>So, if you compile a document (main or sub) named <i>MyWriting.tex</i>, the typo report
+will be <i>MyWriting.typo</i> in the current directory.</p>
+<p>Each time you compile with <code>\examine{1}</code>, a new report is generated. If you compile
+with <code>\examine{0}</code>, it will erase any previous report (but the typo file will still
+be there).</p>
+
+
+<p><a id="fix"></a>&nbsp;</p>
+<h4 class="section">How to Fix Flaws</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>The typo examination does not change anything in your PDF. No flaws are corrected. Some flaws
+are more important than others; only you, the author, can decide whether to re&#8209;write,
+or ignore them.</p>
+<p>When you re-write to remove some flaws, you may introduce others. Unless you have a lot
+of time on your hands, do not expect to remove all flaws.</p>
+<p>Fixing flaws is easy in English, where a native speaker has a large vocabulary of long
+and short words with the same meaning. The Novelette developer has done it. But fixing flaws is
+more difficult in languages where such things as verb declensions (<i>Ach!</i>), or the need for
+academy-approved vocabulary (<i>Zut !</i>) limits what you can write.</p>
+<p>There is absolutely <i>no</i> way to fix flaws, other than re&#8209;write! This is why
+Novelette expects that your work be original, rather than a reprint of someone else's classic.
+You can always re&#8209;write your own work.</p>
+
+
+<p><a id="autoflaw"></a>&nbsp;</p>
+<h4 class="section">Automatic Flaw Prevention</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>During compile, Novelette attempts to avoid these typesetting flaws: one&#8209;letter word
+at end of line; consecutive lines ending with hyphen. If the compile&#8209;time code was unable
+to avoid those flaws, then they will be reported along with the others.</p>
+<p>The original <i>lua-typo</i> code can also detect lines ending in two&#8209;letter words.
+But this feature is too powerful, especially in English, where there are many
+two&#8209;letter words. So it is not used.</p>
+
+
+<p><a id="flawlist"></a>&nbsp;</p>
+<h4 class="section">List of Flaws</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>Some flaws are more important than others. The most important flaws, which should be
+corrected if possible, have uppercase names.</p>
+<ul>
+<li><code>Orphan</code>. This occurs when the first line of a paragraph appears by itself at the
+end of a page, with the rest of the paragraph on the following page.</p>
+<p>It is not very serious in popular fiction, because the reader is expected to quickly continue
+to the next page. The developer has seen many recent popular fiction books with orphans.</p></li>
+<li><p><code>WIDOW</code>. This occurs when the last line of a paragraph appears by itself at the
+top of a page, with the rest of the paragraph on the preceding page.</p>
+<p>This is very serious, even in popular fiction, because it looks bad, and is abrupt. Always
+re&#8209;write to remove widows!</p></li>
+<li><p><code>START-OF-LINE MATCH</code>. Adjacent lines begin with the same word or the same few
+letters. This makes it more difficult for the reader to scan from one line to the next.</p></li>
+<li><p><code>END-OF-LINE MATCH</code>. Adjacent lines end with the same word or same few letters.
+This makes it more difficult for the reader to scan from one line to the next.</p></li>
+<li><p><code>Adjacent lines end with hyphens</code>. This flaw is unlikely, due to Novelette's
+other methods. If you see it, the paragraph was hard to typeset properly.</p></li>
+<li><p><code>HYPHEN AT PAGE BREAK</code>. The last word on a page is hyphenated to the
+next page.</p></li>
+<li><p><code>Hyphen near end of paragraph</code>. The next-to-last line of a paragraph is
+hyphenated to the last line.</p></li>
+<li><p><code>Consecutive hyphens</code>. Two or moare adjacent lines end with hyphen.</p>
+<p>This is almost a major flaw. Novelette attempts to prevent it when paragraphs are typeset.
+If the attempt fails, it is reported.</p></li>
+<li><p><code>Short Last Word</code>. Last word(s) of a paragraph are not at least 1.5x indent
+long.</p>
+<p>For best appearance, the last word(s) of a paragraph should be wider than the indent
+of the following paragraph.</p></li>
+<li><p><code>SINGLE LETTER AT LINE END</code>. Some languages (French, etc.) prohibit lines
+ending with a single letter. Others (English) discourage it.</p>
+<p>Novelette attempts to prevent this, when paragraphs are typeset. But if the attempt fails,
+it will be reported as a flaw.</p></li>
+<li><p><code>Last line almost full</code>. The last line of a paragraph almost reaches the right
+margin. A minor flaw.</p>
+<p>When the last line is noticeably shorter than the full linewidth, it gives a readers a visual
+cue that the next line will be a new paragraph, before they see the indent.</p></li>
+<li><p><code>Short page</code>. The page contains fewer then 5 lines.</p>
+<p>For best appearance, extended text (chapters) should not end on a page with very few lines.
+To fix this, you need to write more, or write less.</p>
+<p>Special pages, such as half-title and dedication, may trigger this flaw. But they are not
+really flaws; the page content is intentionally short. Ignore.</p></li> 
+<li><p><code>Excessive stretch</code>. In order to justify the lines, too much space was added
+between some words.</p>
+<p>Fix by using more or few words, or words with more or fewer syllables.</p></li>
+</ul>
+
+
+<p>&nbsp;</p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree"></span><!--
+--><a href="tutorial.html">Tutorial</a><span class="uptree"></span><!--
+--><a href="preamble.html">Preamble</a><span class="uptree"></span><!--
+--><a href="preamble.html#examine">\examine</a><span class="uptree"></span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
+
+
+
+</div><!-- end master -->
+</body>
+</html>

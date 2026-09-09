@@ -18,12 +18,27 @@
 <h2>Developer/Maintainer Notes</h2>
 
 
+<div id="navbarb"><p class="noindent">
+<a href="#top">Overview</a> &nbsp;
+<a href="#noexpl3">No Expl3</a> &nbsp;
+<a href="#nopkg">No Added Packages</a> &nbsp;
+<a href="#nolang">No Global Lang</a> &nbsp;
+<a href="#fonts">About Fonts</a> &nbsp;
+<a href="#pdfx">About PDF/X</a> &nbsp;
+<a href="#lua">So Much Lua</a> &nbsp;
+<a href="#chapters">No Auto TOC</a>
+</p></div>
+
+
 <h4>Overview</h4>
 <p>If you are an ordinary user, writing a book, then you do not need to know anything here.
 These notes are for future maintainers and developers, who know what they are doing.</p>
 
 
-<h4>What, No Expl3 Syntax?</h4>
+<p><a id="noexpl3"></a>&nbsp;</p>
+<h4 class="section">What, No Expl3 Syntax?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>Novelette only uses Expl3 syntax in code that is copied/modified from standard LaTex.
 All original Novelette code uses ordinary LaTeX and Lua.</p>
 <p>Expl3 is great for resolving most catcode and expansion issues. But because Novelette is
@@ -37,7 +52,10 @@ is plain to read.</p>
 <p>Did Charles Dickens use Expl3? No! Did Victor Hugo use Expl3? No!</p>
 
 
-<h4>What, No Added Packages?</h4>
+<p><a id="nopkg"></a>&nbsp;</p>
+<h4 class="section">What, No Added Packages?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>Novelette does what is necessary. There is no need for writers to waste time and effort
 trying to do more advanced things. They should be writing!</p>
 <p>The original developer has looked through a large number of books in the fiction shelves of
@@ -47,7 +65,10 @@ to compensate for bad writing.</p>
 <p>Did Nikolai Gogol add packages? No! Did Rabelais add packages? No!</p>
 
 
-<h4>What, No Global Language Support?</h4>
+<p><a id="nolang"></a>&nbsp;</p>
+<h4 class="section">What, No Global Language Support?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>Novelette lives within the limits of its developer's grasp. If you wish to write murder
 mysteries in Greek, or Science Fiction in Sanskrit, do it yourself. And if you wish to abuse
 Novelette by transforming it into another academic class, please go away. Quickly.</p>
@@ -55,7 +76,10 @@ Novelette by transforming it into another academic class, please go away. Quickl
 But he did not write murder mysteries. He did read them, so if I were you, I'd start writing.</p>
 
 
-<h4>About the Fonts</h4>
+<p><a id="fonts"></a>&nbsp;</p>
+<h4 class="section">About the Fonts</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>All fonts were edited using FontForge. They are OpenType format with PostScript (cubic)
 outlines at 1000 grid units per em. If you need to edit the fonts, any good font editor
 should be able to do it.</p>
@@ -73,16 +97,16 @@ the original fonts. You may change it to your own setting. The purpose is to (ho
 that original fonts are not confused with modified substitutes.</p>
 
 
-<h4>About PDF Version 1.3 and PDF/X</h4>
+<p><a id="pdfx"></a>&nbsp;</p>
+<h4 class="section">About PDF Version 1.3, and PDF/X</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>PDF/X-1a:2001 is the format preferred by many print-on-demand services. It is the closest to
 "digital paper" that PDF provides. It is based on PDF version 1.3.</p>
-<p>Modern digital Ebooks use PDF 1.7 or later. But this adds nothing useful to paper print,
+<p>Modern digital Ebooks use PDF 1.7 or later. But that adds nothing useful to paper print,
 and possibly adds useless code that commercial printers will reject. Your own home or office
 printer is smart enough to discard unnecessary code. But print-on-demand assumes that your book
 may be printed by any number of shops in any number of places, smart or not.</p>
-
-
-<h4>About PDF/X Output Intent</h4>
 <p>The PDF/X specifications were originally written for the convenience of document exchange
 between content providers and color-critical publications such as magazines. The specs,
 then and now, require that the PDF declare the kind of printing process that is expected.
@@ -93,20 +117,42 @@ declared, because it is part of the spec. The generic Output Intents are FOGRA39
 Coated (SWOP) v2. Rest assured that the actual printer will ignore the Output Intent, because
 its process is nothing like that. Does not matter for black-ink only book interior, but
 could be a minor issue for color cover artwork.</p>
-<p>Novelette does not state or attach a color profile, becuase it might trigger a printer into
+<p>Novelette does not state or attach a color profile, because it might trigger a printer into
 using color inks, when only black is used.</p>
 
 
-<h4>Why So Much Lua Code?</h4>
+<p><a id="lua"></a>&nbsp;</p>
+<h4 class="section">Why So Much Lua Code?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>Lua is not hard to understand. It is particularly effective with if-then-else constructions,
 which may use logical and/or/not, and parentheses for grouping. Also, TeX catcodes do not
 matter (Lua has its own special characters).</p>
 <p>In general, LaTeX gathers information (such as settings), then passes it to Lua for
 interpretation. The results are passed back to LaTeX as per-macro temporary variables,
-which laTeX then cconverts to its own syntax.</p>
+which laTeX then converts to its own syntax.</p>
+<p>The structure of a typical setting command works like this:</p>
+<ul>
+<li><p>Define global and/or local defaults for all values.</p></li>
+<li><p>Read the user's setting. Use <code>\luaescapestring</code> to pass it as an unparsed
+string to Lua.</p></li>
+<li><p>Lua parses the string, using key=value methods and keywords,
+internal to the Lua code.</p></li>
+<li><p>Acceptable values are passed back to LaTeX as temporary (\tmp...) variables.</p></li>
+<li><p>If the string has unacceptable values, or otherwise cannot be fully parsed,
+Lua returns a temporary variable, indicating the bad result. LaTeX will then issue
+an error or warning, and revert to draft mode.</p>
+<p>Lua remembers if any bad results occurred. This is reported to the Summary.</p></li>
+<li><p>When LaTeX receives the temporary variables, it assigns their values to the
+relevant Novelette variables.</p></li>
+<li><p>The variables may have immediate effect, or may be stored for later use.</p></li>
+</ul>
 
 
-<h4>Why Not Automatic Chapter Numbering?</h4>
+<p><a id="chapters"></a>&nbsp;</p>
+<h4 class="section">Why Not Automatic TOC?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
 <p>Normally, LaTeX requires two compiler passes for automatic numbering. The first pass gathers
 the information, and saves it an auxiliary file. The second pass reads that information,
 and writes it into the document.</p>
