@@ -29,14 +29,15 @@ nvt = nvt or {} -- Namespace.
 nvt.mode = nvt.mode or 'draft' -- Actually set before this file is read.
 nvt.startmode = nvt.mode
 
--- Conversion of some useful length values to TeX pt:
-nvt.inch=72.27
-nvt.mm=2.8452755876
+-- Conversion of some useful length values to TeX pt
+nvt.inch = 72.27
+nvt.mm = 2.8452755876
 --
 
 -- Variables. These are the defaults. Quotes mean that the variable is a string, even if it looks
 -- like a number. Without quotes, the variable is a number or a boolean.
-nvt.subdocs = {'placeholder'} -- Holds path/filename for \subdoc call, to prevent cyclic error.
+nvt.subdocs = {} -- Holds path/filename for \subdoc call, to prevent cyclic error.
+nvt.subdocs[1] = 'placeholder'
 nvt.good = true -- Becomes false if error or warning. Once false, remains false.
 nvt.title = 'Untitled Document'
 nvt.author = 'Anonymous Author'
@@ -84,17 +85,53 @@ nvt.luaerr = false -- Becomes true if lua error.
 nvt.metric = false -- Becomes true if trimsize uses mm units. Once true, remains true.
 nvt.pagelist = '' -- Might become nonempty when nvt.examine==true.
 nvt.thisdoc = '' -- Becomes nonempty when compiling only subdoc files.
-nvt.preamble = 1 -- Becomes 0 AtBeginDocument.
-nvt.hasdark = 0 -- Becomes 1 if a Preamble setting loads the dark font. Likewise for these:
-nvt.hasthick = 0
-nvt.hasheavy = 0
-nvt.haswide = 0
-nvt.hasblack = 0
-nvt.hasthin = 0
-nvt.hassrir = 0
-nvt.hasgero = 0
-nvt.hasplas = 0
-nvt.hascrge = 0
+nvt.preamble = true -- Becomes false AtBeginDocument.
+nvt.guide = 0 -- Becomes nonzero if guide enabled.
+nvt.allfonts = 'main,dark,heavy,black,wide,thick,thin,srir,gero,plas,crge,'
+nvt.usefont = {}
+nvt.usefont['main'] = true ; nvt.usefont['dark'] = false ; nvt.usefont['heavy'] = false
+nvt.usefont['black'] = false ; nvt.usefont['wide'] = false ; nvt.usefont['thick'] = false
+nvt.usefont['thin'] = false ; nvt.usefont['srir'] = false ; nvt.usefont['gero'] = false
+nvt.usefont['plas'] = false ; nvt.usefont['crge'] = false
+nvt.space = {} -- em width of space character in font
+nvt.space['main'] = 0.21 ; nvt.space['dark'] = 0.21 ; nvt.space['heavy'] = 0.21
+nvt.space['black'] = 0.21 ; nvt.space['wide'] = 0.21 ; nvt.space['thick'] = 0.21
+nvt.space['thin'] = 0.21 ; nvt.space['srir'] = 0.21 ; nvt.space['gero'] = 0.21
+nvt.space['plas'] = 0.21 ; nvt.space['crge'] = 0.21
+nvt.didstyle = {} -- true when its default style is set
+nvt.styleleft = {} ; nvt.styleright = {} -- left and right fill
+nvt.styletrack = {} -- tracking 0 - 9
+nvt.stylefn = {} -- short font name
+nvt.stylefont = {} -- nvt@ font name
+nvt.stylecn = {} -- short case name
+nvt.stylespace = {} -- em width of space character, depends on font
+nvt.stylescale = {} -- font scale
+nvt.styleraw = {} -- OpenType raw features
+for i = 1, 4 do
+  nvt.didstyle[i] = false
+  nvt.styleleft[i] = '\\hfill'
+  nvt.styleright[i] = '\\hfill'
+  nvt.styletrack[i] = '2'
+  nvt.stylefn[i] = 'main'
+  nvt.stylefont[i] = '\\nvt@mainfont'
+  nvt.stylecn[i] = 'none'
+  nvt.styleraw[i] = 'RawFeature={+ss17}'
+  nvt.stylespace[i] = 0.21
+end
+nvt.stylescale[1]=2 ; nvt.stylescale[2]=1.4 ; nvt.stylescale[3]=1.2 ; nvt.stylescale[1]=1.1
+nvt.didtitle = false
+nvt.didauthor = false
+nvt.didsubtitle = false
+nvt.didversion = false
+nvt.diddocdate = false
+nvt.didmode = false
+nvt.didtrimsize = false
+nvt.didlayout = false
+nvt.didheadstyle = false
+nvt.didscenestyle = false
+nvt.didfootnotestyle = false
+nvt.didversohead = false
+nvt.didrectohead = false
 local GLYPH = node.id('glyph')
 local GLUE = node.id('glue')
 local HLIST = node.id('hlist')
@@ -124,52 +161,57 @@ end
 
 -- Parse \loadfont:
 nvt.parseloadfont = function (s)
-  s = string.gsub(s, ' ', '') ; s = s .. ','
-  if string.find(s, 'all,') then
-    s = 'dark,thick,heavy,wide,srir,gero,black,thin,plas,crge,'
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local all = 0
+  tex.sprint('\\begingroup\\makeatletter')
+  if string.find(s, 'main,') then s = string.gsub(s, 'main,', '') end
+  if string.find(s, 'all,') then s = string.gsub(s, 'all', '') ; all = 1 end
+  if all == 1 or string.find(s, 'dark,') then
+    s = string.gsub(s, 'dark,', '') ; nvt.usefont['dark'] = true
+    tex.sprint('\\global\\nvt@usedarktrue')
   end
-  if string.find(s, 'dark,') then
-    nvt.hasdark = 1 ; s = string.gsub(s, 'dark,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
+  if all == 1 or string.find(s, 'thick,') then
+    s = string.gsub(s, 'thick,', '') ; nvt.usefont['thick'] = true
+    tex.sprint('\\global\\nvt@usethicktrue')
   end
-  if string.find(s, 'thick,') then
-    nvt.hasthick = 1 ; s = string.gsub(s, 'thick,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
+  if all == 1 or string.find(s, 'heavy,') then
+    s = string.gsub(s, 'heavy,', '') ; nvt.usefont['heavy'] = true
+    tex.sprint('\\global\\nvt@useheavytrue')
   end
-  if string.find(s, 'heavy,') then
-    nvt.hasheavy = 1 ; s = string.gsub(s, 'heavy,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
+  if all == 1 or string.find(s, 'wide,') then
+    s = string.gsub(s, 'wide,', '') ; nvt.usefont['wide'] = true
+    tex.sprint('\\global\\nvt@usewidetrue')
   end
-  if string.find(s, 'wide,') then
-    nvt.haswide = 1 ; s = string.gsub(s, 'wide,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
+  if all == 1 or string.find(s, 'srir,') then
+    s = string.gsub(s, 'srir,', '') ; nvt.usefont['srir'] = true
+    tex.sprint('\\global\\nvt@usesrirtrue')
   end
-  if string.find(s, 'srir,') then
-    nvt.hassrir = 1 ; s = string.gsub(s, 'srir,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantsrirtrue\\endgroup')
+  if all == 1 or string.find(s, 'gero,') then
+    s = string.gsub(s, 'gero,', '') ; nvt.usefont['gero'] = true
+    tex.sprint('\\global\\nvt@usegerotrue')
   end
-  if string.find(s, 'gero,') then
-    nvt.hasgero = 1 ; s = string.gsub(s, 'gero,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
+  if all == 1 or string.find(s, 'black,') then
+    s = string.gsub(s, 'black,', '') ; nvt.usefont['black'] = true
+    tex.sprint('\\global\\nvt@useblacktrue')
   end
-  if string.find(s, 'black,') then
-    nvt.hasblack = 1 ; s = string.gsub(s, 'black,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
+  if all == 1 or string.find(s, 'thin,') then
+    s = string.gsub(s, 'thin,', '') ; nvt.usefont['thin'] = true
+    tex.sprint('\\global\\nvt@usethintrue')
   end
-  if string.find(s, 'thin,') then
-    nvt.hasthin = 1 ; s = string.gsub(s, 'thin,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
+  if all == 1 or string.find(s, 'plas,') then
+    s = string.gsub(s, 'plas,', '') ; nvt.usefont['plas'] = true
+    tex.sprint('\\global\\nvt@useplastrue')
   end
-  if string.find(s, 'plas,') then
-    nvt.hasplas = 1 ; s = string.gsub(s, 'plas,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
-  end
-  if string.find(s, 'crge,') then
-    nvt.hascrge = 1 ; s = string.gsub(s, 'crge,', '')
-    tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantcrgetrue\\endgroup')
+  if all == 1 or string.find(s, 'crge,') then
+    s = string.gsub(s, 'crge,', '') ; nvt.usefont['crge'] = true
+    tex.sprint('\\global\\nvt@usecrgetrue')
   end
   s = string.gsub(s, ',', '')
-  if s ~= '' then tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false end
+  tex.sprint('\\endgroup')
+  if s == '' then 
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
 end
 --
 
@@ -339,21 +381,51 @@ end
 
 -- Parse \mode setting:
 nvt.parsemode = function (s)
-    local m = ''
-    s = string.gsub(s, ' ', '')
-    if s == 'draft' or s == '' then m = 'draft'
-    elseif s == 'preview' then m = 'preview'
-    elseif s == 'final' then m = 'final'
-    elseif s == 'dev' then m = 'dev'
-    elseif s == 'usl' then m = 'usl'
-    end 
-    if m ~= '' then
-      nvt.mode = m ; nvt.startmode = m
-      tex.sprint('\\def\\tmpmode{' .. m .. '}')
-      tex.sprint('\\def\\tmpreturn{1}')
+  if nvt.didmode == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',', '')
+    tex.sprint('\\begingroup\\makeatletter')
+    if s == 'draft' then s = string.gsub(s, 'draft', '') end
+    if s == 'preview' then
+      s = string.gsub(s, 'preview', '')
+      if s == '' then
+        tex.sprint('\\gdef\\nvt@titleprefix{PREVIEW: }')
+        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@previewtrue')
+        nvt.mode = 'preview' ; nvt.startmode = 'preview'
+      end
+    end
+    if s == 'final' then
+      s = string.gsub(s, 'final', '')
+      if s == '' then
+        tex.sprint('\\gdef\\nvt@titleprefix{}')
+        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@finaltrue')
+        nvt.mode = 'final' ; nvt.startmode = 'final'
+      end
+    end
+    if s == 'dev' then
+      s = string.gsub(s, 'dev', '')
+      if s == '' then
+        tex.sprint('\\gdef\\nvt@titleprefix{DEV TEST: }')
+        tex.sprint('\\global\\nvt@draftfalse\\global\\nvt@devtrue')
+        nvt.mode = 'dev' ; nvt.startmode = 'dev'
+      end
+    end
+    if s == 'usl' then
+      s = string.gsub(s, 'usl', '')
+      if s == '' then
+        tex.sprint('\\gdef\\nvt@titleprefix{}')
+        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@usltrue')
+        nvt.mode = 'usl' ; nvt.startmode = 'usl'
+      end
+    end
+    tex.sprint('\\endgroup')
+    if s == '' then
+      tex.sprint('\\def\\tmpreturn{1}') ; nvt.didmode = true
     else
       nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
     end
+  end
 end
 --
 
@@ -368,19 +440,6 @@ nvt.parseclass = function (s)
     tex.sprint('\\begingroup\\makeatletter\\gdef\\nvt@clsvar{' .. s .. '}\\endgroup')
   end
   if ok == true then
-    tex.sprint('\\def\\tmpreturn{1}')
-  else
-    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
-  end
-end
---
-
-
--- Parse \devcode setting:
-nvt.parsedevcode = function (s)
-  s = string.gsub(s, ' ', '')
-  if string.find(s, '%.tex$') or string.find(s, '%.lua$') then
-    tex.sprint('\\begingroup\\makeatletter\\gdef\\nvt@devcode{' .. s .. '}\\endgroup')
     tex.sprint('\\def\\tmpreturn{1}')
   else
     nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
@@ -421,19 +480,22 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 nvt.parseheadstyle = function (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   local n, t, a, f, c, x, xx, min, max
+  tex.sprint('\\begingroup\\makeatletter')
   if string.find(s, 'deco=') then -- only head chooses deco
     d, n = string.gsub(s, '.*deco=', '') ; d = string.gsub(d, ',.*', '')
     if n == 1 then
-      if d == 'none' then s = string.gsub(s, 'deco=none', '') ; tex.sprint('\\def\\tmpdn{0}')
-      elseif d == 'bar' then s = string.gsub(s, 'deco=bar', '') ; tex.sprint('\\def\\tmpdn{1}')
+      if d == 'none' then
+        s = string.gsub(s, 'deco=none', '') ; tex.sprint('\\gdef\\nvt@pndeco{}')
+      elseif d == 'bar' then
+        s = string.gsub(s, 'deco=bar', '') ; tex.sprint('\\gdef\\nvt@pndeco{|}')
       elseif d == 'bullet' then
-        s = string.gsub(s, 'deco=bullet', '') ; tex.sprint('\\def\\tmpdn{2}')
+        s = string.gsub(s, 'deco=bullet', '') ; tex.sprint('\\gdef\\nvt@pndeco{}')
       elseif d == 'square' then
-        s = string.gsub(s, 'deco=square', '') ; tex.sprint('\\def\\tmpdn{3}')
+        s = string.gsub(s, 'deco=square', '') ; tex.sprint('\\gdef\nvt@pndeco{}')
       elseif d == 'lozenge' then
-        s = string.gsub(s, 'deco=lozenge', '') ; tex.sprint('\\def\\tmpdn{4}')
+        s = string.gsub(s, 'deco=lozenge', '') ; tex.sprint('\\gdef\\nvt@pndeco{}')
       elseif d == 'dash' then
-        s = string.gsub(s, 'deco=dash', '') ; tex.sprint('\\def\\tmpdn{5}')
+        s = string.gsub(s, 'deco=dash', '') ; tex.sprint('\\gdef\\nvt@pndeco')
       end
     end
   end
@@ -448,85 +510,148 @@ nvt.parseheadstyle = function (s)
   end
   if string.find(s, 'font=') then
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
+    f = string.gsub(f, ',', '')
     if n == 1 then
-      if f == 'main' then
-        s = string.gsub(s, 'font=main', '') ; tex.sprint{'\\def\\tmpfn{0}\\def\\tmpsp{.21}'}
+      if string.find(nvt.allfonts, f) then ----- don't forget the space value
+        s = string.gsub(s, 'font=' .. f, '')
+        tex.sprint('\\gdef\\nvt@headfont{\\nvt@' .. f .. '}' )
+        tex.sprint('\\gdef\\nvt@headfn{' .. f .. '}\\global\\nvt@use' .. f .. 'true')
       end
-      if f == 'dark' then
-        s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
-      end
-      if f == 'thick' then
-        s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
-      end
-      if f == 'heavy' then
-        s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
-      end
-      if f == 'wide' then
-        s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
-      end
-      if f == 'srir' then
-        s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantsrirtrue\\endgroup')
-      end
-      if f == 'gero' then
-        s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
-
-      end
-      if f == 'black' then
-        s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
-      end
-      if f == 'thin' then
-        s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.16}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
-      end
-      if f == 'plas' then
-        s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
-      end
-      if f == 'crge' then
-        s = string.gsub(s, 'font=crge', '') ; tex.sprint{'\\def\\tmpfn{11}\\def\\tmpsp{.22}'}
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantcrgetrue\\endgroup')
+    end
+  end
+  if string.find(s, 'scale=') then ----- needs default. apply scale to case
+    x, n = string.gsub(s, '.*scale=', '') ; x = string.gsub(x, ',.*', '')
+    if n == 1 and x ~= '' then
+      xx = '' .. x -- because tonumber may add preceding 0.
+      x = tonumber(x)
+      if x and x >= 0.83 and x <= 1 then
+        tex.sprint('\\gdef\\nvt@headscale{' .. x .. '}') -- not needed. apply to case feat
+        s = string.gsub(s, 'scale=' .. xx, '')
       end
     end
   end
   if string.find(s, 'case=') then
     c, n = string.gsub(s, '.*case=', '') ; c = string.gsub(c, ',.*', '')
     s = string.gsub(s, 'title', 'titl')
-    if n == 1 then
+    if n == 1 then ----- becomes nvt@headfeat
       if c == 'none' then
-        s = string.gsub(s, 'case=none', '') ; tex.sprint('\\def\\tmpcase{0}')
+        s = string.gsub(s, 'case=none', '') ; tex.sprint('\\gdef\\nvt@headfeat{}')
+        tex.sprint('\\gdef\\nvt@pnfeat{}')
       end
       if c == 'smcp' then
-        s = string.gsub(s, 'case=smcp', '') ; tex.sprint('\\def\\tmpcase{1}')
+        s = string.gsub(s, 'case=smcp', '')
+        tex.sprint('\\gdef\\nvt@headfeat{}') -----
+        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
       end
       if c == 'onum' then
-        s = string.gsub(s, 'case=onum', '') ; tex.sprint('\\def\\tmpcase{2}')
+        s = string.gsub(s, 'case=onum', '')
+        tex.sprint('\\gdef\\nvt@headfeat{}') -----
+        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
       end
       if c == 'smon' then
-        s = string.gsub(s, 'case=smon', '') ; tex.sprint('\\def\\tmpcase{3}')
+        s = string.gsub(s, 'case=smon', '')
+        tex.sprint('\\gdef\\nvt@headfeat{}') -----
+        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
       end
       if c == 'titl' then
-        s = string.gsub(s, 'case=titl', '') ; tex.sprint('\\def\\tmpcase{4}')
+        s = string.gsub(s, 'case=titl', '')
+        tex.sprint('\\gdef\\nvt@headfeat{}') -----
+        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
       end
       if c == 'dflt' then
-        s = string.gsub(s, 'case=dflt', '') ; tex.sprint('\\def\\tmpcase{5}')
+        s = string.gsub(s, 'case=dflt', '')
+        tex.sprint('\\gdef\\nvt@headfeat{}') -----
+        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
       end
     end
   end
-  if string.find(s, 'scale=') then
-    x, n = string.gsub(s, '.*scale=', '') ; x = string.gsub(x, ',.*', '')
-    if n == 1 and x ~= '' then
-      xx = '' .. x -- because tonumber may add preceding 0.
-      x = tonumber(x)
-      if x and x >= 0.83 and x <= 1 then
-        tex.sprint('\\def\\tmpscale{' .. x .. '}')
-        s = string.gsub(s, 'scale=' .. xx, '')
+  s = string.gsub(s, ',', '')
+  tex.sprint('\\endgroup')
+  if s == '' then
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
+end
+--
+
+
+-- Parse \defaultstyleN for N = 1, 2, 3, 4:
+nvt.parsedefaultstyle = function (N, s) -- style number, setting
+  s = s .. ',' ; s = string.gsub(s, ' ', '')
+  local n, m, mm, mmm, t, tt, a, f, c, h, d ; local ok = false
+  if nvt.didstyle[N] == true then ok = false else nvt.didstyle[N] = true ; ok = true end
+  if ok == true and string.find(s, 'scale=') then
+    m, n = string.gsub(s, '.*scale=', '') ; m = string.gsub(m, ',.*', '') ; mm = m
+    if n == 1 and m ~= '' then
+      m = tonumber(m)
+      if m and m >= 1 and m <= 4 then
+        s = string.gsub(s, 'scale=' .. mm, '') ; nvt.stylescale[N] = mm
+      end
+    end
+  end
+  if ok == true and string.find(s, 'align=') then
+    a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
+    if n == 1 then
+      if (a == 'left' or a == 'right' or a == 'center') then
+        s = string.gsub(s, 'align=' .. a, '')
+      end
+      if a == 'left' then
+        string.gsub(s, 'align=left', '')
+        nvt.styleleft[N] = '' ; nvt.styleright[N] = '\\hfill'
+      elseif a == 'right' then
+        string.gsub(s, 'align=right', '')
+        nvt.styleleft[N] = '\\hfill' ; nvt.styleright[N] = ''
+      elseif a == 'center' then
+        string.gsub(s, 'align=center', '')
+        nvt.styleleft[N] = '\\hfill' ; nvt.styleright[N] = '\\hfill'
+      end
+    end
+  end
+  if ok == true and string.find(s, 'track=') then
+    t, n = string.gsub(s, '.*track=', '') ; t = string.gsub(t, ',.*', '') ; tt = t
+    if n == 1 and t ~= '' then
+      t = tonumber(t)
+      if t and t >= 0 and t <= 9 then
+        s = string.gsub(s, 'track=' .. t, '') ; nvt.styletrack[N] = tt
+      end
+    end
+  end
+  if ok == true and string.find(s, 'font=') then
+    f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
+    f = string.gsub(f, ',', '')
+    if n == 1 then
+      if string.find(nvt.allfonts, f) then
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@use' .. f .. 'true\\endgroup')
+        s = string.gsub(s, 'font=' .. f, '')
+        if f == 'main' then
+          nvt.stylefn[N] = 'main' ; nvt.stylefont[N] = '\\normalfont'
+        else
+          nvt.stylefn[N] = f ; nvt.stylefont[N] = '\\nvt@' .. f
+        end
+        local ff = "'" .. f .. "'" ; nvt.stylespace[N] = nvt.space[ff] ; nvt.usefont[ff] = true
+      end
+    end
+  end
+  if ok == true and string.find(s, 'case=') then
+    c, n = string.gsub(s, '.*case=', '') ; c = string.gsub(c, ',.*', '')
+    c = string.gsub(c, 'title', 'titl')
+    if n == 1 then
+      if c == 'none' then
+        nvt.stylecn[N] = 'none' ; s = string.gsub(s, 'case=none', '')
+        nvt.styleraw[N] = 'RawFeature={+ss17}'
+      elseif c == 'smcp' then
+        nvt.stylecn[N] = 'smcp' ; s = string.gsub(s, 'case=smcp', '')
+        nvt.styleraw[N] = 'RawFeature={+smcp,+ss17}'
+      elseif c == 'onum' then
+        nvt.stylecn[N] = 'onum' ; s = string.gsub(s, 'case=onum', '')
+        nvt.styleraw[N] = 'RawFeature={+onum,+ss17}'
+      elseif c == 'smon' then
+        nvt.stylecn[N] = 'smon' ; s = string.gsub(s, 'case=smon', '')
+        nvt.styleraw[N] = 'RawFeature={+smcp,+onum,+ss17}'
+      elseif c == 'titl' then
+        nvt.stylecn[N] = 'titl' ; s = string.gsub(s, 'case=titl', '')
+        nvt.styleraw[N] = 'RawFeature={+titl,+ss17}'
       end
     end
   end
@@ -540,22 +665,32 @@ end
 --
 
 
--- Parse \namestyle, \subnamestyle, and \name, \subname options:
-nvt.parsenamestyle = function (s) ----- defer to begin document
+-- Parse \styleS for N = 1, 2, 3, 4:
+nvt.parsestyle = function (N, s) -- style number, setting
   s = s .. ',' ; s = string.gsub(s, ' ', '')
-  local n, m, mm, mmm, t, tt, a, f, c, h, d ; local miss = ''
-  local min = 1 ; local max = 4
+  local n, m, mm, mmm, t, tt, a, f, c, h, d ; local ok = 1
   if string.find(s, 'scale=') then
-    mm, n = string.gsub(s, '.*scale=', '') ; mm = string.gsub(mm, ',.*', '')
-    if string.find(mm, 'a$') then
-      tex.sprint('\\def\\tmpauto{1}') ; mmm = string.gsub(mm, 'a$', '')
-    else
-      tex.sprint('\\def\\tmpauto{0}') ; mmm = mm
+    m, n = string.gsub(s, '.*scale=', '') ; m = string.gsub(m, ',.*', '') ; mm = m
+    if n == 1 and m ~= '' then
+      m = tonumber(m)
+      if m and m >= 1 and m <= 4 then
+        s = string.gsub(s, 'scale=' .. mm, '')
+        tex.sprint('\\def\\tmpscale{' .. mm .. '}')
+        d = math.max(mm * 0.26 * nvt.em, 0.3 * nvt.bls)
+        h = d + math.max(mm * 0.84 * nvt.em, 0.7 * nvt.bls)
+        tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
+      else
+        d = math.max(nvt.stylescale[N] * 0.26 * nvt.em, 0.3 * nvt.bls)
+        h = d + math.max(nvt.stylescale[N] * 0.84 * nvt.em, 0.7 * nvt.bls)
+        tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
+        tex.sprint('\\def\\tmpscale{' .. nvt.stylescale[N] .. '}')
+      end
     end
-    m = tonumber(mmm)
-    if m and n == 1 and m >= 1 and m <= 4 then
-      s = string.gsub(s, 'scale=' .. mm, '') ; tex.sprint('\\def\\tmpscale{' .. m .. '}')
-    end
+  else
+    d = math.max(nvt.stylescale[N] * 0.26 * nvt.em, 0.3 * nvt.bls)
+    h = d + math.max(nvt.stylescale[N] * 0.84 * nvt.em, 0.7 * nvt.bls)
+    tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
+    tex.sprint('\\def\\tmpscale{' .. nvt.stylescale[N] .. '}')
   end
   if string.find(s, 'align=') then
     a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
@@ -563,130 +698,80 @@ nvt.parsenamestyle = function (s) ----- defer to begin document
       if (a == 'left' or a == 'right' or a == 'center') then
         s = string.gsub(s, 'align=' .. a, '')
       end
-      if a == 'left' then tex.sprint('\\def\\tmpalign{1}')
-      elseif a == 'right' then tex.sprint('\\def\\tmpalign{2}')
-      else tex.sprint('\\def\\tmpalign{0}')
+      if a == 'left' then
+        string.gsub(s, 'align=left', '')
+        tex.sprint('\\def\\tmpleft{0}\\def\\tmpright{1}')
+      elseif a == 'right' then
+        string.gsub(s, 'align=right', '')
+        tex.sprint('\\def\\tmpleft{1}\\def\\tmpright{0}')
+      elseif a == 'center' then
+        string.gsub(s, 'align=center', '')
+        tex.sprint('\\def\\tmpleft{1}\\def\\tmpright{1}')
       end
     end
+  else
+    tex.sprint('\\def\\tmpleft{' .. nvt.styleleft[N] .. '}')
+    tex.sprint('\\def\\tmpright{' .. nvt.styleright[N] .. '}')
   end
   if string.find(s, 'track=') then
     t, n = string.gsub(s, '.*track=', '') ; t = string.gsub(t, ',.*', '') ; tt = t
     if n == 1 and t ~= '' then
       t = tonumber(t)
       if t and t >= 0 and t <= 9 then
-        s = string.gsub(s, 'track=' .. t, '') ; tex.sprint('\\def\\tmptrack{' .. tt .. '}')
+        s = string.gsub(s, 'track=' .. t, '')
+        tex.sprint('\\def\\tmptrack{' .. tt .. '}')
       end
     end
+  else
+    tex.sprint('\\def\\tmptrack{' .. nvt.styletrack[N] .. '}')
   end
   if string.find(s, 'font=') then
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
+    f = string.gsub(f, ',', '')
     if n == 1 then
-      if f == 'main' then
-        s = string.gsub(s, 'font=main', '') ; tex.sprint{'\\def\\tmpfn{0}\\def\\tmpsp{.21}'}
-      end
-      if f == 'dark' then
-        s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
-          nvt.hasdark = 1
-        elseif nvt.hasdark == 0 then miss = 'dark'
+      local ff = '' .. f
+      if nvt.usefont[ff] == true then
+        s = string.gsub(s, 'font=' .. f, '')
+        if f == 'main' then
+          tex.sprint('\\def\\tmpfn{main}')
+          tex.sprint('\\def\\tmpfont{\\normalfont}')
+        else
+          tex.sprint('\\def\\tmpfn{' .. f .. '}')
+          tex.sprint('\\begingroup\\makeatletter\\gdef\\tmpfont{\\nvt@' .. f .. '}\\endgroup')
         end
+        tex.sprint('\\def\\tmpspace{' .. nvt.space[ff] .. '}\\def\\tmpnofont{}')
+      else
+        ok = -2 ; tex.sprint('\\def\\tmpnofont{' .. f .. '}')
       end
-      if f == 'thick' then
-        s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
-          nvt.hasthick = 1
-        elseif nvt.hasthick == 0 then miss = 'thick'
-        end
-      end
-      if f == 'heavy' then
-        s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
-          nvt.hasheavy = 1
-        elseif nvt.hasheavy == 0 then miss = 'heavy'
-        end
-      end
-      if f == 'wide' then
-        s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
-          nvt.haswide = 1
-        elseif nvt.haswide == 0 then miss = 'wide'
-        end
-      end
-      if f == 'srir' then
-        s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantssrirtrue\\endgroup')
-          nvt.hassrir = 1
-        elseif nvt.hassrir == 0 then miss = 'srir'
-        end
-      end
-      if f == 'gero' then
-        s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
-          nvt.hasgero = 1
-        elseif nvt.hasgero == 0 then miss = 'gero'
-        end
-      end
-      if f == 'black' then
-        s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
-          nvt.hasblack = 1
-        elseif nvt.hasblack == 0 then miss = 'black'
-        end
-      end
-      if f == 'thin' then
-        s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.12}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
-          nvt.hasthin = 1
-        elseif nvt.hasthin == 0 then miss = 'thin'
-        end
-      end
-      if f == 'plas' then
-        s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
-          nvt.hasplas = 1
-        elseif nvt.hasplas == 0 then miss = 'plas'
-        end
-      end
-      if f == 'crge' then
-        s = string.gsub(s, 'font=crge', '') ; tex.sprint{'\\def\\tmpfn{11}\\def\\tmpsp{.22}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantcrgetrue\\endgroup')
-          nvt.hascrge = 1
-        elseif nvt.hascrge == 0 then miss = 'crge'
-        end
-      end
-      if miss ~= '' then tex.sprint('\\def\\tmpnofont{' .. miss .. '}') ; nvt.good = false end
     end
+  else
+    tex.sprint('\\def\\tmpfn{' .. nvt.stylefn[N] .. '}')
+    tex.sprint('\\begingroup\\makeatletter\\gdef\\tmpfont{' .. nvt.stylefont[N] .. '}\\endgroup')
+    tex.sprint('\\def\\tmpspace{' .. nvt.space[nvt.stylefn[N]] .. '}')
   end
   if string.find(s, 'case=') then
     c, n = string.gsub(s, '.*case=', '') ; c = string.gsub(c, ',.*', '')
-    s = string.gsub(s, 'title', 'titl')
+    c = string.gsub(c, 'title', 'titl')
     if n == 1 then
       if c == 'none' then
-        s = string.gsub(s, 'case=none', '') ; tex.sprint('\\def\\tmpcase{0}')
-      end
-      if c == 'smcp' then
-        s = string.gsub(s, 'case=smcp', '') ; tex.sprint('\\def\\tmpcase{1}')
-      end
-      if c == 'onum' then
-        s = string.gsub(s, 'case=onum', '') ; tex.sprint('\\def\\tmpcase{2}')
-      end
-      if c == 'smon' then
-        s = string.gsub(s, 'case=smon', '') ; tex.sprint('\\def\\tmpcase{3}')
-      end
-      if c == 'titl' then
-        s = string.gsub(s, 'case=titl', '') ; tex.sprint('\\def\\tmpcase{4}')
+        tex.sprint('\\def\\tmpcn{none}') ; s = string.gsub(s, 'case=none', '')
+        tex.sprint('\\def\\tmpraw{RawFeature={+ss17}}')
+      elseif c == 'smcp' then
+        tex.sprint('\\def\\tmpcn{smcp}') ; s = string.gsub(s, 'case=smcp', '')
+        tex.sprint('\\def\\tmpraw{RawFeature={+smcp,+ss17}}')
+      elseif c == 'onum' then
+        tex.sprint('\\def\\tmpcn{onum}') ; s = string.gsub(s, 'case=onum', '')
+        tex.sprint('\\def\\tmpraw{RawFeature={+onum,+ss17}}')
+      elseif c == 'smon' then
+        tex.sprint('\\def\\tmpcn{smon}') ; s = string.gsub(s, 'case=smon', '')
+        tex.sprint('\\def\\tmpraw{RawFeature={+smcp,+onum,+ss17}}')
+      elseif c == 'titl' then
+        tex.sprint('\\def\\tmpcn{titl}') ; s = string.gsub(s, 'case=titl', '')
+        tex.sprint('\\def\\tmpraw{RawFeature={+titl,+ss17}}')
       end
     end
+  else
+   tex.sprint('\\def\\tmpraw{RawFeature={+ss17}}')
   end
   s = string.gsub(s, ',', '')
   if s == '' then
@@ -694,15 +779,20 @@ nvt.parsenamestyle = function (s) ----- defer to begin document
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
+  if nvt.preamble == true then
+    ok = -1 ; tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  end
+  if ok < 0 then tex.sprint('\\def\\tmpreturn{' .. ok .. '}') ; nvt.good = false ; end
 end
 --
 
 
--- Parse \scenestyle and \scene options:
+-- Parse \scenestyle and \scene options: -----
 nvt.parsescenestyle = function (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   local n, t, a, f, c, x, xx ; local miss = ''
   local min = 1 ; local max = 1.5
+  tex.sprint('\\begingroup\\makeatletter')
   if string.find(s, 'scale=') then
     x, n = string.gsub(s, '.*scale=', '') ; x = string.gsub(x, ',.*', '')
     if n == 1 and x ~= '' then
@@ -738,89 +828,18 @@ nvt.parsescenestyle = function (s)
   if string.find(s, 'font=') then
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
     if n == 1 then
-      if f == 'main' then
-        s = string.gsub(s, 'font=main', '') ; tex.sprint{'\\def\\tmpfn{0}\\def\\tmpsp{.21}'}
-      end
-      if f == 'dark' then
-        s = string.gsub(s, 'font=dark', '') ; tex.sprint{'\\def\\tmpfn{1}\\def\\tmpsp{.21}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantdarktrue\\endgroup')
-          nvt.hasdark = 1
-        elseif nvt.hasdark == 0 then miss = 'dark'
+
+      if string.find(nvt.allfonts, f) then
+        s = string.gsub(s, 'font=' .. f, '') ; tex.sprint('\\gdef\\nvt@scenefn{' .. f .. '}')
+
+        if nvt.preamble == true then
+          tex.sprint('\\global\\nvt@use' .. f .. 'true')
+          nvt.usedark = 1 -----
+        elseif nvt.usedark == 0 then miss = 'dark' -----
         end
+
       end
-      if f == 'thick' then
-        s = string.gsub(s, 'font=thick', '') ; tex.sprint{'\\def\\tmpfn{2}\\def\\tmpsp{.24}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthicktrue\\endgroup')
-          nvt.hasthick = 1
-        elseif nvt.hasthick == 0 then miss = 'thick'
-        end
-      end
-      if f == 'heavy' then
-        s = string.gsub(s, 'font=heavy', '') ; tex.sprint{'\\def\\tmpfn{3}\\def\\tmpsp{.34}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantheavytrue\\endgroup')
-          nvt.hasheavy = 1
-        elseif nvt.hasheavy == 0 then miss = 'heavy'
-        end
-      end
-      if f == 'wide' then
-        s = string.gsub(s, 'font=wide', '') ; tex.sprint{'\\def\\tmpfn{4}\\def\\tmpsp{.4}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantwidetrue\\endgroup')
-          nvt.haswide = 1
-        elseif nvt.haswide == 0 then miss = 'wide'
-        end
-      end
-      if f == 'srir' then
-        s = string.gsub(s, 'font=srir', '') ; tex.sprint{'\\def\\tmpfn{5}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantssrirtrue\\endgroup')
-          nvt.hassrir = 1
-        elseif nvt.hassrir == 0 then miss = 'srir'
-        end
-      end
-      if f == 'gero' then
-        s = string.gsub(s, 'font=gero', '') ; tex.sprint{'\\def\\tmpfn{6}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantgerotrue\\endgroup')
-          nvt.hasgero = 1
-        elseif nvt.hasgero == 0 then miss = 'gero'
-        end
-      end
-      if f == 'black' then
-        s = string.gsub(s, 'font=black', '') ; tex.sprint{'\\def\\tmpfn{7}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantblacktrue\\endgroup')
-          nvt.hasblack = 1
-        elseif nvt.hasblack == 0 then miss = 'black'
-        end
-      end
-      if f == 'thin' then
-        s = string.gsub(s, 'font=thin', '') ; tex.sprint{'\\def\\tmpfn{8}\\def\\tmpsp{.12}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantthintrue\\endgroup')
-          nvt.hasthin = 1
-        elseif nvt.hasthin == 0 then miss = 'thin'
-        end
-      end
-      if f == 'plas' then
-        s = string.gsub(s, 'font=plas', '') ; tex.sprint{'\\def\\tmpfn{10}\\def\\tmpsp{.2}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantplastrue\\endgroup')
-          nvt.hasplas = 1
-        elseif nvt.hasplas == 0 then miss = 'plas'
-        end
-      end
-      if f == 'crge' then
-        s = string.gsub(s, 'font=crge', '') ; tex.sprint{'\\def\\tmpfn{11}\\def\\tmpsp{.22}'}
-        if nvt.preamble == 1 then
-          tex.sprint('\\begingroup\\makeatletter\\global\\nvt@wantcrgetrue\\endgroup')
-          nvt.hascrge = 1
-        elseif nvt.hascrge == 0 then miss = 'crge'
-        end
-      end
+
       if miss ~= '' then tex.sprint('\\def\\tmpnofont{' .. miss .. '}') ; nvt.good = false end
     end
   end
@@ -846,6 +865,7 @@ nvt.parsescenestyle = function (s)
     end
   end
   s = string.gsub(s, ',', '')
+  tex.sprint('\\endgroup')
   if s == '' then
     tex.sprint('\\def\\tmpscreturn{1}')
   else
@@ -857,14 +877,23 @@ end
 
 -- Parse \footnotestyle:
 nvt.parsefnstyle = function (s)
-  local ind
-  s = string.gsub(s, ' ', '') ; s = s .. ','
-  ind = string.gsub(s, '.*indent=', '') ; ind = string.gsub(ind, ',.*', '')
-  if ind == 'near' or ind == '' then tex.sprint('\\def\\tmpind{0}')
-  elseif ind == 'away' then tex.sprint('\\def\\tmpind{1}')
-  elseif ind == 'both' then tex.sprint('\\def\\tmpind{2}')
-  elseif ind == 'none' then tex.sprint('\\def\\tmpind{3}')
-  elseif ind ~= '' then tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  local ok = false
+  if nvt.didfootnotestyle == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    tex.sprint('\\begingroup\\makeatletter')
+    s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',', '') ; s = string.gsub(s, 'indent=', '')
+    if s == 'none' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{0}') end
+    if s == 'away' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{1}') end
+    if s == 'both' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{2}') end
+    if s == 'near' or s == '' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{3}') end
+    nvt.didfootnotestyle = true
+    tex.sprint('\\endgroup')
+    if ok == true then
+      tex.sprint('\\def\\tmpreturn{1}')
+    else
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    end
   end
 end
 --
@@ -929,21 +958,6 @@ end
 --
 
 
--- Parse \devcode:
-function nvt.parsedevcode (s) -- s is filename.tex
-  local ok = true
-  s = string.gsub(s,' ','') -- utf-8 ?
-  if string.find(s,'/') then ok = false end -- utf-8 ?
-  if not string.find(s,'%.tex$') then ok = false end -- utf-8 ? -- *.lua ?
-  if ok == true then
-    tex.sprint('\\def\\tmpreturn{1}')
-  else
-    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
-  end
-end
---
-
-
 -- Parse \entry option:
 function nvt.parseentry (s)
   s = string.gsub(s,' ','') ; if s == '' then s = 0 end
@@ -956,48 +970,58 @@ end
 
 -- Parse option of block environment:
 function nvt.parseblock (s,d)
-  local l, r, text, ind, off, a, n
+  local n, size, a, l, r, ln, rn
   s = string.gsub(s, ' ', '') ; s = s .. ','
-  text, n = string.gsub(s, '.*text=', '') ; text = string.gsub(text, ',.*', '')
+  size, n = string.gsub(s, '.*size=', '') ; size = string.gsub(size, ',.*', '')
   if n == 1 then
     if d == "D" then
-      if text == 'normal' then
-        tex.sprint('\\def\\tmpt{0}') ; s = string.gsub(s, 'text=normal', '')
-      elseif text == 'small' then
-        tex.sprint('\\def\\tmpt{1}') ; s = string.gsub(s, 'text=small', '')
+      if size == 'normal' then
+        tex.sprint('\\def\\tmpblocksize{0}') ; s = string.gsub(s, 'size=normal', '')
+      elseif size == 'small' then
+        tex.sprint('\\def\\tmpblocksize{1}') ; s = string.gsub(s, 'size=small', '')
+        local t = 0.125 * nvt.em ; tex.sprint('\\def\\tmpsmtop{' .. t .. 'pt}')
       end
     else
-      if text == 'small' then tex.sprint('\\def\\tmpt{-2}') end
+      if size == 'small' then tex.sprint('\\def\\tmpblocksize{-2}') end
     end
-  end
-  ind, n = string.gsub(s, '.*indent=', '') ; ind = string.gsub(ind, ',.*', '')
-  if n == 1 then
-    if ind == '0' then tex.sprint('\\def\\tmpind{0}') ; s = string.gsub(s, 'indent=0', '')
-    elseif ind == '1' then tex.sprint('\\def\\tmpind{1}') ; s = string.gsub(s, 'indent=1', '')
-    end
+  else
+    tex.sprint('\\def\\tmpblocksize{0}')
   end
   a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
   if n == 1 then
-    if a == 'justify' then tex.sprint{'\\def\\tmpa{0}'} ; s = string.gsub(s, 'align=justify', '')
-    elseif a == 'center' then tex.sprint{'\\def\\tmpa{1}'} ; s = string.gsub(s, 'align=center', '')
-    elseif a == 'left' then tex.sprint{'\\def\\tmpa{2}'} ; s = string.gsub(s, 'align=left', '')
-    elseif a == 'right' then tex.sprint{'\\def\\tmpa{3}'} ; s = string.gsub(s, 'align=right', '')
+    if a == 'justify' then
+      tex.sprint{'\\def\\tmpblockalign{0}'} ; s = string.gsub(s, 'align=justify', '')
+    elseif a == 'center' then
+      tex.sprint{'\\def\\tmpblockalign{1}'} ; s = string.gsub(s, 'align=center', '')
+    elseif a == 'left' then
+      tex.sprint{'\\def\\tmpblockalign{2}'} ; s = string.gsub(s, 'align=left', '')
+    elseif a == 'right' then
+      tex.sprint{'\\def\\tmpblockalign{3}'} ; s = string.gsub(s, 'align=right', '')
     end
-  end
-  off, n = string.gsub(s, '.*offset=', '') ; off = string.gsub(off, ',.*', '')
-  if n == 1 then
-    l = string.gsub(off, '/.*', '') ; local ln = tonumber(l)
-    r = string.gsub(off, '.*/', '') ; local rn = tonumber(r)
-    if ln and rn and ln > 0 and rn >= 0 and ln <= 8 and rn <= 8 and (ln + rn) <= 12 then
-      tex.sprint('\\def\\tmpl{' .. l .. '}\\def\\tmpr{' .. r .. '}')
-      s = string.gsub(s, 'offset=' .. l .. '/' .. r, '')
-    end
-    if l == 's' and (r == 's' or r == '0') then
-      tex.sprint('\\def\\tmpl{' .. l .. '}\\def\\tmpr{' .. r .. '}')
-      s = string.gsub(s, 'offset=' .. l .. '/' .. r, '')
-    end
+  else
+    tex.sprint('\\def\\tmpblockalign{0}')
   end
   s = string.gsub(s, ',', '')
+  _, n = string.gsub(s, '/', '')
+  if n == 1 then
+    l = string.gsub(s, '/.*', '') ; ln = tonumber(l)
+    r = string.gsub(s, '.*/', '') ; rn = tonumber(r)
+    if l == 'k' and r == 'k' then
+      tex.sprint('\\def\\tmpblockleft{-99}\\def\\tmpblockright{-99}')
+      s = string.gsub(s, 'k/k', '')
+    elseif l == 'k' and rn and rn >= 0 and rn <= 8 then
+      tex.sprint('\\def\\tmpblockleft{-99}\\def\\tmpblockright{' .. r .. '}')
+      s = string.gsub(s, 'k/' .. r, '')
+    elseif r == 'k' and ln and ln >= 0 and ln <= 8 then
+      tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpblockright{-99}')
+      s = string.gsub(s, l .. '/k', '')
+    elseif ln and rn and ln >= 0 and rn >= 0 and ln <= 8 and rn <= 8 then
+      tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpblockright{' .. r .. '}')
+      s = string.gsub(s, l .. '/' .. r, '')
+    else
+      tex.sprint('\\def\\tmpblockleft{2}\\def\\tmpblockright{0}')
+    end
+  end
   if s == '' then
     tex.sprint('\\def\\tmpreturn{1}')
   else
@@ -1010,10 +1034,13 @@ end
 -- Parse option of component environment:
 function nvt.parsecomponent (s1,s2)
   s1 = string.gsub(s1, ' ', '') ; s1 = s1 .. ','
+  tex.sprint('\\def\\tmpguide{' .. nvt.guide .. '}')
   if string.find(s1, 'legal,') then
     tex.sprint('\\def\\tmplegal{1}\\def\\tmprecto{0}\\def\\tmpsingle{1}')
     tex.sprint('\\def\\tmptps{empty}\\def\\tmpguide{0}')
     s1 = '' -- other options ignored.
+  else
+    tex.sprint('\\def\\tmplegal{0}')
   end
   if string.find(s1, 'single,') then
     tex.sprint('\\def\\tmpsingle{1}') ; s1 = string.gsub(s1, 'single', '')
@@ -1278,25 +1305,68 @@ end
 
 -- Parse \title, \author, \subtitle, \version:
 -- Parentheses () have special meaning in PDF, similar to braces {} in LaTeX. If your metadata
--- contains unmatched parentheses, big problem. This enforces matched parentheses, if any used.
-function nvt.parsemeta(str,which)
-  local sp = string.gsub(str, '[^%(%)]', '') -- Check for unbalanced or nested parentheses.
-  sp = string.gsub(sp, '%(%)', '') -- As above.
-  if string.len(sp) > 0 then
-    tex.sprint('\\def\\tmpreturn{0}')
+-- contains unmatched parentheses, big problem. These enforce matched parentheses, if any used.
+function nvt.parsetitle(s)
+  if nvt.didtitle == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
   else
-    str = string.gsub(str, '^ ', '') ; str = string.gsub(str, ' $', '')
-    str = string.gsub(str, '\\', '')
-    if which == 'title' then
-      nvt.title = '' .. str ; tex.sprint('\\def\\tmptitle{' .. str .. '}')
-    elseif which == 'author' then
-      nvt.author = '' .. str ; tex.sprint('\\def\\tmpauthor{' .. str .. '}')
-    elseif which == 'subtitle' then
-      nvt.subtitle = '' .. str ; tex.sprint('\\def\\tmpsubtitle{' .. str .. '}')
-    elseif which == 'version' then
-      nvt.version = '' .. str ; tex.sprint('\\def\\tmpversion{' .. str .. '}')
+    nvt.didtitle = true  ----- use unicode.utf8.sub(x,y,z)
+    local sp = string.gsub(s, '[^%(%)]', '') ; sp = string.gsub(sp, '%(%)', '')
+    if string.len(sp) > 0 then
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    else
+      s = string.gsub(s, '^ ', '') ; s = string.gsub(s, ' $', '')
+      s = string.gsub(s, '\\', ' ') ; s = string.gsub(s, '  ', ' ')
+      nvt.title = s ; tex.sprint('\\def\\tmptitle{' .. s .. '}')
     end
-    tex.sprint('\\def\\tmpreturn{1}')
+  end
+end
+--
+function nvt.parsesubtitle(s)
+  if nvt.didsubtitle == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    nvt.didsubtitle = true  ----- use unicode.utf8.sub(x,y,z)
+    local sp = string.gsub(s, '[^%(%)]', '') ; sp = string.gsub(sp, '%(%)', '')
+    if string.len(sp) > 0 then
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    else
+      s = string.gsub(s, '^ ', '') ; s = string.gsub(s, ' $', '')
+      s = string.gsub(s, '\\', ' ') ; s = string.gsub(s, '  ', ' ')
+      nvt.subtitle = s ; tex.sprint('\\def\\tmpsubtitle{' .. s .. '}')
+    end
+  end
+end
+--
+function nvt.parseauthor(s)
+  if nvt.didauthor == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    nvt.didauthor = true  ----- use unicode.utf8.sub(x,y,z)
+    local sp = string.gsub(s, '[^%(%)]', '') ; sp = string.gsub(sp, '%(%)', '')
+    if string.len(sp) > 0 then
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    else
+      s = string.gsub(s, '^ ', '') ; s = string.gsub(s, ' $', '')
+      s = string.gsub(s, '\\', ' ') ; s = string.gsub(s, '  ', ' ')
+      nvt.author = s ; tex.sprint('\\def\\tmpauthor{' .. s .. '}')
+    end
+  end
+end
+--
+function nvt.parseversion(s)
+  if nvt.didversion == true then
+    tex.sprint('\\def\\tmpreturn{-1}') -- but still good
+  else
+    nvt.didversion = true  ----- use unicode.utf8.sub(x,y,z)
+    local sp = string.gsub(s, '[^%(%)]', '') ; sp = string.gsub(sp, '%(%)', '')
+    if string.len(sp) > 0 then
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    else
+      s = string.gsub(s, '^ ', '') ; s = string.gsub(s, ' $', '')
+      s = string.gsub(s, '\\', ' ') ; s = string.gsub(s, '  ', ' ')
+      nvt.version = s ; tex.sprint('\\def\\tmpversion{' .. s .. '}')
+    end
   end
 end
 --
@@ -1306,20 +1376,25 @@ end
 -- The docdate format is yyyy/mm/dd but the range of numbers is not checked. This changes
 -- the string from your easy-to-read setting, to the string format used within PDF.
 function nvt.parsedocdate (s)
-  s = string.gsub(s,' ','')
-  if s == '' then
-    tex.sprint('\\def\\tmpreturn{1}\\def\\tmpdocdate{}')
+  if nvt.diddocdate == true then
+    tex.sprint('\\def\\tmpreturn{-1}') -- but still good
   else
-    local z = string.gsub(s, '^%d%d%d%d/%d%d/%d%d$','')
-    if z == '' then
-      s = string.gsub(s,'/','')
-      nvt.docdate = 'D:' .. str .. "000001Z"
-      tex.sprint('\\def\\tmpreturn{1}\\def\\tmpdocdate{' .. nvt.docdate .. '}')
+    nvt.diddocdate = true
+    s = string.gsub(s,' ','')
+    if s == '' then
+      tex.sprint('\\def\\tmpreturn{1}\\def\\tmpdocdate{}')
     else
-      nvt.good = false
-      nvt.docdate = nvt.now
-      tex.sprint('\\def\\tmpdocdate{}')
-      tex.sprint('\\def\\tmpreturn{0}')
+      local z = string.gsub(s, '^%d%d%d%d/%d%d/%d%d$','')
+      if z == '' then
+        s = string.gsub(s,'/','')
+        nvt.docdate = 'D:' .. str .. "000001Z"
+        tex.sprint('\\def\\tmpreturn{1}\\def\\tmpdocdate{' .. nvt.docdate .. '}')
+      else
+        nvt.good = false
+        nvt.docdate = nvt.now
+        tex.sprint('\\def\\tmpdocdate{}')
+        tex.sprint('\\def\\tmpreturn{0}')
+      end
     end
   end
 end
@@ -1327,59 +1402,66 @@ end
 
 
 -- Parse \trimsize setting:
+-- Lua calculates and records in Tex pt, converted to Postscript (bp) by LaTEX.
 function nvt.parsetrimsize (s)
-  nvt.trimtext = s
-  s = s .. ',' ; s = string.gsub(s, ' ' ,'')
-  local n, m, w, h, wd, ht ; local ok = true
-  if s == '' then s = 'width=5.5in,height=8.5in,' end
-  w, n = string.gsub(s, '.*width=', '') ; w = string.gsub(w, ',.*', '')
-  h, m = string.gsub(s, '.*height=', '') ; h = string.gsub(h, ',.*', '')
-  if n ~= 1 or m ~= 1 then ok = false end
-  if ok == true then
-    wd, n = string.gsub(w, 'in$', '') ; ht, m = string.gsub(h, 'in$', '')
-    if n == 1 and m == 1 then
-      wd = tonumber(wd) ; ht = tonumber(ht)
-      if not wd or not ht then
-        ok = false
-      else
-        if wd < 5 or wd > 6 or ht < 7.7 or ht > 9.3 or wd > (ht - 2) then
-          ok = false
-        else
-          tex.sprint('\\def\\tmptw{' .. wd .. 'in}')
-          s = string.gsub(s, 'width=' .. wd .. 'in', '')
-          tex.sprint('\\def\\tmpth{' .. ht .. 'in}')
-          s = string.gsub(s, 'height=' .. ht .. 'in', '')
-          nvt.trimwidth = wd*nvt.inch ; nvt.trimheight = ht*nvt.inch          
-        end
-      end
-    else
-      wd, n = string.gsub(w, 'mm$', '') ; ht, m = string.gsub(h, 'mm$', '')
+  if nvt.didtrimsize == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    nvt.didtrimsize = true
+    nvt.trimtext = s
+    s = s .. ',' ; s = string.gsub(s, ' ' ,'')
+    local n, m, w, h, wd, ht ; local ok = true
+    if s == '' then s = 'width=5.5in,height=8.5in,' end
+    w, n = string.gsub(s, '.*width=', '') ; w = string.gsub(w, ',.*', '')
+    h, m = string.gsub(s, '.*height=', '') ; h = string.gsub(h, ',.*', '')
+    if n ~= 1 or m ~= 1 then ok = false end
+    if ok == true then
+      wd, n = string.gsub(w, 'in$', '') ; ht, m = string.gsub(h, 'in$', '')
       if n == 1 and m == 1 then
-        wd = tonumber(wd) ; ht = tonumber(ht) ; nvt.metric = 1
+        wd = tonumber(wd) ; ht = tonumber(ht)
         if not wd or not ht then
           ok = false
         else
-          if wd < 126 or wd > 157 or ht < 197 or ht > 235 or wd > (ht - 68) then
+          if wd < 5 or wd > 6 or ht < 7.7 or ht > 9.3 or wd > (ht - 2) then
             ok = false
           else
-            tex.sprint('\\def\\tmpmetric{1}')
-            tex.sprint('\\def\\tmptw{' .. wd .. 'mm}')
-            s = string.gsub(s, 'width=' .. wd .. 'mm', '')
-            tex.sprint('\\def\\tmpth{' .. ht .. 'mm}')
-            s = string.gsub(s, 'height=' .. ht .. 'mm', '')
-            nvt.trimwidth = wd*nvt.mm ; nvt.trimheight = ht*nvt.mm
+            tex.sprint('\\def\\tmpmetric{0}')
+            s = string.gsub(s, 'width=' .. wd .. 'in', '')
+            nvt.trimwidth = nvt.inch * wd ; nvt.trimheight = nvt.inch * ht ;
+            tex.sprint('\\def\\tmptw{' .. nvt.trimwidth .. '}')
+            s = string.gsub(s, 'height=' .. ht .. 'in', '')
+            tex.sprint('\\def\\tmpth{' .. nvt.trimheight .. '}')
           end
         end
       else
-        ok = false
+        wd, n = string.gsub(w, 'mm$', '') ; ht, m = string.gsub(h, 'mm$', '')
+        if n == 1 and m == 1 then
+          wd = tonumber(wd) ; ht = tonumber(ht) ; nvt.metric = 1
+          if not wd or not ht then
+            ok = false
+          else
+            if wd < 126 or wd > 157 or ht < 197 or ht > 235 or wd > (ht - 68) then
+              ok = false
+            else
+            tex.sprint('\\def\\tmpmetric{1}')
+            s = string.gsub(s, 'width=' .. wd .. 'mm', '')
+            nvt.trimwidth = nvt.mm * wd ; nvt.trimheight = nvt.mm * ht ;
+            tex.sprint('\\def\\tmptw{' .. nvt.trimwidth .. '}')
+            s = string.gsub(s, 'height=' .. ht .. 'mm', '')
+            tex.sprint('\\def\\tmpth{' .. nvt.trimheight .. '}')
+            end
+          end
+        else
+          ok = false
+        end
       end
     end
-  end
-  s = string.gsub(s, ',', '')
-  if s ~= '' or ok == false then
-    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
-  else
-    tex.sprint('\\def\\tmpreturn{1}')
+    s = string.gsub(s, ',', '')
+    if s ~= '' or ok == false then
+      nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
+    else
+      tex.sprint('\\def\\tmpreturn{1}')
+    end
   end
 end
 --
@@ -1387,45 +1469,52 @@ end
 
 -- Parse \layout setting:
 function nvt.parselayout (s)
-  s = s .. ',' ; s = string.gsub(s, ' ' ,'')
-  local p, l, n, g, c ; local ok = true
-  if string.find(s, 'pagestyle=') then
-    p, n = string.gsub(s, '.*pagestyle=', '') ; p = string.gsub(p, ',.*', '')
-    if n == 1 and string.find(':none:plain:center:margin:marcen:split:', ':' .. p .. ':') then
-      tex.sprint('\\def\\tmpps{' .. p .. '}') ; nvt.pagestyle = p
-      s = string.gsub(s, 'pagestyle=' .. p, '')
-      if p == 'none' then nvt.header = false ; nvt.footer = false
-      elseif p == 'plain' then nvt.header = false ; nvt.footer = true
-      elseif p == 'split' then nvt.header = true ; nvt.footer = true
-      else nvt.header = true ; nvt.footer = false
+  if nvt.didlayout == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    nvt.didlayout = true
+    s = s .. ',' ; s = string.gsub(s, ' ' ,'')
+    local p, l, n, g, c ; local ok = true
+    tex.sprint('\\begingroup\\makeatletter')
+    if string.find(s, 'pagestyle=') then
+      p, n = string.gsub(s, '.*pagestyle=', '') ; p = string.gsub(p, ',.*', '')
+      if n == 1 and string.find(':none:plain:center:margin:marcen:split:', ':' .. p .. ':') then
+        tex.sprint('\\gdef\\nvt@pagestyle{' .. p .. '}') ; nvt.pagestyle = p
+        s = string.gsub(s, 'pagestyle=' .. p, '')
+        if p == 'none' then nvt.header = false ; nvt.footer = false
+        elseif p == 'plain' then nvt.header = false ; nvt.footer = true
+        elseif p == 'split' then nvt.header = true ; nvt.footer = true
+        else nvt.header = true ; nvt.footer = false
+        end
       end
     end
-  end
-  if string.find(s, 'lines=') then
-    l, n = string.gsub(s, '.*lines=', '') ; l = string.gsub(l, ',.*', '') ; l = tonumber(l)
-    if n == 1 and l and l >= 26 and l <= 35 and math.floor(l) == l then
-      nvt.lines = l ; tex.sprint('\\def\\tmplines{' .. l .. '}')
-      s = string.gsub(s, 'lines=' .. l, '')
-    end
-  end
-  if string.find(s, 'glue=') then
-    g, n = string.gsub(s, '.*glue=', '') ; g = string.gsub(g, ',.*', '')
-    if n == 1 then
-      if g == 'wide' or g == 'normal' then s = string.gsub(s, 'glue=' .. g, '') end
-      if g == 'wide' then nvt.moreglue = true ; tex.sprint('\\def\\tmpmoreglue{1}') end
-    end
-  end
-  if string.find(s, 'cpl=') then
-    c, n = string.gsub(s, '.*cpl=', '') ; c = string.gsub(c, ',.*', '')
-    if n == 1 then
-      c = tonumber(c)
-      if c and c >= 62 and c <= 70 then
-        nvt.charperline = c ; tex.sprint('\\def\\tmpc{' .. c .. '}')
-        s = string.gsub(s, 'cpl=' .. c, '')
+    if string.find(s, 'lines=') then
+      l, n = string.gsub(s, '.*lines=', '') ; l = string.gsub(l, ',.*', '') ; l = tonumber(l)
+      if n == 1 and l and l >= 26 and l <= 35 and math.floor(l) == l then
+        nvt.lines = l ; tex.sprint('\\gdef\\nvt@lines{' .. l .. '}')
+        s = string.gsub(s, 'lines=' .. l, '')
       end
     end
+    if string.find(s, 'glue=') then
+      g, n = string.gsub(s, '.*glue=', '') ; g = string.gsub(g, ',.*', '')
+      if n == 1 then
+        if g == 'wide' or g == 'normal' then s = string.gsub(s, 'glue=' .. g, '') end
+        if g == 'wide' then nvt.moreglue = true ; tex.sprint('\\global\\nvt@moregluetrue') end
+      end
+    end
+    if string.find(s, 'cpl=') then
+      c, n = string.gsub(s, '.*cpl=', '') ; c = string.gsub(c, ',.*', '')
+      if n == 1 then
+        c = tonumber(c)
+        if c and c >= 62 and c <= 70 then
+          nvt.charperline = c ; tex.sprint('\\gdef\\nvt@charperline{' .. c .. '}')
+          s = string.gsub(s, 'cpl=' .. c, '')
+        end
+      end
+    end
+    s = string.gsub(s, ',', '')
+    tex.sprint('\\endgroup')
   end
-  s = string.gsub(s, ',', '')
   if s ~= '' or ok == false then
     nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
   else
@@ -1437,14 +1526,27 @@ end
 
 -- Parse pdfx setting:
 function nvt.parsepdfx (s)
-  s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',' ,'')
-  if nvt.lang == 'usenglishmax' or nvt.lang == 'en' then nvt.oi = 'swop' else nvt.oi = 'fogra' end
-  if string.find(s, 'swop') then nvt.oi = 'swop' ; s = string.gsub(s, 'swop', '')
-  elseif string.find(s, 'fogra') then nvt.oi = 'fogra' ; s = string.gsub(s, 'fogra' ,'')
-  elseif string.find(s,'off') then nvt.pdfx = false ; nvt.oi = '' ; s = string.gsub(s, 'off', '')
+  if nvt.didpdfx == true then
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+  else
+    nvt.didpdfx = true
+    s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',' ,'')
+    tex.sprint('\\begingroup\\makeatletter')
+    if nvt.lang == 'usenglishmax' or nvt.lang == 'en' then
+      nvt.oi = 'swop'
+    else
+      nvt.oi = 'fogra'
+    end
+    if string.find(s, 'swop') then nvt.oi = 'swop' ; s = string.gsub(s, 'swop', '')
+    elseif string.find(s, 'fogra') then nvt.oi = 'fogra' ; s = string.gsub(s, 'fogra' ,'')
+    elseif string.find(s, 'off') then
+      nvt.pdfx = false ; nvt.oi = '' ; s = string.gsub(s, 'off', '')
+    end
+    if s == '' then tex.sprint('\\gdef\\nvt@oi{' .. nvt.oi .. '}') end
+    tex.sprint('\\endgroup')
   end
   if s == '' then
-    tex.sprint('\\def\\tmpreturn{1}\\def\\tmpoi{' .. nvt.oi .. '}')
+    tex.sprint('\\def\\tmpreturn{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.pdfx = false ; nvt.good = false
   end
@@ -1454,37 +1556,42 @@ end
 
 -- Parse \lang setting:
 nvt.parselang = function (s)
-  s = string.gsub(s, ' ', '') ; s = string.gsub(s, '%-', '')
-  local ok = false ; local k = 1
-  s = string.lower(s)
-  if string.find(s, '^enuk') or string.find('engb') then nvt.lang = 'british' ; ok = true end
-  if s == 'enus' then nvt.lang = 'usenglishmax' ; ok = true end
-  if string.find(s, '^de') then nvt.lang = 'ngerman' ; ok = true end
-  if s == 'dech' then nvt.lang = 'swissgerman' ; ok = true end
-  if string.find(s, '^nn') then nvt.lang = 'nynorsk' ; ok = true end
-  if string.find(s, '^no') or string.find(s, '^nb') then nvt.lang = bokmal ; ok = true end
-  if string.find(s, '^fr') then nvt.lang = 'french' ; ok = true end
-  if string.find(s, '^pt') then nvt.lang = 'portuguese' ; ok = true end
-  if string.find(s, '^ca') then nvt.lang = 'catalan' ; ok = true end
-  if string.find(s, '^es') then nvt.lang = 'spanish' ; ok = true end
-  if string.find(s, '^it') then nvt.lang = 'italian' ; ok = true end
-  if string.find(s, '^nl') then nvt.lang = 'dutch' ; ok = true end
-  if string.find(s, '^sv') then nvt.lang = 'swedish' ; ok = true end
-  if string.find(s, '^da') then nvt.lang = 'danish' ; ok = true end --
-  if string.find(s, '^fi') then nvt.lang = 'finnish' ; ok = true end --
-  if string.find(s, '^eu') then nvt.lang = 'basque' ; ok = true end --
-  if string.find(s, '^ga') then nvt.lang = 'irish' ; ok = true end -- gaelic
-  if string.find(s, '^cy') then nvt.lang = 'welsh' ; ok = true end --
-  if string.find(s, '^is') then nvt.lang = 'icelandic' ; ok = true end --
-  if string.find(s, '^gd') then nvt.lang = 'scottish' ; ok = true end -- gaelic
-  if string.find(s, '^la') then nvt.lang = 'latin' ; ok = true end --
-  if s == 'en' then
-    nvt.lang = 'english' ; ok = true ; k = 3
-  end
-  if s == 'xx' then
-    nvt.lang = 'english' ; ok = true ; k = 2
-    tex.sprint('\\hyphenpenalty 10000\\relax\\exhyphenpenalty 10000\\relax')
-    nvt.nohyphens = true
+  if nvt.didlang == true then
+    tex.sprint('\\def\\tmreturn{-1}') ; nvt.good = false
+  else
+    nvt.didlang = true
+    s = string.gsub(s, ' ', '') ; s = string.gsub(s, '%-', '')
+    local ok = false ; local k = 1
+    s = string.lower(s)
+    if string.find(s, '^enuk') or string.find('engb') then nvt.lang = 'british' ; ok = true end
+    if s == 'enus' then nvt.lang = 'usenglishmax' ; ok = true end
+    if string.find(s, '^de') then nvt.lang = 'ngerman' ; ok = true end
+    if s == 'dech' then nvt.lang = 'swissgerman' ; ok = true end
+    if string.find(s, '^nn') then nvt.lang = 'nynorsk' ; ok = true end
+    if string.find(s, '^no') or string.find(s, '^nb') then nvt.lang = bokmal ; ok = true end
+    if string.find(s, '^fr') then nvt.lang = 'french' ; ok = true end
+    if string.find(s, '^pt') then nvt.lang = 'portuguese' ; ok = true end
+    if string.find(s, '^ca') then nvt.lang = 'catalan' ; ok = true end
+    if string.find(s, '^es') then nvt.lang = 'spanish' ; ok = true end
+    if string.find(s, '^it') then nvt.lang = 'italian' ; ok = true end
+    if string.find(s, '^nl') then nvt.lang = 'dutch' ; ok = true end
+    if string.find(s, '^sv') then nvt.lang = 'swedish' ; ok = true end
+    if string.find(s, '^da') then nvt.lang = 'danish' ; ok = true end --
+    if string.find(s, '^fi') then nvt.lang = 'finnish' ; ok = true end --
+    if string.find(s, '^eu') then nvt.lang = 'basque' ; ok = true end --
+    if string.find(s, '^ga') then nvt.lang = 'irish' ; ok = true end -- gaelic
+    if string.find(s, '^cy') then nvt.lang = 'welsh' ; ok = true end --
+    if string.find(s, '^is') then nvt.lang = 'icelandic' ; ok = true end --
+    if string.find(s, '^gd') then nvt.lang = 'scottish' ; ok = true end -- gaelic
+    if string.find(s, '^la') then nvt.lang = 'latin' ; ok = true end --
+    if s == 'en' then
+      nvt.lang = 'english' ; ok = true ; k = 3
+    end
+    if s == 'xx' then
+      nvt.lang = 'english' ; ok = true ; k = 2
+      tex.sprint('\\hyphenpenalty 10000\\relax\\exhyphenpenalty 10000\\relax')
+      nvt.nohyphens = true
+    end
   end
   if ok == true then
     tex.sprint('\\def\\tmplang{' .. nvt.lang .. '}\\def\\tmpreturn{' .. k .. '}')
@@ -1495,7 +1602,7 @@ end
 --
 
 
--- Parse \enable setting(s):
+-- Parse \enable setting(s), which may be used more than once, with cumulative effect:
 function nvt.parseenable (s)
   local conflict = false ; local g = 0
   s = s .. ',' ; s = string.gsub(s,' ','')
@@ -1511,7 +1618,7 @@ function nvt.parseenable (s)
       g = tonumber(g)
       if g and g >= 1 and g == math.floor(g) then
         tex.sprint('\\def\\tmphasguide{1}') ; tex.sprint('\\def\\tmpguideline{' .. g .. '}')
-        s = string.gsub(s, 'guide=' .. g, '')
+        nvt.guide = g ; s = string.gsub(s, 'guide=' .. g, '')
       end
     end
     if g == 'last' then
@@ -1529,7 +1636,7 @@ end
 --
 
 
--- Parse disable setting(s):
+-- Parse disable setting(s), which may be used more than once, for cumulative effect:
 function nvt.parsedisable (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   if string.find(s, 'blankend,') then
@@ -1541,9 +1648,6 @@ function nvt.parsedisable (s)
   if string.find(s, 'pageflip,') then
     nvt.nopageflip = true ; tex.sprint('\\def\\tmpnopageflip{1}')
     s = string.gsub(s, 'pageflip', '')
-  end
-  if string.find(s,'oldstyle,') then
-    tex.sprint('\\def\\tmpnooldstyle{1}') ; s = string.gsub(s, 'oldstyle', '')
   end
   if string.find(s,'autodeco,') then
     tex.sprint('\\def\\tmpnoautodeco{1}') ; s = string.gsub(s, 'autodeco', '')
@@ -1565,7 +1669,7 @@ end
 --
 
 
--- Parse \examine setting:
+-- Parse \examine setting: ---- nvt.didexamine ?
 nvt.parseexamine = function (s)
   s = string.gsub(s, ' ', '') ; local n = 0
   if string.find(s, '1,') then

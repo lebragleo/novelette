@@ -18,116 +18,88 @@
 %% The fixed/calculated values have been carefully chosen for compatibility with nearly all
 %% worldwide print-on-demand services, and for readability in popular fiction books.
 
-\newif\ifnvt@duplicatesetting %% No repeated settings allowed. If this becomes true, problem.
 
 %% METADATA:
 %%   The \title and \author settings are required. These will be stored in the Info dictionary
 %% and (if you use it) XMP metadata.
-%%   If your book has a subtitle, you may use \subtitle to store it. This is not shown anywhere
-%% in the Info dictionary or XMP, because (believe it or not) there is no standard for it,
-%% and your print service does not care. But the value is hashed, along with title and author,
-%% to create ID hex strings.
-%%   The optional \docdate and \version are also hashed (if used) for ID. If you use \docdate,
-%% it will lock the creation date to the start of that day GMT, even if you modify the
-%% document later. If you use \version, it will appear as VersionID in XMP (if used).
-%% Thus, a document with fixed (or unused) title, author, subtitle, docdate, and version,
-%% will have its document ID hash at a fixed value. This may be useful for reproducible builds.
-%% However, the instance ID always changes at each compile, even if the document is unchanged.
-%%   Novelette has special requirements for title, author, subtitle, docdate, and version.
-%% The character set is limited to Latin-1 alphanumeric, with a few characters of common
-%% punctuation. Most symbols cannot be used. Quotation marks, of any kind, cannot be used,
-%% but the single straight quote may be used as apostophe.
-%%   Some (not all) print services allow @ # $ % & characters in metadata. If you use them,
-%% they must be preceded by backslash: \@ \# \$ \% \&. Otherwise, the backslash is strictly
-%% prohibited, so you cannot use LaTeX codes such as \'e for lowercase eacute; but you may paste
-%% its Unicode character. Note that the fonts have many printable characters that are not
-%% allowed in metadata, so that a book written in English can have short dialogue in Welsh
-%% or Hawai'ian with correct characters.
-%%   How it works: Each metadata setting is detokenized, so that it becomes a literal string.
-%% At the end of \begin{document}, it is temporarily typeset in a one-line box,
-%% using OpenType features that assign \@ \# \$ \% and \& to their plain single characters,
-%% and that assign out-of-range characters to a too-deep substitute. If the depth of the box
-%% is too deep, then a fatal error is thrown. Error or not, the page is discarded.
-%% Later, when metadata is prepared, Lua manipulates those detokenized setting strings.
-%%   Traditionally, the colon separates title from subtitle in the book distribution database.
-%% This is easy to understand for a book such as "Firble Bottoms : A Detective Smith Mystery".
-%% But for books such as "2001 : A Space Odyssey" and "Magic : The Gathering", it is not clear
-%% whether those are just the title, or are title : subtitle. If in doubt, ask your distributor.
-%%   The numbersign # is traditionally used for books in a series, such as
-%% "Doofus Manor : #7 in the Doofus Chronicles". Some distibutors refuse to carry books in
-%% a serial, unless they carry all of them. Ask.
-%%   Many distributors refuse books with a monetary unit such as $ in the metadata, although they
-%% may accept Dollar spelled out. Similarly for % and @ and &. Ask. Fun fact: "The 7% Solution"
-%% and "The 7 Per-Cent Solution" are different books, by different authors. One is nonfiction,
-%% the other is fiction.
-%%   If you use \docdate, its format is yyyy/mm/dd. If you use \version, it may be anything
-%% convenient, such as Edition 1.02, build 2394.
+%%   If your book has a subtitle, you may use \subtitle. It will be written to a custom Info key,
+%% and to a Prism tag in XMP (if used). You may disable the key/tag.
+%%   If you use \docdate, it locks the metadata creation date to the start of that day GMT.
+%% If you use \version, it appears as VersionID in XMP (if used).
+%%   The \docdate format is yyyy/mm/dd. The \version may be anything convenient, such as
+%% Edition 1.02, build 2394.
+%%   Title, author, aubtitle, docdate, and version (even if empty) are hashed for the uniqueID.
+%% The instanceID changes at each compile.
+%%   Novelette has special requirements for metadata. The characters are limited to a subset
+%% of Latin-1. Symbols @ # & must be escaped with backslash. Otherwise, the backslash cannot
+%% be used; you cannot write \'E for Eacute, but must paste the actual Unicode character.
 %%   The total number of characters in all of title, author, subtitle, docdate, and version,
-%% may not exceed 240. This is much more than you need for fiction. Do not use the subtitle
-%% as a lengthy description or marketing tool; you can provide that kind of information to the
-%% distribution database, without it appearing anywhere in the PDF.
-%%   You may use a pseudonym as author. But if you do that, be sure to print your real name
-%% as copyright holder, on the copyright page. That avoids problems if someone cheats.
-%% If you don't show your real name, you could only enforce copyright by proving that
-%% "Aloysius Fakename" is "Real E. You". You cannot hide from the distribution database.
+%% may not exceed ~200. This is far more than you need for popular fiction.
+%%   Tech note: The metadata settings are concatenated and detokenized. This string is typeset
+%% on a temporary page (discarded). The font has features that convert \@ \# \& to their base
+%% characters, and convert all disallowed characters to a narrow bar with excess depth. Then the
+%% string is boxed. If the box depth is too much, it means a disallowed character was used. Error.
 \def\thetitle{Untitled Document}
-\newif\ifnvt@didtitle
 \def\title#1{%%
-  \ifnvt@didtitle\nvt@duplicatesettingtrue\fi
   \edef\nvt@rawtitle{\nvt@expdet{#1}}
   \catcode`\#=12 \catcode`\$=12 \catcode`\%=12 \catcode`\&=12
-  \directlua{nvt.parsemeta('\luaescapestring{\nvt@rawtitle}', 'title')}
+  \directlua{nvt.parsetitle('\luaescapestring{\nvt@rawtitle}')}
   \catcode`\#=6 \catcode`\$=3 \catcode`\%=14 \catcode`\&=4
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\title.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\title. Unmatched parentheses ().}%%
   \else
     \def\thetitle{\nvt@expdet{\tmptitle}}
   \fi
-  \nvt@didtitletrue
 }%%
-\title{Untitled Document}\nvt@didtitlefalse %% Default.
+\title{Untitled Document} %% Default.
+\directlua{nvt.didtitle=0}
 %%
 \def\theauthor{Anonymous Author}
-\newif\ifnvt@didauthor
 \def\author#1{%%
-  \ifnvt@didauthor\nvt@duplicatesettingtrue\fi
   \edef\nvt@rawauthor{\nvt@expdet{#1}}
   \catcode`\#=12 \catcode`\$=12 \catcode`\%=12 \catcode`\&=12
-  \directlua{nvt.parsemeta('\luaescapestring{\nvt@rawauthor}', 'author')}
+  \directlua{nvt.parseauthor('\luaescapestring{\nvt@rawauthor}')}
   \catcode`\#=6 \catcode`\$=3 \catcode`\%=14 \catcode`\&=4
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\author.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\author. Unmatched parentheses ().}%%
   \else
     \edef\theauthor{\tmpauthor}
   \fi
-  \nvt@didauthortrue
 }%%
-\author{Anonymous Author}\nvt@didauthorfalse %% Default.
+\author{Anonymous Author} %% Default.
+\directlua{nvt.didauthor=0}
 %%
-\newif\ifnvt@didsubtitle
 \def\thesubtitle{} %% Default.
 \def\subtitle#1{%%
-  \ifnvt@didsubtitle\nvt@duplicatesettingtrue\fi
   \edef\nvt@rawsubtitle{\nvt@expdet{#1}}
   \catcode`\#=12 \catcode`\$=12 \catcode`\%=12 \catcode`\&=12
-  \directlua{nvt.parsemeta('\luaescapestring{\nvt@rawsubtitle}', 'subtitle')}
+  \directlua{nvt.parsesubtitle('\luaescapestring{\nvt@rawsubtitle}')}
   \catcode`\#=6 \catcode`\$=3 \catcode`\%=14 \catcode`\&=4
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\subtitle.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\subtitle. Unmatched parentheses ().}%%
   \else
     \edef\thesubtitle{\tmpsubtitle}
   \fi
-  \nvt@didsubtitletrue
 }%%
 %%
-\newif\ifnvt@diddocdate
 \def\thedocdate{} %% Default.
 \def\docdate#1{%%
-  \ifnvt@diddocdate\nvt@duplicatesettingtrue\fi
   \edef\nvt@rawdocdate{\nvt@expdet{#1}}
   \catcode`\#=12 \catcode`\$=12 \catcode`\%=12 \catcode`\&=12
   \directlua{nvt.parsedocdate('\luaescapestring{\nvt@rawdocdate}')}
   \catcode`\#=6 \catcode`\$=3 \catcode`\%=14 \catcode`\&=4
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\docdate. First obeyed, others ignored.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\docdate\space in Preamble.^^J%%
       \spii Format: \string\docdate{yyyy/mm/dd} or empty.}
@@ -135,23 +107,22 @@
   \else
     \edef\thedocdate{\tmpdocdate}
   \fi
-  \nvt@diddocdatetrue
 }%%
 %%
-\newif\ifnvt@didversion
 \def\theversion{} %% Default.
 \def\version#1{%%
-  \ifnvt@didversion\nvt@duplicatesettingtrue\fi
   \edef\nvt@rawversion{\nvt@expdet{#1}}
   \catcode`\#=12 \catcode`\$=12 \catcode`\%=12 \catcode`\&=12
-  \directlua{nvt.parsemeta('\luaescapestring{\nvt@rawversion}', 'version')}
+  \directlua{nvt.parseversion('\luaescapestring{\nvt@rawversion}')}
   \catcode`\#=6 \catcode`\$=3 \catcode`\%=14 \catcode`\&=4
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\version. First obeyed, others ignored.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\version. Unmatched parentheses ().}%%
   \else
     \edef\theversion{\tmpversion}
   \fi
-  \nvt@didversiontrue
 }%%
 \@onlypreamble\subtitle %% \title and \author are already in \@onlypreamble.
 \@onlypreamble\docdate
@@ -176,28 +147,16 @@
 \newif\ifnvt@dev
 \newif\ifnvt@preview
 \newif\ifnvt@final
-\newif\ifnvt@didmode
 \def\mode#1{%%
-  \ifnvt@didmode\nvt@duplicatesettingtrue\fi
-  \def\tmpmode{draft}
   \directlua{nvt.parsemode('\luaescapestring{#1}')}
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\mode.}
+  \fi
   \ifnum\tmpreturn=0\relax
-    \typeout{^^JFATAL ERROR: Bad setting for \string\mode.^^J%%
+    \nvt@fatal{Bad setting for \string\mode.^^J%%
       Choices: draft preview final. Default draft.}%% usl, dev for developer only.
     \batchmode \read-1 to \sorry
-  \else
-    \def\tmptest{preview}\ifx\tmpmode\tmptest
-      \nvt@draftfalse\nvt@previewtrue\def\nvt@titleprefix{PREVIEW: }
-    \fi
-    \def\tmptest{final}\ifx\tmpmode\tmptest
-      \nvt@draftfalse\nvt@finaltrue\def\nvt@titleprefix{}
-    \fi
-    \def\tmptest{dev}\ifx\tmpmode\tmptest
-      \nvt@draftfalse\nvt@devtrue\def\nvt@titleprefix{DEV TEST: }
-    \fi
-    \def\tmptest{usl}\ifx\tmpmode\tmptest\nvt@draftfalse\nvt@usltrue\fi
   \fi
-  \nvt@didmodetrue
 }%%
 \@onlypreamble\mode
 %%
@@ -209,14 +168,19 @@
 %%   Default width=5.5in,height=8.5in, a common size for print-on-demand un USA. If you set
 %% either of width or height, then you must also set the other.
 \newlength\nvt@trimwidth \newlength\nvt@trimheight
-\setlength\nvt@trimwidth{5.5in} \setlength\nvt@trimheight{8.5in} %% Default.
 \newif\ifnvt@metric %% Becomes true if W and H use metric units.
-\newif\ifnvt@didtrimsize
 \DeclareDocumentCommand\trimsize{m}{%% Ignored when mode=usl.
-  \ifnvt@didtrimsize\nvt@duplicatesettingtrue\fi
-  \def\tmptw{5.5in}\def\tmpth{8.5in}
   \directlua{nvt.parsetrimsize('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=0\relax
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\trimsize.}
+  \fi
+  \ifnum\tmpreturn=1\relax
+    \edef\tmprtw{\fpeval{round(72*\tmptw/72.27,3)}}
+    \edef\tmprth{\fpeval{round(72*\tmpth/72.27,3)}}
+    \setlength\nvt@trimwidth{\tmprtw bp}\setlength\nvt@trimheight{\tmprth bp}
+    \xdef\nvt@TrimBox{/TrimBox [ 0 0 \tmprtw\space\tmprth\space]}
+    \ifnum\tmpmetric=1\global\nvt@metrictrue\else\global\nvt@metricfalse\fi
+  \else
     \nvt@fatal{Bad setting for \string\trimsize.^^J%%
       \spii Format: \string\strimsize{width=W,height=H}^^J%%
       \spiv W -> Width of finished pages. Default 5.5in.^^J%%
@@ -227,14 +191,10 @@
       \spix British and American book sizes for print-on-demand popular fiction.^^J%%
       \spix But W and H do not accomodate very small, or business paper sizes.^^J%%
       \spix H must exceed W by a certain amount. See Novelette docs for info.}%%
-  \else
-    \setlength\nvt@trimwidth{\tmptw}
-    \setlength\nvt@trimheight{\tmpth}
-    \edef\nvt@trimtext{#1}
   \fi
 }%%
 \trimsize{width=5.5in,height=8.5in} %% Default.
-\nvt@didtrimsizefalse
+\directlua{nvt.didtrimsize=0}
 \@onlypreamble\trimsize
 %%
 
@@ -242,13 +202,11 @@
 %% LAYOUT: \layout{lines=L,pagestyle=P,glue=G,cpl=C}
 %%   This sets the page arrangement. Anything omitted uses its default.
 \newif\ifnvt@moreglue %% Becomes true if \layout{glue=wide}. 
-\def\nvt@lines{35}\def\nvt@charperline{66} %% Defaults.
-\def\nvt@pagestyle{marcen} %% Default.
-\newif\ifnvt@didlayout
 \DeclareDocumentCommand\layout{m}{%%
-  \ifnvt@didlayout\nvt@duplicatesettingtrue\fi
-  \def\tmplines{35}\def\tmpps{marcen}\def\tmpmoreglue{0}\def\tmpc{66}
   \directlua{nvt.parselayout('\luaescapestring{#1}')}
+  \ifnum\tmpreturn=-1\relax
+    \nvt@fatal{Duplicate setting for \string\layout.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\layout.^^J%%
       \spii Format: \string\layout{lines=L,pagestyle=P,glue=G,cpl=C}^^J%%
@@ -258,17 +216,10 @@
       \spiv G -> Glue strip at spine. Choices: normal wide. Default normal.^^J%%
       \spiv C -> Characters per line of text (estimated average). Default 66.^^J%%
       \spix Range 62-70. Automatically adjusts em size or textwidth.}%%
-  \else
-    \edef\nvt@lines{\tmplines}
-    \edef\nvt@pagestyle{\tmpps}
-    \edef\nvt@layout{#1}
-    \ifnum\tmpmoreglue=1\relax\global\nvt@moregluetrue\fi
-    \edef\nvt@charperline{\tmpc}
   \fi
-  \nvt@didlayouttrue
 }%%
 \layout{lines=35,pagestyle=margin,glue=normal,cpl=66} %% Default.
-\nvt@didlayoutfalse
+\directlua{nvt.didlayout=0}
 \@onlypreamble\layout
 %%
 
@@ -288,18 +239,16 @@
 %% will not declare an Ouput Intent, and will not add XMP, regardless of settings.
 \def\nvt@oi{fogra} %% Default Output Intent FOGRA39. Becomes SWOP if \lang{en-US}.
 \newif\ifnvt@pdfx\nvt@pdfxtrue %% Default PDF/X-1a:2001.
-\newif\ifnvt@didpdfx
 \def\pdfx#1{
-  \ifnvt@didpdfx\nvt@duplicatesettingtrue\fi
   \def\tmpoi{fogra}
   \directlua{nvt.parsepdfx('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=1\relax
-    \edef\nvt@oi{\tmpoi}\ifx\tmpoi\@empty\nvt@pdfxfalse\fi
-  \else
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\pdfx. First obeyed, others ignored.}
+  \fi
+  \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\pdfx{choice}.^^J%%
       \spii Choose one of: fogra swop off. Default fogra or swop, depending on \string\lang.}
   \fi
-  \nvt@didpdfxtrue
 }%%
 \@onlypreamble\pdfx
 %%
@@ -325,77 +274,68 @@
 \newif\ifnvt@didversohead
 \newif\ifnvt@didrectohead
 \def\versohead#1{%% Ignored when page payout has no header.
-  \ifnvt@didversohead\nvt@duplicatesettingtrue\fi
+  \ifnvt@didversohead
+    \nvt@warn{Duplicate setting for \string\versohead. First obeyed, others ignored.}
+  \fi
   \nvt@didversoheadtrue
   \def\nvt@versohead{#1}
 }%%
 \def\rectohead#1{%% Ignored when page payout has no header.
-  \ifnvt@didrectohead\nvt@duplicatesettingtrue\fi
+  \ifnvt@didrectohead
+    \nvt@warn{Duplicate setting for \string\rectohead. First obeyed, others ignored.}
+  \fi
   \nvt@didrectoheadtrue
   \def\nvt@rectohead{#1}%%
 }%%
-%% Hackers: If you comment-out these two \@onlypreamble, then you can re-set the header texts
+%% Hackers: If you comment-out the following two \@onlypreamble, and you comment-out the above
+%% lines \nvt@didversoheadtrue, and \nvt@didrectoheadtrue, then you can re-set the header texts
 %% using \versohead and \rectohead between components. Do that at your own risk!
-%% Print-on-demand usually insists that page header text must not change.
+%% Print-on-demand often insists that page header texts must not change.
 \@onlypreamble\versohead
 \@onlypreamble\rectohead
 %%
 
 
-%% DEFAULT STYLES for \name, \subname, \scene, \footnote, page header/footer: 
-%%   The \name, \subname, and \scene commands have global default styles. Each default may be
-%% changed in Preamble. Locally, each style may be changed via command option.
-%%   You may globally change how the first line of footnotes is indented. But there is no
-%% local option. 
-%%   The \layout setting determines whether pages have headers and/or footers, and the header
-%% (if used) is placed. But it does not set the style of text and page numbers. You may set
-%% the default style. There is no local option, although other factors determine whether or not
-%% the header/footer actually prints on a particular page.
-\newif\ifnvt@didheadstyle
-\def\nvt@headfn{main}\def\nvt@headfont{\normalfont}
-\def\nvt@headcn{dflt}\def\nvt@headraw{RawFeature={+titl}}
-\def\nvt@headscale{.93}\def\nvt@headtrack{2}
-\def\nvt@headfeat{\nvt@aff{\nvt@headraw,Scale=\nvt@headscale,LetterSpace=\nvt@headtrack}}
-\def\nvt@pnfeat{\nvt@aff{\nvt@headraw,Scale=\nvt@headscale}}
-\def\nvt@pndn{bar}\def\nvt@pndeco{}
+%% DEFAULT STYLES for \style1, \style2, \style3, \style4: 
+%%   These commands have global defaults, which may be locally changed by option. If you do not
+%% like the built-in global defaults, you may change them.
+\DeclareDocumentCommand\defaultstyle{mm}{%%
+  \directlua{nvt.parsedefaultstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
+  %%%% get the space
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{One or more duplicate \string\defaultstyle settings. Duplicates ignored.}
+  \fi
+  \ifnum\tmpreturn=0\relax
+    \nvt@err{Bad setting for \string\defaultstyleN.^^J%%
+      \spii Format: \string\defaultstyleN{font=F,scale=S,track=T,align=A,case=C}^^J%%
+      \spii The N is one of 1 2 3 4. Not the letter N or n.^^J%%
+      \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
+      \spiv S -> Decimal number 1-4. Default varies.^^J%%
+      \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
+      \spiv A -> center left right. Default center.^^J%%
+      \spiv C -> none titl smcp onum smon. Default none. Ignored unless font=main.^^J%%
+      \spix none -> No changes. Default.^^J%%
+      \spix titl -> Lowercase letters become titling caps.^^J%%
+      \spix smcp -> Lowercase letters become small caps.^^J%%
+      \spix onum -> Numerals become oldstyle.^^J%%
+      \spix smon -> Combines smcp and onum.}%%
+  \fi
+}%%
+\defaultstyle1{font=main,scale=2,track=2,align=center,case=none}
+\defaultstyle2{font=main,scale=1.4,track=2,align=center,case=none}
+\defaultstyle3{font=main,scale=1.2,track=2,align=center,case=none}
+\defaultstyle4{font=main,scale=1.1,track=2,align=center,case=none}
+\directlua{nvt.didstyle1=0;nvt.didstyle2=0;nvt.didstyle3=0;nvt.didstyle4=0}
+%%
 \DeclareDocumentCommand\headstyle{m}{%%
-  \ifnvt@didheadstyle\global\nvt@duplicatesettingtrue\fi
-  \begingroup
-  \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpdn{-1}
-  \def\tmpscale{}\def\tmptrack{}\def\tmpsp{.21}
   \directlua{nvt.parseheadstyle('\luaescapestring{#1}')}
-  \ifnum\tmpfn=0\relax\gdef\nvt@headfn{main}\gdef\nvt@headfont{\normalfont}\fi
-  \ifnum\tmpfn=1\relax\gdef\nvt@headfn{dark}\gdef\nvt@headfont{\nvt@dark}\fi
-  \ifnum\tmpfn=2\relax\gdef\nvt@headfn{thick}\gdef\nvt@headfont{\nvt@thick}\fi
-  \ifnum\tmpfn=3\relax\gdef\nvt@headfn{heavy}\gdef\nvt@headfont{\nvt@heavy}\fi
-  \ifnum\tmpfn=4\relax\gdef\nvt@headfn{wide}\gdef\nvt@headfont{\nvt@wide}\fi
-  \ifnum\tmpfn=5\relax\gdef\nvt@headfn{srir}\gdef\nvt@headfont{\nvt@srir}\fi
-  \ifnum\tmpfn=6\relax\gdef\nvt@headfn{gero}\gdef\nvt@headfont{\nvt@gero}\fi
-  \ifnum\tmpfn=7\relax\gdef\nvt@headfn{black}\gdef\nvt@headfont{\nvt@black}\fi
-  \ifnum\tmpfn=8\relax\gdef\nvt@headfn{thin}\gdef\nvt@headfont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\fi %% unused
-  \ifnum\tmpfn=10\relax\gdef\nvt@headfn{plas}\gdef\nvt@headfont{\nvt@plas}\fi
-  \ifnum\tmpfn=11\relax\gdef\nvt@headfn{crge}\gdef\nvt@headfont{\nvt@crge}\fi
-  \ifx\tmpscale\@empty\else\xdef\nvt@headscale{\tmpscale}\fi
-  \ifx\tmptrack\@empty\else\xdef\nvt@headtrack{\tmptrack}\fi
-  \xdef\nvt@headsp{\fpeval{\nvt@headscale*(\tmpsp + .02*\nvt@headtrack)}em}
-  \ifnum\tmpcase=0\relax\gdef\nvt@headcn{none}\gdef\nvt@headraw{}\fi
-  \ifnum\tmpcase=1\relax\gdef\nvt@headcn{smcp}\gdef\nvt@headraw{RawFeature={+smcp}}\fi
-  \ifnum\tmpcase=2\relax\gdef\nvt@headcn{onum}\gdef\nvt@headraw{RawFeature={+onum}}\fi
-  \ifnum\tmpcase=3\relax\gdef\nvt@headcn{smon}\gdef\nvt@headraw{RawFeature={+smcp,+onum}}\fi
-  \ifnum\tmpcase=4\relax\gdef\nvt@headcn{titl}\gdef\nvt@headraw{RawFeature={+titl}}\fi
-  \ifnum\tmpcase=5\relax\gdef\nvt@headcn{dflt}\gdef\nvt@headraw{RawFeature={+titl,+cv22}}\fi
-  \ifnum\tmpdn=0\relax\gdef\nvt@pndn{none}\gdef\nvt@pndeco{}\fi
-  \ifnum\tmpdn=1\relax\gdef\nvt@pndn{bar}\gdef\nvt@pndeco{|}\fi
-  \ifnum\tmpdn=2\relax\gdef\nvt@pndn{bullet}\gdef\nvt@pndeco{\char"2022}\fi
-  \ifnum\tmpdn=3\relax\gdef\nvt@pndn{square}\gdef\nvt@pndeco{\char"25AA}\fi
-  \ifnum\tmpdn=4\relax\gdef\nvt@pndn{lozenge}\gdef\nvt@pndeco{\char"25CA}\fi
-  \ifnum\tmpdn=5\relax\gdef\nvt@pndn{dash}\gdef\nvt@pndeco{{\nvt@headfeat\char"2013}}\fi
-  \gdef\nvt@headfeat{\nvt@aff{\nvt@headraw,Scale=\nvt@headscale,LetterSpace=\nvt@headtrack}}
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\headstyle. First obeyed, others ignored.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\headstyle.^^J%%
       \spii Format: \headstyle{font=F,scale=S,track=T,deco=D,case=C}^^J%%
-      \spiv F -> main dark thick heavy black thin srir gero plas crge.^^J%%
+      \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
       \spix Default main.^^J%%
       \spiv S -> Decimal number 0.83-1. Default 0.93.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
@@ -409,151 +349,29 @@
       \spix smon -> Combines smcp and onum.^^J%%
       \spix none -> No changes.}%%
   \fi
-  \global\nvt@didheadstyletrue
-  \endgroup
 }%%
+\headstyle{}%%%%%
+\directlua{nvt.didheadstyle=0}
 %%
-\newif\ifnvt@didnamestyle
-\DeclareDocumentCommand\namestyle{m}{%%
-  \ifnvt@didnamestyle\global\nvt@duplicatesettingtrue\fi
-  \begingroup
-  \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}
-  \def\tmpscale{}\def\tmptrack{}
-  \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}
-  \ifnum\tmpfn=0\relax\gdef\nvt@namefn{main}\gdef\nvt@namefont{\normalfont}\fi
-  \ifnum\tmpfn=1\relax\gdef\nvt@namefn{dark}\gdef\nvt@namefont{\nvt@dark}\fi
-  \ifnum\tmpfn=2\relax\gdef\nvt@namefn{thick}\gdef\nvt@namefont{\nvt@thick}\fi
-  \ifnum\tmpfn=3\relax\gdef\nvt@namefn{heavy}\gdef\nvt@namefont{\nvt@heavy}\fi
-  \ifnum\tmpfn=4\relax\gdef\nvt@namefn{wide}\gdef\nvt@namefont{\nvt@wide}\fi
-  \ifnum\tmpfn=5\relax\gdef\nvt@namefn{srir}\gdef\nvt@namefont{\nvt@srir}\fi
-  \ifnum\tmpfn=6\relax\gdef\nvt@namefn{gero}\gdef\nvt@namefont{\nvt@gero}\fi
-  \ifnum\tmpfn=7\relax\gdef\nvt@namefn{black}\gdef\nvt@namefont{\nvt@black}\fi
-  \ifnum\tmpfn=8\relax\gdef\nvt@namefn{thin}\gdef\nvt@namefont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\fi %% unused
-  \ifnum\tmpfn=10\relax\gdef\nvt@namefn{plas}\gdef\nvt@namefont{\nvt@plas}\fi
-  \ifnum\tmpfn=11\relax\gdef\nvt@namefn{crge}\gdef\nvt@namefont{\nvt@crge}\fi
-  \ifx\tmpsp\@empty\else\xdef\nvt@namesp{\tmpsp}\fi
-  \ifnum\tmpauto=0\relax\gdef\nvt@nameauto{0}\fi
-  \ifnum\tmpauto=1\relax\gdef\nvt@nameauto{1}\fi
-  \ifx\tmpscale\@empty\else\xdef\nvt@namescale{\tmpscale}\fi
-  \ifx\tmptrack\@empty\else\xdef\nvt@nametrack{\tmptrack}\fi
-  \ifnum\tmpalign=0\relax\gdef\nvt@namealign{center}\gdef\nvt@namel{1}\gdef\nvt@namer{1}\fi
-  \ifnum\tmpalign=1\relax\gdef\nvt@namealign{left}\gdef\nvt@namel{0}\gdef\nvt@namer{1}\fi
-  \ifnum\tmpalign=2\relax\gdef\nvt@namealign{right}\gdef\nvt@namel{1}\gdef\nvt@namer{0}\fi
-  \ifnum\tmpcase=0\relax\gdef\nvt@namecn{none}\gdef\nvt@nameraw{RawFeature={+ss17}}\fi
-  \ifnum\tmpcase=1\relax\gdef\nvt@namecn{smcp}\gdef\nvt@nameraw{RawFeature={+smcp,+ss17}}\fi
-  \ifnum\tmpcase=2\relax\gdef\nvt@namecn{onum}\gdef\nvt@nameraw{RawFeature={+onum,+ss17}}\fi
-  \ifnum\tmpcase=3\relax\gdef\nvt@namecn{smon}\gdef\nvt@nameraw{RawFeature={+smcp,+onum,+ss17}}\fi
-  \ifnum\tmpcase=4\relax\gdef\nvt@namecn{titl}\gdef\nvt@nameraw{RawFeature={+titl,+ss17}}\fi
-  \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\namestyle.^^J%%
-      \spii Format: \namestyle{font=F,scale=S,track=T,align=A,case=C}^^J%%
-      \spiv F -> main dark thick heavy black wide thin gero plas crge.^^J%%
-      \spix Default main.^^J%%
-      \spiv S -> Decimal number 1-4. Default 2.^^J%%
-      \spix If followed by a (such as 2.7a) will auto-adjust wide content.^^J%%
-      \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
-      \spiv A -> center left right. Default center.^^J%%
-      \spiv C -> none titl smcp onum smon. Default none. Ignored unless font=main.^^J%%
-      \spix none -> No changes. Default.^^J%%
-      \spix titl -> Lowercase letters become titling caps.^^J%%
-      \spix smcp -> Lowercase letters become small caps.^^J%%
-      \spix onum -> Numerals become oldstyle.^^J%%
-      \spix smon -> Combines smcp and onum.^^J%%
-      \spiv L -> none above below both. Default none.^^J%%
-      \spix Prints decorative line(s) above/below text, at its width.}%%
-  \fi
-  \global\nvt@didnamestyletrue
-  \endgroup
-}%%
-\namestyle{font=main,scale=2a,track=2,align=center,case=none} %% Default.
-\nvt@didnamestylefalse
-%%
-\newif\ifnvt@didsubstyle
-\DeclareDocumentCommand\subnamestyle{m}{%%
-  \ifnvt@didsubstyle\global\nvt@duplicatesettingtrue\fi
-  \begingroup
-  \def\tmpfn{-1}\def\tmpcase{-1}\def\tmpalign{-1}\def\tmpauto{-1}
-  \def\tmpscale{}\def\tmptrack{}
-  \directlua{nvt.parsenamestyle('\luaescapestring{#1}')}
-  \ifnum\tmpfn=0\relax\gdef\nvt@subfn{main}\gdef\nvt@subfont{\normalfont}\fi
-  \ifnum\tmpfn=1\relax\gdef\nvt@subfn{dark}\gdef\nvt@subfont{\nvt@dark}\fi
-  \ifnum\tmpfn=2\relax\gdef\nvt@subfn{thick}\gdef\nvt@subfont{\nvt@thick}\fi
-  \ifnum\tmpfn=3\relax\gdef\nvt@subfn{heavy}\gdef\nvt@subfont{\nvt@heavy}\fi
-  \ifnum\tmpfn=4\relax\gdef\nvt@subfn{wide}\gdef\nvt@subfont{\nvt@wide}\fi
-  \ifnum\tmpfn=5\relax\gdef\nvt@subfn{srir}\gdef\nvt@subfont{\nvt@srir}\fi
-  \ifnum\tmpfn=6\relax\gdef\nvt@subfn{gero}\gdef\nvt@subfont{\nvt@gero}\fi
-  \ifnum\tmpfn=7\relax\gdef\nvt@subfn{black}\gdef\nvt@subfont{\nvt@black}\fi
-  \ifnum\tmpfn=8\relax\gdef\nvt@subfn{thin}\gdef\nvt@subfont{\nvt@thin}\fi
-  \ifnum\tmpfn=9\relax\fi %% unused
-  \ifnum\tmpfn=10\relax\gdef\nvt@subfn{plas}\gdef\nvt@subfont{\nvt@plas}\fi
-  \ifnum\tmpfn=11\relax\gdef\nvt@subfn{crge}\gdef\nvt@subfont{\nvt@crge}\fi
-  \ifx\tmpsp\@empty\else\xdef\nvt@subsp{\tmpsp}\fi
-  \ifnum\tmpauto=0\relax\gdef\nvt@subauto{0}\fi
-  \ifnum\tmpauto=1\relax\gdef\nvt@subauto{1}\fi
-  \ifx\tmpscale\@empty\else\xdef\nvt@subscale{\tmpscale}\fi
-  \ifx\tmptrack\@empty\else\xdef\nvt@subtrack{\tmptrack}\fi
-  \ifnum\tmpalign=0\relax\gdef\nvt@subalign{center}\gdef\nvt@subl{1}\gdef\nvt@subr{1}\fi
-  \ifnum\tmpalign=1\relax\gdef\nvt@subalign{left}\gdef\nvt@subl{0}\gdef\nvt@subr{1}\fi
-  \ifnum\tmpalign=2\relax\gdef\nvt@subalign{right}\gdef\nvt@subl{1}\gdef\nvt@subr{0}\fi
-  \ifnum\tmpcase=0\relax\gdef\nvt@subcn{none}\gdef\nvt@subraw{RawFeature={+ss17}}\fi
-  \ifnum\tmpcase=1\relax\gdef\nvt@subcn{smcp}\gdef\nvt@subraw{RawFeature={+smcp,+ss17}}\fi
-  \ifnum\tmpcase=2\relax\gdef\nvt@subcn{onum}\gdef\nvt@subraw{RawFeature={+onum,+ss17}}\fi
-  \ifnum\tmpcase=3\relax\gdef\nvt@subcn{smon}\gdef\nvt@subraw{RawFeature={+smcp,+onum,+ss17}}\fi
-  \ifnum\tmpcase=4\relax\gdef\nvt@subcn{titl}\gdef\nvt@subraw{RawFeature={+titl,+ss17}}\fi
-  \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\subnamestyle.^^J%%
-      \spii Format: \subnamestyle{font=F,scale=S,track=T,align=A,case=C}^^J%%
-      \spiv F -> main dark thick heavy black wide thin gero plas crge.^^J%%
-      \spix Default main.^^J%%
-      \spiv S -> Decimal number 1-4. Default 2.^^J%%
-      \spix If followed by a (such as 2.7a) will auto-adjust wide content.^^J%%
-      \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
-      \spiv A -> center left right. Default center.^^J%%
-      \spiv C -> none titl smcp onum smon. Default none. Ignored unless font=main.^^J%%
-      \spix none -> No changes. Default.^^J%%
-      \spix titl -> Lowercase letters become titling caps.^^J%%
-      \spix smcp -> Lowercase letters become small caps.^^J%%
-      \spix onum -> Numerals become oldstyle.^^J%%
-      \spix smon -> Combines smcp and onum.^^J%%
-      \spiv L -> none above below both. Default none.^^J%%
-      \spix Prints decorative line(s) above/below text, at its width.}%%
-  \fi
-  \global\nvt@didsubstyletrue
-  \endgroup
-}%%
-\subnamestyle{font=main,scale=1.5a,track=2,align=center,case=none} %% Default.
-\nvt@didsubstylefalse
-%%
-\newif\ifnvt@didscenestyle
-\DeclareDocumentCommand\scenestyle{m}{%% %%%%% has more options
-  \ifnvt@didscenestyle\global\nvt@duplicatesettingtrue\fi
-  \begingroup\def\tmpalign{-1}
+\DeclareDocumentCommand\scenestyle{m}{%%
   \directlua{nvt.parsescenestyle('\luaescapestring{#1}')}
-  \gdef\nvt@scalign{center}\gdef\nvt@scleft{\hfill}\gdef\nvt@scright{\hfill}
-  \ifnum\tmpalign=1\relax\gdef\nvt@scalign{left}\gdef\nvt@scleft{}\fi
-  \ifnum\tmpalign=2\relax\gdef\nvt@scalign{right}\gdef\nvt@scright{}\fi
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\scenestyle. First obeyed, others ignored.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\scenestyle.^^J%%
       \spii Format: \string\scenestyle{align=A}^^J%%
       \spiv A -> left right center. Default center.}%%
   \fi
-  \global\nvt@didscenestyletrue
-  \endgroup
 }%%
-\scenestyle{align=center}
-\nvt@didscenestylefalse
+\scenestyle{align=center} %% Default
+\directlua{nvt.didscenestyle=0}
 %%
-\newif\ifnvt@didfootnotestyle
-\def\nvt@fnind{0} %% dflt
 \DeclareDocumentCommand\footnotestyle{m}{%%
-  \ifnvt@didfootnotestyle\global\nvt@duplicatesettingtrue\fi
-  \begingroup\def\tmpind{-1}\def\tmpreturn{1}
   \directlua{nvt.parsefnstyle('\luaescapestring{#1}')}
-  \ifnum\tmpind=0\relax\gdef\nvt@fnind{0}\fi %% dflt
-  \ifnum\tmpind=1\relax\gdef\nvt@fnind{1}\fi %% away
-  \ifnum\tmpind=2\relax\gdef\nvt@fnind{2}\fi %% both
-  \ifnum\tmpind=3\relax\gdef\nvt@fnind{3}\fi %% none
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate setting for \string\footnotestyle. First obeyed, others ignored.}
+  \fi
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\footnotestyle.^^J%%
       \spii Format: \string\footnotestyle{indent=I}^^J%%
@@ -563,13 +381,12 @@
       \spix both -> Label at indent, space, text.^^J%%
       \spix none -> Label at margin, space, text.}%%
   \fi
-  \global\nvt@didfootnotestyletrue
-  \endgroup
 }%%
+\footnotestyle{indent=near} %% Default.
+\directlua{nvt.didfootnotestyle=0}
 %%
 \@onlypreamble\headstyle
-\@onlypreamble\namestyle
-\@onlypreamble\subnamestyle
+\@onlypreamble\defaultstyle
 \@onlypreamble\scenestyle
 \@onlypreamble\footnotestyle
 %%
@@ -581,12 +398,11 @@
 %% loads a font that would not otherwise be loaded, so it can be used later.
 %% Use one or more comma-separated font codes, such as \loadfont{dark,heavy}.
 \DeclareDocumentCommand\loadfont{m}{%%
-  \def\tmpreturn{1}
   \directlua{nvt.parseloadfont('\luaescapestring{#1}')}
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Bad setting for \string\loadfont.^^J%%
       \spii Format: \string\loadfont{comma,separated,codes}^^J%%
-      \spii Codes: dark thick heavy wide black thin srir gero plas crge.^^J%%
+      \spii Choose codes from among the Novelette 'font codes'.^^J%%
       \spii For all of them: all.}%%
   \fi
 }%%
@@ -605,12 +421,10 @@
 %% and Dutch 'jacute', in any language. There is also built-in support for French punctuation,
 %% because ~ is re-defined as a thin non-breaking space, rather than full-width.
 %%   Hyphenation is automatically disabled in areas where it would not be appropriate.
-\newif\ifnvt@didlang %% True if \lang set.
 \newif\ifnvt@nohyphenate %% True when \lang is a no-hyphen choice. Default en, but ignores it.
 \newif\ifnvt@genericen\nvt@genericentrue %% Becomes false if valid \lang other than {en}.
 \def\nvt@lang{english} %% Default.
 \def\lang#1{%% If your language is English, then set en-US or en-UK instead!
-  \ifnvt@didlang\nvt@duplicatesettingtrue\fi
   \def\nvt@rawlang{#1}
   \def\tmpreturn{3}
   \directlua{nvt.parselang('\luaescapestring{\nvt@rawlang}')}
@@ -625,7 +439,6 @@
   \fi
   \ifnum\tmpreturnlang=1\relax\nvt@genericenfalse\fi
   \ifnum\tmpreturnlang=2\relax\nvt@nohyphenatetrue\fi
-  \nvt@didlangtrue
 }%%
 \@onlypreamble\lang
 %%
@@ -641,13 +454,11 @@
 %%     With or without xmp, the Info dictionary always contains essential metadata.
 %%   guide=G -> Marker in left margin at line G, only on first page of component in draft mode.
 %%     guide=last places marker at last line per page (not including footer).
-%%\newif\ifnvt@didenable
 \newif\ifnvt@britq
 \newif\ifnvt@xmp
 \newif\ifnvt@hasguide
 \def\nvt@guideline{0}
 \DeclareDocumentCommand\enable{m}{%%
-%%  \ifnvt@didenable\nvt@duplicatesettingtrue\fi
   \begingroup
   \def\tmpbritq{0}\def\tmpxmp{0}
   \def\tmphasguide{0}\def\tmpguide{0}
@@ -655,13 +466,14 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\enable.^^J%%
       \spii Format: \string\enable{comma,separated,choices}.^^J%%
-      \spiv Choices:  britq xmp}%%
+      \spiv Choices: britq xmp guide=G^^J%%
+      \spix G is an integer from 0 (no guide) to lines per page.^^J%%
+      \spix If you \string\disable{guide}, it over-rides this value.}%%
   \fi
   \ifnum\tmpbritq=1\relax\global\nvt@britqtrue\fi
   \ifnum\tmpxmp=1\relax\global\nvt@xmptrue\fi
   \ifnum\tmphasguide=1\relax\global\nvt@hasguidetrue\xdef\nvt@guideline{\tmpguideline}\fi
   \endgroup
-%%  \nvt@didenabletrue
 }%%
 \@onlypreamble\enable
 %%
@@ -678,43 +490,26 @@
 %%   pageflip -> Ignored if not draft mode. Normally, the glue strip shifts from left to right
 %%     margin, as required for print. This is distracting when you proofread draft, on screen.
 %%     \disable{pageflip}  splits the glue equally, so no shift. Does not affect typesetting.
-%%   oldstyle -> Normally, \onum{text} command prints oldstyle numerals (and related punctuation).
-%%     \disable{oldstyle} prints all \onum{text} as ordinary lining numerals.
-%%     This may be useful if you wrote many \onum, then changed your mind about oldstyle.
 %%   autodeco -> Transitions frontmatter/mainmatter/backmatter have verso/recto requirements.
 %%     If necessary, a generic decorative recto page is inserted for that purpose.
 %%     \disable{autodeco} does not insert the page.
 %%   metasub -> Normally, non-empty subtitle has custom Info dictionary entry. If using xmp,
 %%     it is written there (prism namespace). \disable(metasub) omits these entries.
 %%   guide -> Any global or local guide=N setting is ignored.
-\newif\ifnvt@diddisable
 \newif\ifnvt@noblankend
 \newif\ifnvt@norenumber
 \newif\ifnvt@nopageflip
-\newif\ifnvt@nooldstyle
 \newif\ifnvt@noautodeco
 \newif\ifnvt@nometasub
 \newif\ifnvt@noguide
 \def\disable#1{%%
-  \ifnvt@diddisable\nvt@duplicatesettingtrue\fi
-  \begingroup
-  \def\tmpnoblankend{0}\def\tmpnorenumber{0}\def\tmpnooldstyle{0}
-  \def\tmpnopageflip{0}\def\tmpnoautodeco{0}\def\tmpnometasub{0}\def\tmpnoguide{0}
   \directlua{nvt.parsedisable('\luaescapestring{#1}')}
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\disable.^^J%%
-      \spii Format: \string\disable{comma,separated,choices}. Choices:^^J%%
-      \spiv blankend renumber pageflip oldstyle autodeco}%% 
+      \spii Format: \string\disable{comma,separated,choices}.^^J%%
+      \spiv Choices: blankend renumber pageflip autodeco metasub guide^^J%%
+      \spix If you \string\disable{guide}, it over-rides \string\enable{guide=G}.}%%
   \fi
-  \ifnum\tmpnoblankend=1\relax\global\nvt@noblankendtrue\fi
-  \ifnum\tmpnorenumber=1\relax\global\nvt@norenumbertrue\fi
-  \ifnum\tmpnopageflip=1\relax\global\nvt@nopagefliptrue\fi
-  \ifnum\tmpnooldstyle=1\relax\global\nvt@nooldstyletrue\fi
-  \ifnum\tmpnoautodeco=1\relax\global\nvt@noautodecotrue\fi
-  \ifnum\tmpnometasub=1\relax\global\nvt@nometasubtrue\fi
-  \ifnum\tmpnoguide=1\relax\global\nvt@noguidetrue\fi
-  \endgroup
-  \nvt@diddisabletrue
 }%%
 \@onlypreamble\disable
 %%
@@ -725,40 +520,16 @@
 %% It reports "flaws" in a separate text file. This is time-consuming, so do not set \examine
 %% until you are near completion. 
 \newif\ifnvt@examine
-\newif\ifnvt@didexamine
 \DeclareDocumentCommand\examine{m}{%% Choice 1 or 0 (on/off).
-  \ifnvt@didexamine\nvt@duplicatesettingtrue\fi
-  \def\tmpex{0}\def\tmpreturn{1}
   \directlua{parseexamine('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=1\relax
-    \ifnum\tmpex=1\relax\global\nvt@examinetrue\fi
-  \else
+  \ifnum\tmpreturn=-1\relax
+    \nvt@warn{Duplicate settings for \string\examine. First obeyed, others ignored.}
+  \fi
+  \ifnum\tmpreturn=0\relax
     \nvt@err{Bad choice for \string\examine{choice}. Either 1 or 0. Default 0.}
   \fi
-  \nvt@didexaminetrue
 }%%
 \@onlypreamble\examine
-%%
-
-
-%% DEVCODE:
-%%   For experts only. If you wish to hack Novelette by adding code, you may place your code
-%% in an external file with extension '.tex' or '.lua'. No other file extension! The file must be
-%% located in folder named 'devcode' relative to main document.
-%%   The file is named as a Preamble setting, but not loaded until late in AtBeginDocument,
-%% after other settings have been processed and Novelette macros defined. At that moment,
-%% the # may still be used as argument number, but @ $ ^ & _ are catcode 12 "other" text.
-%%   Only one file may be loaded. It may not chain-load other files (no \input).
-\def\devcode#1{%% Name of file (no path), with extension 'tex' or 'lua'.
-  \directlua{nvt.parsedevcode('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=0
-    \nvt@fatal{Bad \string\devcode{file} setting.^^J%%
-      \spii The file must have '.tex' or '.lua' file extension.^^J%%
-      \spii It must be located in folder 'devcode' relative to main document.^^J%%
-      \spii Do not write its path. At this point, only the setting was checked.^^J%%
-      \spii The file existence, or its code validity, has not yet been checked.}%%
-  \fi
-}%%
 %%
 
 
@@ -812,14 +583,14 @@
 \setcounter{topnumber}{2} %% Maximum number of floats allowed there.
 \setcounter{bottomnumber}{1} %% And there.
 \setcounter{totalnumber}{2} %% And all together.
-\renewcommand\topfraction{.75} %% Maximum portion of page allowed for top floats.
-\renewcommand\bottomfraction{.25} %% Or bottom floats.
-\renewcommand\textfraction{.25} %% Minimum portion of page to be occupied by main text.
-\renewcommand\floatpagefraction{.5} %% Probably not useful, but must be less than \topfraction.
+\def\topfraction{.75} %% Maximum portion of page allowed for top floats.
+\def\bottomfraction{.25} %% Or bottom floats.
+\def\textfraction{.25} %% Minimum portion of page to be occupied by main text.
+\def\floatpagefraction{.5} %% Probably not useful, but must be less than \topfraction.
 %% Novelette does not use 2-column layout, so these are generic:
 \setcounter{dbltopnumber}{2}
-\renewcommand\dbltopfraction{.7}
-\renewcommand\dblfloatpagefraction{.5}
+\def\dbltopfraction{.7}
+\def\dblfloatpagefraction{.5}
 %% Novelette controls alignment via command options, not by direct user commands:
 \let\nvt@raggedleft\raggedleft\relax\let\nvt@raggedright\raggedright\relax
 \def\raggedleft{\nvt@warn{\string\raggedleft\space not available in Novelette. Ignored.}}
@@ -832,10 +603,9 @@
 \let\nvt@endcenter\endcenter
 \long\def\center{\nvt@warn{%%
   \spii The center environment, and \string\centering, cannot be used in Novelette.^^J%%
-  \spii The block environment has [center] option, which serves that purpose.^^J%%
-  \spii \string\namestyle, \string\subnamestyle, %%
-        and \string\scenestyle\space allow {align=center}.^^J%%
-  \spii \string\name, \string\subname, \string\scenetext, \string\sceneimage, %%
+  \spii The block environment has [align=center] option, which serves that purpose.^^J%%
+  \spii \string\defaultstyleN (N=1,2,3,4), and \string\scenestyle\space allow {align=center}.^^J%%
+  \spii \string\styleN, \string\scenetext, \string\sceneimage, %%
         and \string\image\space allow [align=center].}%%
 }%%
 \let\endcenter\par

@@ -52,11 +52,10 @@
   \ifnum\tmppp=1\relax\else%%
     \nvt@warn{No printable material may be placed outside of a component environment.}%%
   \fi%%
-  \nvt@didcomponenttrue%%
+  \global\nvt@didcomponenttrue%%
   \suppressfloats[t]%%
   \begingroup%%
   \nvt@indisplaytrue\nvt@didmaintextfalse\setcounter{footnote}{0}%%
-  \def\tmplegal{0}\def\tmpsingle{0}\def\tmprecto{0}\def\tmpguide{-1}%%
   \ifnvt@inmainmatter%%
     \ifnvt@hasfooter\def\tmptps{plain}\else\def\tmptps{empty}\fi%%
   \fi%%
@@ -73,8 +72,6 @@
   }{%%
     \blankline%%
   }%%
-  \ifnum\tmpsingle=1\relax\nvt@compsingletrue\fi%%
-  \ifnum\tmprecto=1\relax\ifodd\c@page\else\nvt@blankverso\fi\fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad component [option]. Format: [style=S,guide=G,keywords]^^J%%
     \spiv keywords -> single recto legal. Default is none of those.^^J%%
@@ -140,9 +137,9 @@
 
 %% TRANSITION FROM DISPLAY TO ORDINARY MAIN TEXT: \maintext
 %%   This command may be used once within a component, on its first page. Prior to \maintext,
-%% the \name, and \subname, commands are available, and the block environment allows small text
+%% the \styleN (N=1,2,3,4) commands are available, and the block environment allows small text
 %% or normal text.
-%%   After \maintext, \name and \subname are disallowed, and the block environment only allows
+%%   After \maintext, the \styleN are disallowed, and the block environment only allows
 %% normal text.
 %%   The first paragraph after \maintext is not indented, then normal indent resumes.
 %% The \init or \dcap command may be used at the start of the first paragraph. Footnotes
@@ -181,7 +178,7 @@
       \fi%%
     \else%%
       \nvt@err{\string\maintext\space appears in bad location.^^J%%
-         \spii Must be within a component, but not within \string\name, \string\subname,^^J%%
+         \spii Must be within a component, but not within \string\styleN (N=1,2,3,4),^^J%%
          \spii \string\footnote, page header, or block environment.}%%
     \fi%%
   \fi%%
@@ -216,7 +213,7 @@
     \else%%
       \xdef\tmphw{\fpeval{1in+.5*\pagewidth-.5*\nvt@glue-.5\wd0}pt}%%
     \fi%%
-   \put(\tmphw,-\tmpva){\usebox0}%% %%%%%
+   \put(\tmphw,-\tmpva){\smash{\usebox0}}%% %%%%%
   }%%
 }%%
 %%

@@ -117,7 +117,7 @@
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnum\tmpok=0\relax%%
     \nvt@err{Cannot place \string\image\space in footnote or page header.^^J%%
-      Cannot place \string\image\space in \string\name, \string\subname, %%
+      Cannot place \string\image\space in \string\styleN (N=1,2,3,4) %%
       or block environment.}%%
     {\char"FFFD}%%
   \fi%%
@@ -254,7 +254,7 @@
   %% test content for macros, ~ etc.
   \ifnum\tmpok=0\relax%%
     \nvt@err{Command \string\sceneimage\space cannot be nested in itself,^^J%%
-      \spii or used in \string\scenetext, \string\name, \string\subname, or block environment.}%%
+      \spii or used in \string\styleN (N=1,2,3,4), \string\scenetext, or block environment.}%%
     \char"FFFD\nvt@par%%
   \else%%
     \nvt@insceneimagetrue%%

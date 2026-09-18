@@ -115,6 +115,7 @@
   \lpcode\the\font 567=-70\relax %%
 \upshape
 \def\setmainfont{\nvt@fatal{Sorry, you cannot \string\setmainfont. It is set automatically.}}
+\let\nvt@mainfont\normalfont
 %%
 
 
@@ -188,17 +189,17 @@
 
 %% These fonts are only used in certain locations.
 %% They do not need expansion or protrusion. The macros that use them, kern the text with uni200D.
-\ifnvt@wantdark\nvt@newfontface\nvt@dark{NoveletteSans-Dark}\fi
-\ifnvt@wantthick\nvt@newfontface\nvt@thick{NoveletteSans-Thick}\fi
-\ifnvt@wantheavy\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}\fi
-\ifnvt@wantblack\nvt@newfontface\nvt@black{NoveletteSans-Black}\fi
-\ifnvt@wantwide\nvt@newfontface\nvt@wide{NoveletteSans-Wide}\fi
-\ifnvt@wantthin\nvt@newfontface\nvt@thin{NoveletteSans-Thin}\fi
+\ifnvt@usedark\nvt@newfontface\nvt@dark{NoveletteSans-Dark}\fi
+\ifnvt@usethick\nvt@newfontface\nvt@thick{NoveletteSans-Thick}\fi
+\ifnvt@useheavy\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}\fi
+\ifnvt@useblack\nvt@newfontface\nvt@black{NoveletteSans-Black}\fi
+\ifnvt@usewide\nvt@newfontface\nvt@wide{NoveletteSans-Wide}\fi
+\ifnvt@usethin\nvt@newfontface\nvt@thin{NoveletteSans-Thin}\fi
 %%
-\ifnvt@wantsrir\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}\fi
-\ifnvt@wantgero\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}\fi
-\ifnvt@wantplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
-\ifnvt@wantcrge\nvt@newfontface\nvt@crge{NoveletteDeco-Crge}\fi
+\ifnvt@usesrir\nvt@newfontface\nvt@srir{NoveletteDeco-Srir}\fi
+\ifnvt@usegero\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}\fi
+\ifnvt@useplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
+\ifnvt@usecrge\nvt@newfontface\nvt@crge{NoveletteDeco-Crge}\fi
 %%
 \def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
 %%
@@ -351,14 +352,11 @@
 
 %% Only NoveletteSerif12-Regular and NoveletteSerif10-Regular have small caps. Numerals default
 %% to lining, but these fonts (also Italic) have oldstyle feature.
-%%   Setting \disable{oldstyle} neutralizes \onum (its text is printed, but not oldstyle).
-%% Then, if you use \onum repeatedly, but change your mind, you do not have to edit-out
-%% all of the \onum commands.
-\long\def\onum#1{\ifnvt@nooldstyle{#1}\else{\nvt@aff{RawFeature={+onum}}#1}\fi}
+\long\def\onum#1{{\nvt@aff{RawFeature={+onum}}#1}}
 %% \SMCP converts uppercase and lowercase to small caps. May also use \onum.
-\long\def\SMCP#1{{\nvt@aff{RawFeature={+c2sc,+smcp}}#1}}%%
+\long\def\SMCP#1{{\nvt@aff{RawFeature={+c2sc,+smcp}}#1}}
 \let\Smcp\SMCP %% Convenience.
-%% \smcp converts only lowercase to small caps. Also numerals to oldstyle (even if disabled).
+%% \smcp converts only lowercase to small caps. Also, numerals to oldstyle.
 \long\def\smcp#1{{\nvt@aff{RawFeature={+smcp}}#1}}
 %% Some combinations, such as 3-7 or M-H, automatically raise the hyphen to uppercase height.
 %% This also applies to dashes and some symbols. But if the automatic change is wrong,

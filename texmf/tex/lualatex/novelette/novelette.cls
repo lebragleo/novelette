@@ -186,16 +186,17 @@
 %%   Some packages must know those settings, before they load.
 \RequirePackage{novelette-errwarnban} %% Custom errors, warnings, and banned LaTeX commands.
 \newif\ifnvt@incomponent %% True within component environment.
-\newif\ifnvt@wantdark %% Refers to font; also following lines:
-\newif\ifnvt@wantthick
-\newif\ifnvt@wantheavy
-\newif\ifnvt@wantblack
-\newif\ifnvt@wantwide
-\newif\ifnvt@wantthin
-\newif\ifnvt@wantsrir
-\newif\ifnvt@wantgero
-\newif\ifnvt@wantplas
-\newif\ifnvt@wantcrge
+\newif\ifnvt@usemain\nvt@usemaintrue %% Always true.
+\newif\ifnvt@usedark %% Refers to font; also following lines:
+\newif\ifnvt@usethick
+\newif\ifnvt@useheavy
+\newif\ifnvt@useblack
+\newif\ifnvt@usewide
+\newif\ifnvt@usethin
+\newif\ifnvt@usesrir
+\newif\ifnvt@usegero
+\newif\ifnvt@useplas
+\newif\ifnvt@usecrge
 \let\nvt@par\par\relax %% For local \par tweaks.
 \let\nvt@brk\\\relax %% For break tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
@@ -246,12 +247,6 @@
 %%   After LaTeX performs its own AtBeginDocument routines, these are added, so that they
 %% are effective in the document body. Particularly note that math-mode commands, which might
 %% have been internally used by LaTeX, will now be neutralized.
-%%   If you have expertise, you may create a file containing your own code. Its file name must
-%% have extension '.tex' or '.lua' (not '.sty' or anything else). It must be located in folder
-%% 'devcode' relative to main document. In Preamble, use \devcode{filename.ext}. That does not
-%% load your code immediately, but loads that file at the last step before reading the
-%% document body. Your code may use # for macro arguments, but @ is ordinary there, so you
-%% may need to use \makeatletter ... \makeatother in your code.
 \AddToHook{begindocument/end}{%%
   \AddToHook{shipout/before}{\stepcounter{nvt@bookpage}}
   \nvt@defineindent%% Set normal paragraph indent.
@@ -269,12 +264,6 @@
   \def\ensuremath#1{\nvt@warn{\string\ensuremath\space undefined in Novelette.}#1}%%
   \catcode`\&=12\relax%% The purpose of a table is to wine & dine & have a good time.
   \catcode`\^=12\relax%% No superscripts. Another method is used for footnote markers.
-  \ifdefined\nvt@devcode
-    \typeout{Info: Loading file defined by \string\devcode.}
-    \typeout{\spii If LaTeX throws an error or warning here, it is in your own code.}
-    \nvt@input{\nvt@filepath/devcode/\nvt@devcode}
-    \typeout{Info: Finished loading file defined by \string\devcode.^^J}
-  \fi
   \def\nvt{%% Note: LaTeX automatically sets @ to catcode 12, immediately after \documentclass.
     \nvt@fatal{Detected use of forbidden \string\nvt\space command.^^J%%
       \spii This occurs when you issue a command such as \string\nvt@something,^^J%%
@@ -323,7 +312,7 @@
       return nvt.check_page
     }%%
   \fi
-  \directlua{nvt.preamble=0}
+  \directlua{nvt.preamble=false}
   \ifdefined\nvt@thisdoc
     \typeout{Info: Now beginning the subdoc.^^J}
     \nvt@input{\nvt@filepath\nvt@thisdocpath/\nvt@thisdoc}

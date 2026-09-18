@@ -28,10 +28,7 @@
 \newlength\nvt@bls %% Normal baselinekip. Set by calculation.
 \newlength\nvt@linegap %% Normal gap between lowest descender and highest following ascender.
 \newif\ifnvt@hasheader \newif\ifnvt@hasfooter
-\def\nvt@processlayout{%%
-  \ifnvt@duplicatesetting
-    \nvt@err{Duplicate setting in Preamble. Each setting may be used at most once.}
-  \fi
+\def\nvt@processlayout{%% Called by hook begindocument/before.
   \ifnvt@usl %% Developer use only.
     \def\nvt@pagestyle{empty}\let\thispagestyle\nvt@thispagestyle
     \def\tmpmm{.75in}\def\tmpglue{0pt}
@@ -43,10 +40,6 @@
     \def\nvt@TrimBox{}
   \else %% ordinary users
     \directlua{nvt.calculatehorizontal() ; nvt.calculatevertical()}
-    \edef\tmprtw{\fpeval{round(72*\nvt@trimwidth/72.27,3)}}
-    \edef\tmprth{\fpeval{round(72*\nvt@trimheight/72.27,3)}}
-    \setlength\nvt@trimwidth{\tmprtw bp}\setlength\nvt@trimheight{\tmprth bp}
-    \edef\nvt@TrimBox{/TrimBox [ 0 0 \tmprtw\space\tmprth\space]}
     \setlength\nvt@minmargin{\tmpmm}\setlength\nvt@glue{\tmpglue}
     \setlength\nvt@minspinemargin{\nvt@minmargin}\addtolength\nvt@minspinemargin{\nvt@glue}
     \setlength\nvt@em{\tmpfontem}\setlength\nvt@bls{\tmpbls}
@@ -94,7 +87,7 @@
   \else
 \setlength\footskip{0pt}
   \fi
-  \edef\tmpa{\fpeval{\nvt@bls}pt plus \fpeval{.5\nvt@bls}pt minus \fpeval{.5\nvt@bls}pt}
+  \edef\tmpa{\fpeval{1.3\nvt@bls}pt plus \fpeval{.2*\nvt@bls}pt minus \fpeval{.8*\nvt@bls}pt}
   \skip\footins=\tmpa\relax%% This is for footnotes, not footer.
   \def\nvt@strut{\rule[-.3\nvt@bls]{0pt}{\nvt@bls}} %% Same size, even in scaled text.
 }%%
@@ -387,7 +380,8 @@
 \newif\ifnvt@infootnote %% True within footnote.
 \dimen\footins=3in %% Maximum height per page, for all footnotes on that page.
 %% Some printers recommend line widths at least 0.75pt:
-\def\footnoterule{\kern-3\p@ \hrule \@width 1.5in \@height .75pt \kern 5.25\p@}
+%% \def\footnoterule{\kern-3\p@ \hrule \@width 2in \kern 2.6\p@} % the \hrule is .4pt high %%%%%
+\def\footnoterule{\kern-3\p@ \hrule \@width 1.5in \@height .75pt \kern 2.25\p@}
 \DeclareDocumentCommand\footnote{O{}+m}{%% Ignore optional argument.
   \unskip\nvt@infootnotetrue%%
   \ifnvt@indisplay\else\stepcounter{footnote}\fi%%
@@ -409,11 +403,11 @@
     \floatingpenalty\@MM%%
     \noindent\upshape\nvt@small%%
     \rule[-.3\baselineskip]{0pt}{\baselineskip}%%
-    \ifnum\nvt@fnind=0\relax\makebox[\nvt@parindent]{\hfill\tmpmarker\space}\fi%% near
-    \ifnum\nvt@fnind=1\relax\makebox[\nvt@parindent]{\tmpmarker\hfill}\fi%% away
-    \ifnum\nvt@fnind=2\relax\makebox[\nvt@parindent]{}\tmpmarker\space\fi%% both
-    \ifnum\nvt@fnind=3\relax\strut\tmpmarker\space\fi%% none
-    {#2}\rule[-.3\baselineskip]{0pt}{\baselineskip}\par%%
+    \ifnum\nvt@fnindent=0\relax\strut\tmpmarker\space\fi%% none
+    \ifnum\nvt@fnindent=1\relax\makebox[\nvt@parindent]{\tmpmarker\hfill}\fi%% away
+    \ifnum\nvt@fnindent=2\relax\makebox[\nvt@parindent]{}\tmpmarker\space\fi%% both
+    \ifnum\nvt@fnindent=3\relax\makebox[\nvt@parindent]{\hfill\tmpmarker\space}\fi%% near
+    {#2}\par%%
   }%%
   \ifnum\c@footnote=8\relax\setcounter{footnote}{0}\fi%%
   \nvt@infootnotefalse%%
