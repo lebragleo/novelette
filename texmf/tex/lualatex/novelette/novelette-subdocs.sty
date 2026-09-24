@@ -82,10 +82,11 @@
     \nvt@fatal{Cannot find \nvt@thisdoc, relative to main document.^^J%%
       \spii Be sure that \string\def\string\thisdoc\space has correct path and filename.tex.}%%
   }%%
-  \nvt@test{\nvt@thisdoc}{\jobname.tex}{}{%%
+  \edef\tmptd{\nvt@thisdoc}\edef\tmpjn{\jobname.tex}%%
+  \ifx\tmptd\tmpjn\else%%
     \nvt@fatal{Filename in \string\def\string\thisdoc\space does not match^^J%%
       \spii its actual filename. Novelette saw \nvt@thisdoc, expected file \jobname.tex.}%%
-  }%%
+  \fi%%
 \fi
 \def\thisdoc{}
 %%

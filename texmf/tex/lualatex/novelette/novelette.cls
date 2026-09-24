@@ -104,7 +104,8 @@
 }{}%%
 \def\nvt@expdet#1{\expandafter\detokenize\expandafter{#1}} %% Those characters become catcode 12.
 \edef\nvt@now{\nvt@expdet{\pdffeedback creationdate}} %% Date and time at compile. Format D:---
-\def\spii{\space\space}\def\spiv{\spii\spii}\def\spix{\spiv\spiv\space}
+\def\spii{\space\space}\def\spiv{\spii\spii}\def\spvi{\spiv\spii}
+\def\spix{\spiv\spiv\space}\def\spxi{\spix\spii}
 \ifdefined\directlua
   \IfFileExists{\jobname.typo}{%%
     \directlua{%%
@@ -143,11 +144,6 @@
 \protected\edef\pdfpageattr{\pdfvariable pageattr} %% Compatibility.
 \nofiles %% *.aux not needed, since double-compile not used.
 \newif\ifcolors@ %% Always false. Possible compatibility.
-\def\nvt@test#1#2#3#4{%%
-  \edef\tmptesta{\nvt@expdet{#1}}%%
-  \edef\tmptestb{\nvt@expdet{#2}}%%
-  \ifx\tmptesta\tmptestb#3\else#4\fi%%
-}%%
 \def\nvt@filepath{./} %% Re-defined when compiling subdoc.
 \def\nvt@nowcompiling{} %% Empty for main doc, nonempty for \subdoc.
 \def\nvt@zrule{\rule{0pt}{0pt}} %% Provides anchor point for various fill commands.
@@ -344,12 +340,12 @@
     \typeout{Info: Reached end of the document body.}
   \fi
   \directlua{nvt.finalize()}
-  \nvt@test{\tmpmode}{bad}{\def\nvt@titleprefix{BAD: }}{}
+  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
   \ifnvt@didnext
-    \nvt@test{\tmpmode}{preview}{\def\tmpmode{draft}}{}
-    \nvt@test{\tmpmode}{final}{\def\tmpmode{draft}}{}
+    \def\tmptest{preview}\ifx\tmpmode\tmptest\def\tmpmode{draft}\fi
+    \def\tmptest{final}\ifx\tmpmode\tmptest\def\tmpmode{draft}\fi
   \fi
-  \nvt@test{\tmpmode}{final}{}{\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse}
+  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
 %%  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
 %%  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
   \ifnvt@examine
@@ -363,17 +359,11 @@
   \nvt@writepdfinfo
   \ifnvt@pdfx\nvt@declareoutputintent\fi
   \ifnvt@xmp\nvt@addxmp\fi
-  \nvt@test{\nvt@titleprefix}{BAD: }{
-%%  \def\tmptest{BAD: }\ifx\nvt@titleprefix\tmptest
-    \def\nvt@hastalavistababy{%%
-      \nonstopmode%%
-%%      \errmessage{Fix errors, warnings, overfull boxes, and other problems.}%%
-    }
-  }{
-%%  \else
+  \def\tmptest{BAD: }\ifx\nvt@titleprefix\tmptest
+    \def\nvt@hastalavistababy{\nonstopmode}
+  \else
     \let\nvt@hastalavistababy\relax
-%%  \fi
-  }
+  \fi
   \nvt@hastalavistababy
 }%%
 %%

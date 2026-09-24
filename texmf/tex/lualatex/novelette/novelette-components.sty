@@ -62,31 +62,31 @@
   \ifnvt@infrontmatter\def\tmptps{empty}\fi%%
   \ifnvt@inbackmatter\def\tmptps{empty}\fi%%
   \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\the\c@page}')}%% %%%%%
-  \nvt@test{\tmptps}{layout}{}{\@specialpagetrue}%%
-  \nvt@test{\tmptps}{empty}{\nvt@thispagestyle{empty}}{}%%
-  \nvt@test{\tmptps}{plain}{%%
+  \def\tmptest{layout}\ifx\tmptps\tmptest\else\@specialpagetrue\fi%%
+  \def\tmptest{empty}\ifx\tmptps\tmptest\nvt@thispagestyle{empty}\fi%%
+  \def\tmptest{plain}\ifx\tmptps\tmptext%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
-  }{}%%
-  \nvt@test{\tmptps}{drop}{%%
+  \fi%%
+  \def\temptest{drop}\ifx\tmptps\tmptest%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
-  }{%%
+  \else%%
     \blankline%%
-  }%%
+  \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad component [option]. Format: [style=S,guide=G,keywords]^^J%%
     \spiv keywords -> single recto legal. Default is none of those.^^J%%
     \spix single -> Issues warning if entire component does not fit on one page.^^J%%
     \spix recto -> Issues warning if page is not recto.^^J%%
-    \spix\spiv Combination single,recto is allowed.^^J%%
+    \spxi Combination single,recto is allowed.^^J%%
     \spix legal -> Special formats for copyright page. See Novelette docs.^^J%%
-    \spix\spiv Issues warning if page is not single verso.^^J%%
-    \spix\spiv Ignores other keywords, style, and guide options.^^J%%
+    \spxi Issues warning if page is not single verso.^^J%%
+    \spxi Ignores other keywords, style, and guide options.^^J%%
     \spiv S -> normal empty plain drop layout. Default normal.^^J%%
-    \spix\spiv Applied only at first page of component.^^J%%
+    \spix Applied only at first page of component.^^J%%
     \spix empty -> Does not print header or footer.^^J%%
     \spix plain -> Prints footer, only if layout pagestyle is plain/split.^^J%%
     \spix drop -> Same as plain, if layout pagestyle is plain or split.^^J%%
-    \spix\spiv Else reduces text height, creates fake footer beneath.^^J%%
+    \spxi Else reduces text height, creates fake footer beneath.^^J%%
     \spix layout -> Prints both header/footer, if in layout pagestyle.^^J%%
     \spiv G -> Integer 0 to lines per page. Over-rides global guide setting.}%%
   \fi%%
@@ -111,9 +111,13 @@
       \AddToHookNext{shipout/background}{%% Print guide marker.
         \xdef\tmpgput{\fpeval{1in+\topmargin+\headheight+\headsep+(\tmpthisguide*\nvt@bls)}pt}%%
         \ifodd\c@page%%
-          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){{\upshape\normalfont\char"21AC}}%%
+          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\nvt@aff{RawFeature={+cv59}}g}%%
+          }%%
         \else%%
-          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){{\upshape\normalfont\char"21AC}}%%
+          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\nvt@aff{RawFeature={+cv59}}g}%%
+          }%%
         \fi%%
       }%%
     \fi%%

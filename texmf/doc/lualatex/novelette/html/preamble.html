@@ -58,13 +58,16 @@ possible settings:</p>
 <a href="#pdfx">\pdfx{<i>choice</i>}</a>
 <a href="#styles">\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
 -->deco=<i>D</i>,case=<i>C</i>}</a>
-<a href="#styles">\namestyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+<a href="#styles">\setstyle1{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
 -->align=<i>A</i>,case=<i>C</i>}</a>
-<a href="#styles">\subnamestyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+<a href="#styles">\setstyle2{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+-->align=<i>A</i>,case=<i>C</i>}</a>
+<a href="#styles">\setstyle3{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+-->align=<i>A</i>,case=<i>C</i>}</a>
+<a href="#styles">\setstyle4{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
 -->align=<i>A</i>,case=<i>C</i>}</a>
 <a href="#styles">\scenestyle{align=<i>A</i>}</a>
 <a href="#styles">\footnotestyle{indent=<i>I</i>}</a>
-<a href="#loadfont">\loadfont{<i>comma,separated,choices</i>}</a>
 <a href="#enable">\enable{<i>comma,separated,choices</i>}</a>
 <a href="#disable">\disable{<i>comma,separated,choices</i>}</a>
 <a href="#examine">\examine{<i>0|1</i>}</a>
@@ -317,15 +320,15 @@ setting with no local over-ride, although header/footer does not print in some l
 </ul>
 
 
-<p><a id="namestyle"></a>&nbsp;</p>
-<h4 class="section">Default \name Style</h4>
+<p><a id="styles"></a>&nbsp;</p>
+<h4 class="section">Default \styleN style (N=1,2,3,4)</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
-<p>The <code>\name</code> command is one way to style text,
+<p>The <code>\styleN</code> commands (N=1,2,3,4) are one way to style text,
 in <a href="components.html#display">display zones</a>.
 This sets the default appearance. You may locally over-ride any of these, by
-per-instance option of the <code>\name</code> command.</p>
-<p><code>\namestyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+per-instance option of the related <code>\styleN</code> command.</p>
+<p><code>\styleN{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
                         -->align=<i>A</i>,case=<i>C</i>}</code></p>
 <ul>
 <li><p><code><i>F</i></code> is a <a href="">font code</a>. Default <code>main</code>.</p></li>
@@ -355,15 +358,6 @@ per-instance option of the <code>\name</code> command.</p>
         Combines smcp and onum.</p></li>
     </ul></li>
 </ul>
-
-
-<p><a id="subnamestyle"></a>&nbsp;</p>
-<h4 class="section">Default \subname Style</h4>
-<h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
-<p>This has the same purpose, and same syntax, as the <code>\namestyle</code> command,
-shown above. The only diference is that <code>\subnamestyle{<i>choices</i>}</code>
-applies to the <code>\subname</code> command, and the default scale is <code>1.25</code>.</p>
 
 
 <p><a id="scenestyle"></a>&nbsp;</p>
@@ -400,20 +394,6 @@ one paragraph, the additional paragraphs are indented normally.</p>
       Label at margin, space, text.</p></li>
 </ul></li>
 </ul>
-
-
-<p><a id="loadfont"></a>&nbsp;</p>
-<h4 class="section">\loadfont{<i>comma,separated,choices</i>}</h4>
-<h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
-<p>Novelette always loads the NoveletteSerif fonts. It only loads its other fonts upon request.
-This saves time and space.</p>
-<p>If you choose fonts in any of the above-listed styling commands, then Novelette will
-automatically load those fonts.</p>
-<p>If your book will use a font that is <i>not</i> NoveletteSerif and is <i>not</i>
-among the fonts loaded by style settings, then you must tell Novelette to load them now,
-so that they are available for later use.</p>
-<p><code>\loadfont{comma,separated,codes}</code>. See <a href="">font codes</a></p>
 
 
 <p><a id="enable"></a>&nbsp;</p>

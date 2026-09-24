@@ -49,8 +49,7 @@
 %% F) Vertical Alignment: When an image is shorter than the gap reserved by its [lines=L] option,
 %% it will be padded above and/or below. Option [tweak=T] adjusts the padding. [tweak=up] prints
 %% the image with all padding below; [tweak=down] prints with all padding above; [tweak==mid]
-%% (default) splits the padding. [tweak=drop] is as low as the image can go, lower than down;
-%% it should only be used when the image is a scene separator.
+%% (default) splits the padding.
 %%
 %% G) Floats: Pay attention! Novelette floats are similar to standard LaTeX floats, but have
 %% slightly different possible choices and behavior.
@@ -118,31 +117,27 @@
   \ifnum\tmpok=0\relax%%
     \nvt@err{Cannot place \string\image\space in footnote or page header.^^J%%
       Cannot place \string\image\space in \string\styleN (N=1,2,3,4) %%
-      or block environment.}%%
+      or \string\scene, or block environment.}%%
     {\char"FFFD}%%
-  \fi%%
-  \ifnvt@inscenetext%%
-    \nvt@err{Cannot place \string\image\space in \string\scenetext.^^J%%
-      Try the \string\sceneimage\space command.}%%
-    \def\tmpok{0}%%
   \fi%%
   \ifnum\tmpok=1\relax%%
     \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
-    \def\tmpimgalign{0}\def\tmptweak{0}\def\tmplines{0}\def\tmpvalidate{0}%%
+    \def\tmpalign{0}\def\tmptweak{0}\def\tmplines{0}\def\tmpvalidate{0}%%
     \ifnvt@indisplay\def\tmpfloat{0}\else\def\tmpfloat{1}\fi%%
     \ifnvt@infrontmatter\def\tmpfloat{0}\fi%%
     \ifnvt@inbackmatter\def\tmpfloat{0}\fi%%
     \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph.
-    \catcode`\~=12\def\zopt{#2}%% Otherwise, ~ would be undetected here.
+    \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
-      {\directlua{nvt.parseimage('star','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
-      {\directlua{nvt.parseimage('','\luaescapestring{\zopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
 %%    \ifnum\tmplines>20\relax%%
-%%      \ifnvt@compsingle\else\def\tmpimgreturn{0}\fi%%
+%%      \ifnvt@compsingle\else\def\tmpreturn{0}\fi%%
 %%    \fi%%
-    \ifnum\tmpimgreturn=0\relax%%
-      \nvt@err{Bad \string\image\space option [\zopt].^^J%%
-        \spii Format: [lines=L,align=A,float=F,tweak=T]^^J%%
+%%
+    \ifnum\tmpreturn=0\relax%%
+      \nvt@err{Bad \string\image\space option.^^J%%
+        \spii Format: [lines=L,align=A,float=F,tweak=T] or [scene,align=A]^^J%%
         \spiv L -> Integer 1<=L<=20. Must be set.^^J%%
         \spix Exception: In component with [single] option, max L= lines per page.^^J%%
         \spiv A -> left right center. Default center.^^J%%
@@ -153,15 +148,23 @@
         \spiv T -> down up mid. Default mid.^^J%%
         \spix down ->  Bottom of image at baseline of lowest displaced line.^^J%%
         \spix up -> Top at accented uppercase height of highest displaced line.^^J%%
-        \spix mid -> Splits padding above/below image.}%%
+        \spix mid -> Splits padding above/below image.^^J%%
+        \spii If [scene] option:^^J%%
+        \spiv You may also use align=A, but no other options.^^J%%
+        \spiv Default alignment is set by \string\defaultscene, or center if unset.^^J%%
+        \spiv No float. Special values are used for lines and tweak.}%%
     \fi%%
-    \ifnum\tmpimgalign=-1\relax\def\imgleft{}\def\imgright{}\fi%% \sceneimage
-    \ifnum\tmpimgalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
-    \ifnum\tmpimgalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
-    \ifnum\tmpimgalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
-    \ifnum\tmplines=0\relax%%
-      \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=linesPerPage.}%%
-      \def\tmplines{3}%% Placeholder default. Almost always an incorrect value.
+%%
+    \ifnum\tmpscene=1\relax\blankline\fi%%
+    \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
+    \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
+    \ifnum\tmpscene=0\relax%%
+      \ifnum\tmplines=0\relax%%
+        \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=linesPerPage.}%%
+        \def\tmplines{3}%% Placeholder default. Almost always an incorrect value.
+      \fi%%
     \fi%%
     \ifnum\tmpisfile=0\relax\def\imgfake{1}\fi%%
     \ifnum\tmpisfile=1\relax%%
@@ -183,96 +186,51 @@
         \spix Do not use absolute path, or symlink (softlink).^^J%%
         \spiv 3. Image file is not in same folder as main document,^^J%%
         \spix or in subfolder from main document (max 5 levels).^^J%%
-        \spiv 4. Path or filename has forbidden characters.^^J%%
+        \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\imgfake{1}%%
     \fi%%
-    \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
-    \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
-    \ifnum\tmpfloat=2\relax\def\fps@figure{!t}\fi%%
-    \ifnum\tmpfloat=3\relax\def\fps@figure{!b}\fi%%
-    \ifnvt@indisplay%%
-      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+    \ifnum\tmpscene=1\relax%%
       \def\fps@figure{}%%
-    \fi%%
-    \ifnvt@infrontmatter%%
-      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
-      \def\fps@figure{}%%
-    \fi%%
-    \ifnvt@inbackmatter%%
-      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
-      \def\fps@figure{}%%
+    \else%%
+      \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
+      \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
+      \ifnum\tmpfloat=2\relax\def\fps@figure{!t}\fi%%
+      \ifnum\tmpfloat=3\relax\def\fps@figure{!b}\fi%%
+      \ifnvt@indisplay%%
+        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+        \def\fps@figure{}%%
+      \fi%%
+      \ifnvt@infrontmatter%%
+        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+        \def\fps@figure{}%%
+      \fi%%
+      \ifnvt@inbackmatter%%
+        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+        \def\fps@figure{}%%
+      \fi%%
     \fi%%
     \ifnum\imgfake=0\relax\nvt@realimage{#3}\else\nvt@fakeimage\fi%%
     \nvt@printimage%%
     \par\vspace*{-\nvt@bls}\null%%
   \fi%%
+  \ifnum\tmpscene=1\relax\gdef\tmpaddblank{1}\else\gdef\tmpaddblank{0}\fi%%
   \endgroup%%
+  \ifnum\tmpaddblank=1\relax\blankline\fi\gdef\tmpaddblank{0}%%
 }%%
 %%
 
 
 %% Fake image, placeholder rectangle:
 \def\nvt@fakeimage{%%
-  \ifnvt@insceneimage%%
-    \def\imgwd{2in}\def\imght{.24in}%%
+  \ifnum\tmpscene=1\relax%%
+    \def\imgwd{3.5in}\def\imght{.24in}%%
   \else%%
     \edef\imgwd{\fpeval{0.6*\textwidth}pt}%%
     \edef\imght{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls}pt}%%
   \fi%%
   \sbox0{{\nvt@gray{8}\rule{\imgwd}{\imght}}}%%
   \def\imglabel{{\nvt@gray{4}\nvt@aff{RawFeature={+titl},Scale=.75}\tmplabel}}%%
-}%%
-%%
-
-
-
-%% SCENEIMAGE: \sceneimage[option]{content}  also starred command.
-%%   When a scene break is an image, you can use \image. But in many cases, that will not provide
-%% the vertical spacing that you need.
-%%   The \sceneimage command behaves like \scenetext, in terms of its vertical space. However,
-%% the content is interpreted the way that \image interprets its content. That is, in draft mode
-%% it prints a gray placeholder rectangle; in preview or final mode, the content is used as
-%% path/to/filename.png. You do not write the \image command. \sceneimage* uses \image*.
-%%   The only option is [align=A] where A is one of left, right, center. Default center.
-%% Unlike \image, you have no choice for number of lines, or tweak. The image never floats.
-%% Width of image cannot exceed 3.5in. Height of image cannot exceed 0.24in. These values are
-%% regardless of page layout. The image will be auto-tweaked for best results.
-%%   As with \scenetext, the first line of the scene gap is omitted at the top of a page, and the
-%% following paragraph is not indented.
-\newif\ifnvt@sistar
-\newif\ifnvt@insceneimage
-\DeclareDocumentCommand\sceneimage{sO{}m}{%%
-  \par\edef\tmppgtot{\fpeval{\pagetotal = 0pt}}%%
-  \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
-  \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
-  \begingroup\setlength\parindent{0pt}%%
-  \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
-  \ifnvt@inblock\def\tmpok{0}\fi%%
-  \ifnvt@inscenetext\def\tmpok{0}\fi%%
-  \ifnvt@insceneimage\def\tmpok{0}\fi%%
-  %% test content for macros, ~ etc.
-  \ifnum\tmpok=0\relax%%
-    \nvt@err{Command \string\sceneimage\space cannot be nested in itself,^^J%%
-      \spii or used in \string\styleN (N=1,2,3,4), \string\scenetext, or block environment.}%%
-    \char"FFFD\nvt@par%%
-  \else%%
-    \nvt@insceneimagetrue%%
-    \directlua{nvt.parsescenestyle('\luaescapestring{#2}','scene')}%%
-    \ifnum\tmpscreturn=1\relax%%
-      \ifnum\tmpscalign=0\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{\hfill\strut}\fi%%
-      \ifnum\tmpscalign=1\relax\def\tmpscleft{}\def\tmpscright{\hfill\strut}\fi%%
-      \ifnum\tmpscalign=2\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{}\fi%%
-      \IfBooleanTF{#1}{\nvt@sistartrue}{\nvt@sistarfalse}%%
-      \ifnvt@sistar\image*[type=scene]{#3}\else\image[type=scene]{#3}\fi%%
-    \else%%
-      \nvt@err{Bad \string\sceneimage[option]{content} command.^^J%%
-      \spii Option: [align=A]^^J%%
-      \spiv A -> left right center. Default \nvt@scalign.}%%
-      \char"FFFD\nvt@par%%
-    \fi%%
-  \fi%%
-  \endgroup\nopagebreak\blankline%%
 }%%
 %%
 
@@ -284,7 +242,7 @@
   \edef\tmpfit{\fpeval{(\ht0 > \tmpht) + (\wd0 > \textwidth)}}%%
   \ifnum\tmpfit>0\relax%%
     \nvt@warn{Image #1 is too large.^^J%%
-      \spii Reduce image width and/or height, or increase [lines=L] option.}%% %%%% \sceneimage ?
+      \spii Reduce image width and/or height, or increase [lines=L] option.}%% %%%% \tmpscene ?
     \def\tmplabel{oversize image}\nvt@fakeimage%%
   \else%%
     \def\tmpvalid{1}%%
@@ -312,15 +270,17 @@
 
 %% Print the real or fake image:
 \def\nvt@printimage{%%
-  \ifnvt@insceneimage%% %%%%%
+  \ifnum\tmpscene=1\relax%% %%%%%
     \edef\imgruleht{\fpeval{\nvt@bls}pt}%%
+    \edef\tmppad{\fpeval{.117in - \ht0}pt}%% %%%%%
   \else%%
     \edef\imgruleht{\fpeval{\tmplines*\nvt@bls}pt}%%
+    \ifnum\tmptweak=0\relax\edef\tmppad{%%
+      \fpeval{.5*(.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0)}pt}%%
+    \fi%%
+    \ifnum\tmptweak=1\relax\edef\tmppad{\fpeval{.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0}pt}\fi%%
+    \ifnum\tmptweak=2\relax\def\tmppad{0pt}\fi%%
   \fi%%
-  \ifnum\tmptweak=0\relax\edef\tmppad{\fpeval{.5*(.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0)}pt}\fi%%
-  \ifnum\tmptweak=1\relax\edef\tmppad{\fpeval{.84*\nvt@em+(\tmplines-1)*\nvt@bls-\ht0}pt}\fi%%
-  \ifnum\tmptweak=2\relax\def\tmppad{0pt}\fi%%
-  \ifnvt@insceneimage\edef\tmppad{\fpeval{.117in - \ht0}pt}\fi%% %%%%%
   \ifx\fps@figure\@empty\else\@float{figure}\fi%%
   \nvt@zrule\imgleft\rule{\nvt@imgrulewd}{\imgruleht}%%
   \smash{\raisebox{\tmppad}{\usebox0}}%%

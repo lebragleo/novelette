@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Table of Contents</title>
+</head>
+<body>
+<div id="master">
+
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+
+<h4 class="pagepath"><a href="home.html">Home</a><span class="downtree"></span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree"></span><!--
+--><a href="preamble.html">Preamble</a><span class="downtree"></span><!--
+--><a href="preamble.html#examine">\examine</a><span class="downtree"></span></h4>
+<h1 class="pagename">Table of Contents</h1>
+
+
+<div id="navbarb"><p class="noindent">
+<a href="#top">Overview</a> &nbsp;
+</p></div>
+
+
+<h4>Overview</h4>
+<p>Most popular fiction has no table of contents. The reader is expected to read through,
+perhaps placing a bookmark (or face the open book down) as a pause.</p>
+<p>A table of contents is used when the book (1) Is a collection of short stories, or
+(2) Has titled chapter so distinctive that they are self-contained episodes.</p>
+<p>Novelette has no automated table of contents, because that requires two-pass compiling
+(not the Novelette way of doing things). If you need a table, you must construct it yourself.
+This shows you how to do it.</p>
+
+
+<h4>The Table is a Component</h4>
+<p>As with all other content, a table is contained in a component environment. Use the
+<code>[recto]</code> component option, to ensure that the table begins on a recto page.</p>
+<p>When you do not yet know page numbers (and perhaps do noy know chapter numbers),
+use the <code>{\next}</code> command. This prints a pair of numbersigns (##). The presence of
+any <code>{\next}</code> forces draft mode. The Summary will remind you.</p>
+<p>To proceed with preview or final mode, you must manually remove each <code>{\next}</code>,
+and substitute the actual value. The means you must be near finishing your work.</p>
+
+
+<h4>Table Design<h4>
+<p>Novelette does not care how your table looks. For simplicity, a few commands will help
+your design:</p>
+<ul>
+<li><p>Enclose the table in a <i>block</i> environment. Choose the side offsets so that
+the entries are not too wide, not too narrow.</p></li>
+<li><p>Use <code>\styleN</code> (N=1,2,3,4) for the table title.</p>
+<p>The title may be as simple as <i>Contents</i>. In some cases, the title may repeat
+the book title. For example, if your book is <i>The February County</i> with a dozen short
+stories about snow, you might use <i>The February County</i> instead of <i>Contents</i></p></li>
+<li><p>Command <code>\entrygap{<i>number</i>}</code> may appear before the table entries.
+The <i>number</i> is 0 to 1. Default 0.</p></li>
+<li><p><code>\entry{number}{name}{page}</code></p></li>
+<ul>
+
+
+<h4>Sample Table</h4>
+<div class="code">
+\begin{component[recto]
+\blankline
+\begin{block}[3+3]
+\style3[scale=1.5]{The February County}
+\entrygap(0.2}
+\entry{1}{Wicked Flakes}{\next}
+\entry{2}{Yellow Snow}{\next}
+\entry{3}{Snowman's Surprise}{\next}
+\entry{4}{When Hell Freezes Over}{\next}
+\entry{5}{School's Out}{\next}
+\entry{6}{Slithering Sleet}{\next}
+
+\end{block}
+\end{component}
+</div>
+
+<p><a id="whatare"></a>&nbsp;</p>
+<h4 class="section">What Are Typo Flaws?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+
+
+
+
+
+<p>&nbsp;</p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree"></span><!--
+--><a href="tutorial.html">Tutorial</a><span class="uptree"></span><!--
+--><a href="preamble.html">Preamble</a><span class="uptree"></span><!--
+--><a href="preamble.html#examine">\examine</a><span class="uptree"></span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
+
+
+
+</div><!-- end master -->
+</body>
+</html>

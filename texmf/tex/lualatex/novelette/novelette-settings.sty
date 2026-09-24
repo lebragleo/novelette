@@ -296,19 +296,25 @@
 %%
 
 
-%% DEFAULT STYLES for \style1, \style2, \style3, \style4: 
-%%   These commands have global defaults, which may be locally changed by option. If you do not
-%% like the built-in global defaults, you may change them.
-\DeclareDocumentCommand\defaultstyle{mm}{%%
-  \directlua{nvt.parsedefaultstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
+%% STYLE SETTINGS for \style1 - \style9: 
+%%   Each \styleN uses global settings. They cannot be locally changed.
+\def\nvt@badsetstyle{%%
+  \nvt@fatal{Do not write \string\setstyle{N}{setting}.^^J%%
+    \spii Write \string\setstyleN{setting} with N=1-9.}%%
+}%%
+\def\setstyle{%%
+  \@ifnextchar\bgroup\nvt@badsetstyle\nvt@setstylecmd
+}%%
+\DeclareDocumentCommand\nvt@setstylecmd{mm}{%%
+  \directlua{nvt.parsesetstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
   %%%% get the space
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{One or more duplicate \string\defaultstyle settings. Duplicates ignored.}
+    \nvt@warn{One or more duplicate \string\setstyle settings. Duplicates ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\defaultstyleN.^^J%%
-      \spii Format: \string\defaultstyleN{font=F,scale=S,track=T,align=A,case=C}^^J%%
-      \spii The N is one of 1 2 3 4. Not the letter N or n.^^J%%
+    \nvt@err{Bad setting for \string\setstyleN.^^J%%
+      \spii Format: \string\setstyleN{font=F,scale=S,track=T,align=A,case=C}^^J%%
+      \spii N is integer 1-9. Not the letter N or n.^^J%%
       \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
       \spiv S -> Decimal number 1-4. Default varies.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
@@ -321,11 +327,7 @@
       \spix smon -> Combines smcp and onum.}%%
   \fi
 }%%
-\defaultstyle1{font=main,scale=2,track=2,align=center,case=none}
-\defaultstyle2{font=main,scale=1.4,track=2,align=center,case=none}
-\defaultstyle3{font=main,scale=1.2,track=2,align=center,case=none}
-\defaultstyle4{font=main,scale=1.1,track=2,align=center,case=none}
-\directlua{nvt.didstyle1=0;nvt.didstyle2=0;nvt.didstyle3=0;nvt.didstyle4=0}
+\setstyle0{font=main,scale=1,track=0,align=center,case=none} %% developer test.
 %%
 \DeclareDocumentCommand\headstyle{m}{%%
   \directlua{nvt.parseheadstyle('\luaescapestring{#1}')}
@@ -341,7 +343,7 @@
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
       \spiv D -> bar bullet square lozenge dash none. Default none.^^J%%
       \spix Some layouts over-ride the choice for D.^^J%%
-      \spiv C -> head titl smcp onum smon none. Ignored unless font=main.^^J%%
+      \spiv C -> dflt titl smcp onum smon none. Ignored unless font=main.^^J%%
       \spix dflt -> Default. Uppercase/lowercase all become titling size. Best.^^J%%
       \spix titl -> Lowercase letters become titling caps.^^J%%
       \spix smcp -> Lowercase letters become small caps.^^J%%
@@ -350,21 +352,21 @@
       \spix none -> No changes.}%%
   \fi
 }%%
-\headstyle{}%%%%%
+\headstyle{font=main,scale=0.93,track=2,deco=bar,case=dflt}
 \directlua{nvt.didheadstyle=0}
 %%
-\DeclareDocumentCommand\scenestyle{m}{%%
+\DeclareDocumentCommand\defaultscene{m}{%%
   \directlua{nvt.parsescenestyle('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\scenestyle. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\defaultscene. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\scenestyle.^^J%%
-      \spii Format: \string\scenestyle{align=A}^^J%%
+    \nvt@err{Bad setting for \string\defaultscene.^^J%%
+      \spii Format: \string\defaultscene{align=A}^^J%%
       \spiv A -> left right center. Default center.}%%
   \fi
 }%%
-\scenestyle{align=center} %% Default
+\defaultscene{align=center} %% Default
 \directlua{nvt.didscenestyle=0}
 %%
 \DeclareDocumentCommand\footnotestyle{m}{%%
@@ -386,29 +388,9 @@
 \directlua{nvt.didfootnotestyle=0}
 %%
 \@onlypreamble\headstyle
-\@onlypreamble\defaultstyle
-\@onlypreamble\scenestyle
+\@onlypreamble\setstyle
+\@onlypreamble\defaultscene
 \@onlypreamble\footnotestyle
-%%
-
-
-%% LOAD FONT FOR LATER USE:
-%%   The Serif fonts are always loaded. A Sans or Deco font is loaded if a setting requests it.
-%% But If a local command requests a font that was not already loaded, error. This command
-%% loads a font that would not otherwise be loaded, so it can be used later.
-%% Use one or more comma-separated font codes, such as \loadfont{dark,heavy}.
-\DeclareDocumentCommand\loadfont{m}{%%
-  \directlua{nvt.parseloadfont('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=0\relax
-    \nvt@fatal{Bad setting for \string\loadfont.^^J%%
-      \spii Format: \string\loadfont{comma,separated,codes}^^J%%
-      \spii Choose codes from among the Novelette 'font codes'.^^J%%
-      \spii For all of them: all.}%%
-  \fi
-}%%
-\let\loadfonts\loadfont
-\@onlypreamble\loadfont
-\@onlypreamble\loadfonts
 %%
 
 
@@ -492,7 +474,7 @@
 %%     \disable{pageflip}  splits the glue equally, so no shift. Does not affect typesetting.
 %%   autodeco -> Transitions frontmatter/mainmatter/backmatter have verso/recto requirements.
 %%     If necessary, a generic decorative recto page is inserted for that purpose.
-%%     \disable{autodeco} does not insert the page.
+%%     \disable{autodeco} does not insert the page at mainmatter/backmatter transition.
 %%   metasub -> Normally, non-empty subtitle has custom Info dictionary entry. If using xmp,
 %%     it is written there (prism namespace). \disable(metasub) omits these entries.
 %%   guide -> Any global or local guide=N setting is ignored.
@@ -604,9 +586,8 @@
 \long\def\center{\nvt@warn{%%
   \spii The center environment, and \string\centering, cannot be used in Novelette.^^J%%
   \spii The block environment has [align=center] option, which serves that purpose.^^J%%
-  \spii \string\defaultstyleN (N=1,2,3,4), and \string\scenestyle\space allow {align=center}.^^J%%
-  \spii \string\styleN, \string\scenetext, \string\sceneimage, %%
-        and \string\image\space allow [align=center].}%%
+  \spii \string\setstyleN (N = 1 2 3 4), and \string\defaultscene, allow {align=center}.^^J%%
+  \spii \string\styleN, \string\scene, and \string\image\space allow [align=center].}%%
 }%%
 \let\endcenter\par
 \let\centering\par %%%%% Maybe allow ?

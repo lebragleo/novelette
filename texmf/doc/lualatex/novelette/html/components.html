@@ -11,12 +11,12 @@
 <h4>Novelette Documentation</h4>
 
 <div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="home.html"><img src="images/home.svg" width="16" height="16" alt=""/>Home</a> &nbsp;
 <a href="install.html"><!--
---><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+--><img src="images/install.svg" width="16" height="16" alt=""/>Installation</a> &nbsp;
 <a href="tutorial.html"><!--
---><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
-<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+--><img src="images/tutorial.svg" width="16" height="16" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16" height="16" alt=""/>Index</a>
 </p></div>
 
 <h2>Tutorial &gt; Components</h2>
@@ -36,7 +36,7 @@ which have no pre-defined meaning. There is no rank, no hierarchy, no sub-compon
 <p><a id="environment"></a>&nbsp;</p>
 <h4 class="section">Component Environment</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>With the exception of page headers/footers, all printed content must be contained
 within a <i>component</i> environment:</p>
 <div class="code">
@@ -72,18 +72,27 @@ main text lower on that page. Then, the main text continues to additional pages.
 typical for chapters.</p>
 <p>Within the display zone, you may:</p>
 <ul>
-<li><p>Use the <code>\name</code> and <code>\subname</code> commands, described below.</p></li>
+<li><p>Use the <code>\style<i>N</i></code> (N=1-9) commands, described below.</p></li>
 <li><p>Place <i>non-floating</i> images.</p></li>
 <li><p>Use <code>\footnote</code> where allowed, but it will not print a marker.</p></li>
 <li><p>Place the <i>block</i> environment, with normal or small text.</p></li>
 <li><p>Write ordinary text, but <i>not</i> the text of your story.</p></li>
 </ul>
+<p class="noindent">>In most cases, the content of a display zone is widely spread vertically,
+using <code>\blanline</code> and/or <code>\vspace</code> where needed.</p>
+<p>If you use <code>\vspace</code>, write its value in units of <code>\baselineskip</code>.
+Do not use units of <code>pt</code> or any other measure.</p>
+<p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p>
 
 
 <h4>Main Text</h4>
-<p>The <code>\maintext</code> command ends the display zone. It adds a blank line, then returns
-text to the line grid, if (as usual) display material was off&#8209;grid. If the display occupies
+<p>The <code>\maintext</code> command ends the display zone. If the display occupies
 the entire component, do not write <code>\maintext</code>.</p>
+<p>At <code>\maintext</code>, one or two blank lines are added automatically. It will be two,
+unless the <i>component</i> uses option <code>[style=drop]</code>, in which case, only one.</p>
+<p>At this point, the text baseline is probably off&#8209;grid, due to the varying heights
+of styled text in the display zone. Novelette calculates how much vertical space is needed
+to restore the baseline to grid, then automatically adds that space.</p>
 <p>Following <code>\maintext</code>, you may:</p>
 <ul>
 <li><p>Use <code>\init</code> or <code>\dcap</code> commands, where allowed.</p></li>
@@ -95,38 +104,54 @@ the entire component, do not write <code>\maintext</code>.</p>
 </ul>
 
 
+<h4>Guide Mark</h4>
+<p>The content and spacing of the display zone, determines where the first line after
+<code>\maintext</code> will print. Standard practice (not mandatory) is to tweak the
+display zones, so that each <code>\maintext</code> prints at the same vertical position.</p>
+<p>To help you find that position, Novelette provides a guide marker. It only prints in
+draft mode. The marker is lowercase <code>g</code> with the baseline shown, appearing
+in the left margin next to the text.</p>
+<p>The global default guide position, counted in normal lines, is set in preamble by
+<code>\enable{guide=<i>G</i>}</code> for integer <i>G</i>. Default <i>G</i>=0 means
+no guide.</p>
+<p>You may locally change the value per&#8209;component using option
+<code>[guide=<i>G</i>]</code>.</p> 
+<p>You choose whether or not to obey the guide. Missing it is not a problem.</p>
+
+
 <h4>Component Option</h4>
 <p>Most components do not need an option.</p>
 <p><code>\begin{component}[class=<i>C</i>,style=<i>S</i>,guide=<i>G</i>]</code></p>
 <ul>
 <li><p><i>C</i> -> Choices: normal single legal. Default normal.</p>
-<ul>
-<li><p>normal -> Content may extend for one or more pages.</p></li>
-<li><p>single -> Allows image at full textblock height. Warns if content exceeds one page.</p></li>
-<li><p>legal -> Warns if content exceeds one page. Warns if page is not verso.
-Applies special rules to content (see below). Useful for copyright page.</p></li>
-</ul></li>
+  <ul>
+  <li><p>normal -> Content may extend for one or more pages.</p></li>
+  <li><p>single -> Allows image at full textblock height. Warns if content exceeds
+      one page.</p></li>
+  <li><p>legal -> Warns if content exceeds one page. Warns if page is not verso.
+      Applies special rules to content (see below). Useful for copyright page.</p></li>
+  </ul></li>
 <li><p><i>S</i> -> Choices: normal plain empty drop layout. Default normal. Applies only to
-first page of the component.</p></li>
-<ul>
-<li><p>normal -> Becomes <i>plain</i> or <i>empty</i>, depending on location.</p></li>
-<li><p>plain -> Header does not print. If layout has footer, it prints.
-This is the default in mainmatter.</p></li>
-<li><p>empty -> No header or footer prints. This is the default in frontmatter and
-backmatter.</p></li>
-<li><p>drop -> Known as <i>drop folio</i> (not <i>drop cap</i>). Header does not print.
-If layout has footer, it prints. If layout does not have footer, then the height of the
-textblock is reduced by one line, and a fake footer (page number) prints where the
-last line would ordinarily be located.</p>
-<p>Only use this option when necessary. That might be the case if your book is a collection
-of short stories, listed by page number.</p></li>
-<li><p>layout -> Forces page style set by <code>\layout</code>, even if header/footer
-would normally be empty on the first page.</p>
-<p>This might be useful if the component is a single page in mainmatter, containing only
-an image.</p></li>
-</ul></li>
+      first page of the component.</p>
+  <ul>
+  <li><p>normal -> Becomes <i>plain</i> or <i>empty</i>, depending on location.</p></li>
+  <li><p>plain -> Header does not print. If layout has footer, it prints.
+      This is the default in mainmatter.</p></li>
+  <li><p>empty -> No header or footer prints. This is the default in frontmatter and
+      backmatter.</p></li>
+  <li><p>drop -> Known as <i>drop folio</i> (not <i>drop cap</i>). Header does not print.
+      If layout has footer, it prints. If layout does not have footer, then the height of the
+      textblock is reduced by one line, and a fake footer (page number) prints where the
+      last line would ordinarily be located.</p>
+      <p>Only use this option when necessary. That might be the case if your book is a collection
+      of short stories, listed by page number.</p></li>
+  <li><p>layout -> Forces page style set by <code>\layout</code>, even if header/footer
+      would normally be empty on the first page.</p>
+      <p>This might be useful if the component is a single page in mainmatter, containing only
+      an image.</p></li>
+  </ul></li>
 <li><p><i>G</i> -> Integer 0 - lines per page. Over&#8209;rides the default set
-by <code>\layout</code></p></li>
+      by <code>\layout</code>.</p></li>
 </ul>
 
 
@@ -140,13 +165,13 @@ but that is unusual.</p>
 PDF metadata. It is your responsibility to ensure that the information matches.</p>
 <p>Behavior of a legal page:</p>
 <ul>
-<li><p>A warning is issued if the legal content does not fit on one page.</p</li>
+<li><p>A warning is issued if the legal content does not fit on one page.</p></li>
 <li><p>If the page is recto, then a warning is issued. This does not apply when compiling
 a sub-document, because its page numbers are unknown.</p></li>
 <li><p>The <code>\maintext</code> command, if used, will be ignored.</p></li>
-<li><p>You may use Italics and small caps.<p></li>
+<li><p>You may use Italics and small caps.</p></li>
 <li><p>You may <i>not</i> use the <i>block</i> environment.</p></li>
-<li><p>You may <i>not</i> use any of <code>\name \subname \scene \init \dcap</code>.</p></li>
+<li><p>You may <i>not</i> use any <code>\styleN \scene \init \dcap</code>.</p></li>
 <li><p>Numerals will always be lining. Requests for oldstyle will be ignored.</p></li>
 <li><p>You may use <i>non-floating</i> images. Do not write essential copyright information
 as images; it must be machine&#8209;readable ordinary text. Only use images for such small things
@@ -161,9 +186,60 @@ than the full textwidth. Do not allow lines to wrap!</p></li>
 </ul>
 
 
+<h4>\style<i>N</i>[<i>option</i>]{<i>one line of text</i>} where <i>N</i>=1-9</h4>
+<p>There are nine commands of the form <code>\style1</code> through <code>\style9</code>.
+Each of them can style <i>one line of text</i> according to the corresponding
+<code>\scenestyle<i>N</i></code> setting in preamble.</p>
+<ul>
+<li><p>The <i>one line of text</i> is just that: no line breaks or wrap. Do not write
+<code>\par</code> within the <code>\style<i>N</i></code> command.</p></li>
+<li><p>These commands may only be used in display zones, but not within <i>block</i>
+environments.</p></li>
+<li><p>There is no hierarchy. You decide whether <code>\style1</code> is more or less important,
+and more or less prominent, than <code>\style2</code>.</p></li>
+<li><p>You may use any of these commands more than once in a display zone, in any order.</p></li>
+<li><p>You may not nest one style within another.</p></li>
+<li><p>The only option is <code>[info]</code>. With this option, Novelette will write the measured
+width of the typeset text, in Terminal (console). Format:</p>
+<p><code>Info: PDFpage ..., \style<i>N</i> width is ...em.</code></p>
+<p>That info might be useful if you will use the <code>\line</code> command to print line(s)
+with their width(s) related to that line of styled text.</p></li>
+</ul>
+
+
+<h4>\line{values}</h4>
+<p>Although standard LaTeX has a <code>\line</code> command, its purpose is irrelevant
+in Novelette. So the command is re&#8209;written with custom syntax:</p>
+<p><code>\line{align=<i>A</i>,width=<i>W</i>,thick=<i>T</i>}</code></p>
+<ul>
+<li><p><i>A</i> -> left right center. Default center.</p></li>
+<li><p><i>W</i> -> must be measured in units of <code>em</code>. Not <code>pt</code>.</p>
+    <ul>
+    <li><p>Recommended: W >= 4em.</p></li>
+    <li><p>If W is larger than the textwidth, it will be silently truncated to the
+       textwidth. Thus W=100em is a quick way to produce a full&#8209;width line.</p></li>
+    <li><p>To produce a line width that is related to the width of some
+        <code>\style<i>N</i></code> line of text, do this: Compile using <code>[info]</code>
+        for that style. Then request a suitable line width
+        (may be more, less, or the same value).</p></li>
+    </ul></li>
+<li><p><i>T</i> -> number without units 1-9. May be decimal.</p>
+    <ul>
+    <li><p>T=1 is the thinnest available line, 0.75pt. Print services prefer this minimum,
+    for best appearance.</p></li>
+    <li><p>T=9 is 6.75pt.</p></li>
+    </ul>
+</ul>
+<p class="noindent">When identical <code>\line</code> are used above and below
+a <code>\style<i>N</i></code>, they will be vertically symmetrical around the styled font
+uppercase Xheight.</p>
+<p>Use <code>\vspace</code> to tweak the vertical spacing. Be sure that the space is measured
+in units of <code>\baselineskip</code>.</p>
+
+ 
 <h4 class="section">&nbsp;</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>&nbsp;</p>
 
 

@@ -8,20 +8,25 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">HOME</a> &nbsp;
-<a href="installation.html">Installation</a> &nbsp;
-<a href="index.html">Alphabetical Index</a>
-</div>
 
-<h2>Novelette Documentation - Front Matter</h2>
+<h4>Novelette Documentation</h4>
+
+<div id="navbara"><p class="noindent">
+<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
+<a href="install.html"><!--
+--><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
+<a href="tutorial.html"><!--
+--><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
+<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
+</p></div>
+
+<h2>Tutorial &gt; Front Matter</h2>
 
 <div id="navbarb">
 <a href="#top">Overview</a> &nbsp;
-</div>
 
 
-<h3>Overview</h3>
+<h4>Overview</h4>
 <p>Front matter precedes your story. It contains information about the book: title, author,
 copyright, and often other things that are not part of the story itself.</p>
 <p>Professional nonfiction often has extended front matter, where the author (or others)
@@ -29,7 +34,7 @@ explain why you should read this book, and why you should believe what you read.
 the case of reprinted classical material, there may be critical or historical essays there.</p>
 <p>Popular fiction almost never has extended front matter. Get to the story! A good minimum
 for front matter is six (6) pages: Half-Title, Frontispiece (often blank), Title Page,
-Copyright Page, Transitional Page (often a Dedication or Epigraph), blank page. Then the
+Copyright Page, Transition Page (often a Dedication or Epigraph), blank page. Then the
 main matter (the story) begins on the next page, which is always recto.</p>
 
 
@@ -50,7 +55,7 @@ repeated <code>\frontmatter</code> commands will be ignored.</p>
 
 
 <h4>Half-Title Page</h4>
-<p>It is customary to use a "half-title" as first page in frontmatter. Historically, this was
+<p>It is customary to use a <i>half-title</i> as first page in frontmatter. Historically, this was
 a dust cover for books that were printed, but not yet bound. It remains useful, as a way
 to protect the title page, and as a place where readers can get your autograph or
 write a note.</p>
@@ -84,18 +89,18 @@ to understand the story.</p></li>
 <p>The third page in front matter is the title page. It contains the title, subtitle, and author.
 Often, it contains the name and location of the publisher at the bottom of the page.
 Remember that the publisher of a self-published book is <i>you</i>, not the print service.</p>
-<p>Best practice is to make a visually interesting title page, possible rendering some of
+<p>Best practice is to make a visually interesting title page, possibly rendering some of
 it as a fancy image. Do not make it so fancy that the title is hard to read.</p>
 <p>Sample title page:</p>
 <div class="code"><code><!-- do not copy this from its html source text -->
 \begin{component}<br>
 \blanline\blankline\blankline<br>
 \blankline\blankline<br>
-\name{THE}\name{CONSPIRACY}\name{MANIFESTO}<br>
+\style1{THE}\style1{CONSPIRACY}\style1{MANIFESTO}<br>
 \blankline<br>
-\subname{LONDON}<br>
+\style2{LONDON}<br>
 \blankline\blankline\blankline<br>
-\name{Jack DeRipper}<br>
+\style3{Jack DeRipper}<br>
 \vfill % forces next content to bottom<br>
 \begin{block}[align=center]<br>
 Indescribably Bad Press &bull; Honking, New Zealand<br> 
@@ -117,8 +122,8 @@ some formats that are specifically designed for this page:</p>
 to ensure that line do not wrap or span the full textblock width.</p></li>
 <li><p>The block of text appears slightly below the vertical center of the page.</p></li>
 <li><p>Hyphenation is disabled. Oldstyle numerals are disabled.</p></li>
-<li><p>You may use Italics and small caps. But you may not use <code>\name</code> or any other
-styling commands.</p></li>
+<li><p>You may use Italics and small caps. But you may not use <code>\styleN</code>
+(N=1,2,3,4) or any other styling commands.</p></li>
 <li><p>You may not use the block environment, because the page already is within a block.</p></li>
 <li><p>Paragraphs are not indented, and there is a line gap between paragraphs.</p></li>
 </ul></li>
@@ -144,15 +149,15 @@ ISBN 978-0-00-000000-0\par<br>
 </code></div>
 
 
-<h4>Transitional Page</h4>
+<h4>Transition Page</h4>
 <p>The copyright page is verso, and the start of your story will be recto. But you do not want
 these pages to face each other. Transition to the rescue, as the fifth page of front matter!</p>
 <p>Possibilities for a transition page:</p>
 <ul>
 <li><p>Epigraph. Under-used. A good epigraph can be most effective. It is a short piece
 of prose or poetry that directly leads to the theme of your book. Perhaps the most
-famous in this category is Tolkien's "One ring to rule them all..."</p>
-<p>Professional publishers make business arrangements so that one author can use some words from
+famous in this category is Tolkien's verse containing "One ring to rule them all..."</p>
+<p>Professional publishers make business arrangements, so that one author can use words from
 a different author. Don't do it. You are not in the business.</p>
 <p>Here is <a href="verse.html">how to write an epigraph</a>.</li>
 <li><p>Dedication. Over-used. There was a time when an author would dedicate the book to
@@ -167,9 +172,8 @@ romance, and you wish to inform the reader that the story's volcanic eruption re
 in that era. Best practice is to style it like a one-page chapter.</p>
 <p>This is <i>not</i> the place to write about yourself! Any author's note must
 directly lead into the story.</p></li>
-<li><p>Repeat of the half-title page. This is sometimes used when the author has nothing else
-to put there. When front matter is extended, the half-title page is reapted at as the
-first page of main matter.</p></li>
+<li><p>Repeat of the half-title page. This is sometimes used when the author has nothing else to
+put there. When front matter is extended, the half-title page is a repeated half-title.</p></li>
 <li><p>If Novelette detects that <code>\mainmatter</code> immediately follows the
 <code>[legal]</code> page, it will insert a placeholder transition, in the form of a large
 design character. Not best, but it does not hurt.</p></li>

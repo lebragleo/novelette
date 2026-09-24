@@ -161,7 +161,7 @@
 %% based on prior \key{text} setting. The value is half the difference between the full textwidth
 %% and the width of typeset key text (although it is not printed). See the \key command.
 %% Setting [k/k] is particularly useful for prose epigraphs; [k/0] is useful for poetry.
-%%   Limits: 0<=L<=8, 0<=R<=8, (L+R)<=12. This also applies when a calculated k is used for
+%%   Limits: 0<=L<=8, 0<=R<=8. This also applies when a calculated k is used for
 %% either or both sides of the block.
 %%   Within the block, align=A sets text justification. If not set, text is justified and
 %% hyphenated as usual, and each paragraph is indented (you may use \noindent). If A is one of
@@ -193,12 +193,12 @@
         \spii Option format: [L/R,align=A,size=S]^^J%%
         \spiv L and/or R -> left/right block side offsets, relative to margins.^^J%%
         \spix Numerical values may be decimal, but integers strongly preferred.^^J%%
-        \spix\spii Value is multiple of normal paragraph indent.^^J%%
-        \spix\spii Limits: 0<=L<=8, 0<=R<=8, (L+R)<=12.^^J%%
+        \spxi Value is multiple of normal paragraph indent.^^J%%
+        \spxi Limits: 0<=L<=8, 0<=R<=8, (L+R)<=12.^^J%%
         \spix Alternative: The letter k may be used for L and/or R.^^J%%
-        \spix\spii The value of k is calculated, based on prior \string\key{text}.^^J%%
-        \spix\spii Limits: Width of key text must be^^J%%
-        \spix\spiv (4*parindent)<=keywidth<=textwidth.^^J%%
+        \spxi The value of k is calculated, based on prior \string\key{text}.^^J%%
+        \spxi Limits: Width of key text must be^^J%%
+        \spxi\spiv (4*parindent)<=keywidth<=textwidth.^^J%%
         \spiv A -> center left right justify. Default justify.^^J%%
         \spix Text alignment within block, relative to block offsets.^^J%%
         \spix If justify (or not set), normal hyphenation and paragraph indent.^^J%%
@@ -255,51 +255,46 @@
 %%
 
 
-%% STYLES: \styleN[option]{one line of content} where N is one of 1 2 3 4.
+%% STYLES: \styleN[option]{one line of content} where N is integer 1-9. (0 for developer test)
 %%   These commands may only be used in display zones. There is no particular meaning; they are
 %% merely commands for styling non-main text. You may use them repeatedly, in any order, in the
 %% same display zone. Although these commands are intended for such purposes as chapter titles,
 %% Novelette does not care why you use them.
-%%   Global defaults are set by \defaultstyleN commands in preamble. The \styleN options
-%% locally over-ride the defaults, per-instance.
-%%   The scale will necessarily affect the vertical space, which will usually be a non-integer
-%% number of lines. No problem, since line grid is restored at \maintext. You will need to add
-%% or subtract lines from the bottom of the display zone, if you wish to have \maintext start
-%% at a particular line.
+%%   Each \styleN has its font, scale, track, align, and case set by \setstyleN commands
+%% in preamble, or the built-in defaults (if unset by user). These are fixed. The local
+%% \styleN[option] only affects whether info is written to Terminal (console).
 %%   There is no automatic chapter numbering (see \next command, for placeholder).
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
-    \spii inside \string\styleN (N=1,2,3,4), or \string\scenetext.}%%
+    \spii inside \string\styleN (N=1-9), or \string\scene.}%%
 }%%
-\newif\ifnvt@instyle %% True within \styleN and \scenetext commands.
-\DeclareDocumentCommand\style{mO{}+m}{%% +m will be re-parsed as m.
+\def\nvt@badstyle#1{%%
+  \nvt@err{Do not write \string\style{N}[option]{text}.^^J%%
+    \spii Write \string\styleN[option]{text} with N=1-9.}%%
+    \char"FFFD\space%%
+}%%
+\def\style{\@ifnextchar\bgroup\nvt@badstyle\nvt@stylecmd}
+\newif\ifnvt@instyle %% True within \styleN and \scene commands.
+\DeclareDocumentCommand\nvt@stylecmd{mO{}+m}{%% +m will be re-parsed as m.
   \begingroup%%
   \directlua{nvt.parsestyle('\luaescapestring{#1}','\luaescapestring{#2}')}%%
-  \ifnum\tmpreturn=-2\relax%%
-    \nvt@err{Requested font '\tmpnofont' but did not load it.^^J%%
-    \spii How to fix: In Preamble, write \string\loadfont{\tmpnofont} or \string\loadfont{all}}%%
-    \strut\char"FFFD\par%%
+  \ifnum\tmpreturn=-99\relax%%
+    \nvt@fatal{Cannot use \string\styleN\space in preamble.^^J%%
+      Did you mean \string\setstyleN\space instead (N=1-9) ?}%%
   \fi%%
   \ifnum\tmpreturn=-1\relax%%
-    \nvt@err{Commands \string\styleN\space (N=1,2,3,4) may only be used within display zones.^^J%%
+    \nvt@err{Commands \string\styleN\space (N=1-9) may only be used within display zones.^^J%%
       \spii They may not be nested, or used within block environment.}%%
     \strut\char"FFFD\par%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
-    \nvt@err{Bad \string\styleN.^^J%%
-      \spii The N must be one of: 1 2 3 4. Not the letter N or n.^^J%%
-      \spii Format: \string\styleN[font=F,scale=S,track=T,align=A,case=C]{content}^^J%%
-      \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
-      \spiv S -> Number 1<=S<=4. May be decimal. Defaults vary with N.^^J%%
-      \spiv T -> Integer 0-9. Tracking, tight to very loose. Default 2.^^J%%
-      \spiv A -> center left right. Default center.^^J%%
-      \spiv C -> none titl smcp onum smon. Ignored unless font=main. Default none.^^J%%
-      \spix none -> No changes.^^J%%
-      \spix titl -> Lowercase letters become titling caps.^^J%%
-      \spix smcp -> Lowercase letters become small caps.^^J%%
-      \spix onum -> Numerals become oldstyle.^^J%%
-      \spix smon -> Combines smcp and onum.^^J%%
-      \spii Above defaults may be changed by \string\defaultstyleN\space in preamble.}%%
+    \nvt@err{Bad \string\styleN[option]{text}.^^J%%
+      \spii N must be integer 1-9. Not the letter N or n.^^J%%
+      \spii Choices for font, scale, track, align, and case^^J%%
+      \spiv are globally fixed by \string\setstyle[N]{choices} in preamble.^^J%%
+      \spii Option [info] is the only local possibility:^^J%%
+      \spiv It writes the typeset text width to Terminal (console).^^J%%
+      \spiv That might be useful for your own design purposes.}%%
       \strut\char"FFFD\par%%
   \fi%%
   \ifnum\tmpreturn=1\relax%%
@@ -322,6 +317,10 @@
         \spii Measured content width is \tmphowmuch\@percentchar\space of max textwidth.^^J%%
         \spii You must reduce content or reduce scale.}%%
       \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpsp{\char"FFFD}}%%
+    \fi
+    \ifnum\tmpinfo=1\relax%%
+      \edef\tmpwdz{\fpeval{round(\wd0/\nvt@em,2)}em}%%
+      \typeout{Info: PDFpage \thepage, \string\style#1\space width \tmpwdz.}%%
     \fi%%
     \tmpstrut\tmpleft\smash{\usebox0}\tmpright\tmpstrut\nvt@par%%
     \vspace{-\nvt@bls}\strut\nvt@par%%
@@ -331,57 +330,53 @@
 %%
 
 
-%% SCENE: \scenetext[option]{content}  see also \sceneimage in graphics file.
+%% SCENE: \scene[option]{text}  see also \image[scene,option]{filename} in graphics.
 %%   The simplest scene breaks are one or more \blankline, possible with \dinkus where needed.
 %% You may also use ordinary text, perhaps aligned via the block environment. Or you may use
-%% an ordinary image.
+%% an image.
 %%   But if a chapter of your story has distinct sub-chapters, each with its own name, then the
-%% \scenetext command may be useful. This creates a three-line gap between paragraphs. The first
-%% line is always blank, and is omitted if the \scenetext happens to fall at the top of a page.
-%% If you prefer a larger gap, use \blankline before or after \scenetext.
-%%   The \scenetext content must fit on one line, maximum width 4in regardless of layout. The text
+%% \scene command may be useful. This creates a three-line gap between paragraphs. The first
+%% line is always blank, and is omitted if the \scene happens to fall at the top of a page.
+%% If you prefer a larger gap, use \blankline before or after \scene.
+%%   The \scene text must fit on one line, maximum width 3.5in regardless of layout. The text
 %% sits slightly below the middle of the other two lines. Its is styled to be slightly different
-%% than normal text. The first paragraph following \scenetext is not indented.
+%% than normal text. The first paragraph following \scene is not indented.
+%%   The default \scene alignment is set in preamble by \defaultscene, or center if unset.
+%% Option [align=A] is for local over-ride (A = left right center).
 %%   Scenes have no automatic numbering. Do it yourself. See the \next command.
-\newif\ifnvt@inscenetext %% True within \scenetext.
-\DeclareDocumentCommand\scenetext{O{}+m}{%% +m will be re-parsed as m.
+\DeclareDocumentCommand\scene{O{}+m}{%% +m will be re-parsed as m.
   \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
   \ifnvt@inblock\def\tmpok{0}\fi%%
-  \ifnvt@inscenetext\def\tmpok{0}\fi%%
-  \ifnvt@insceneimage\def\tmpok{0}\fi%%
-  \begingroup\nvt@inscenetexttrue%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \begingroup\nvt@instyletrue%%
+  \def\tmpsceneleft{\nvt@sceneleft}\def\tmpsceneright{\nvt@sceneright}%%
+  \directlua{nvt.parsescene('\luaescapestring{#1}')}%%
+  \ifnum\tmpreturn=-99\relax%%
+    \nvt@fatal{Cannot use \string\scene\space in preamble.^^J%%
+      Did you mean \string\defaultscene\space instead?}%%
+  \fi%%
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@err{Did not understand \string\scene\space option.^^J%%
+      \spii Only option is [align=A] for A -> left right center.}%%
+  \fi%%
   \ifnum\tmpok=1\relax%%
     \par\edef\tmppgtot{\fpeval{\pagetotal = 0pt}}%%
     \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
     \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
     \setlength\parindent{0pt}%%
-    \def\tmpscalign{-1}\def\tmpscleft{\nvt@scleft}\def\tmpscright{\nvt@scright}\def\tmpfont{}%%
     \def\textit##1{##1}\def\it##1{##1}%%
     \def\smcp##1{##1}\def\SMCP##1{##1}\def\Smcp##1{##1}\def\onum##1{##1}%%
-    \directlua{nvt.parsescenestyle('\luaescapestring{#1}','scene')}%%
-    \ifnum\tmpscreturn=1\relax%%
-      \ifnum\tmpscalign=0\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{\hfill\strut}\fi%%
-      \ifnum\tmpscalign=1\relax\def\tmpscleft{}\def\tmpscright{\hfill\strut}\fi%%
-      \ifnum\tmpscalign=2\relax\def\tmpscleft{\strut\hfill}\def\tmpscright{}\fi%%
-      \sbox0{\nvt@aff{RawFeature={+titl,+case},Scale=1.08,FakeStretch=.96,LetterSpace=4}%%
-        \char"200D{#2}\char"200D}%%
-      \edef\tmpfit{\fpeval{\wd0 > 4in}}%%
-      \ifnum\tmpfit=1\relax%%
-        \nvt@warn{\string\scenetext\space content width exceeds 4in. Too wide.}%%
-        \sbox0{\char"FFFD\space \string\scenetext\space content is too wide.}%%
-      \fi%%
-      \strut\tmpscleft\smash{\raisebox{-.108\nvt@em}{\usebox0}}\tmpscright\strut\par%%
-    \else%%
-      \nvt@err{Bad \string\scenetext[option]{content} command.^^J%%
-      \spii Option: [align=A]^^J%%
-      \spiv A -> left right center. Default \nvt@scalign.^^J%%
-      \spii Content must fit on one line, max width 4in.^^J%%
-      \spii Text is specially styled for this purpose. Ignores other styling.}%%
-      {\char"FFFD}%%
+    \sbox0{\nvt@aff{RawFeature={+titl,+case},Scale=1.08,FakeStretch=.96,LetterSpace=4}%%
+      \char"200D{#2}\char"200D}%%
+    \edef\tmpwide{\fpeval{\wd0 > 3.5in}}%%
+    \ifnum\tmpwide=1\relax%%
+      \nvt@warn{\string\scene\space content width exceeds 3.5in. Too wide.}%%
+      \sbox0{\char"FFFD\space \string\scene\space content is too wide.}%%
     \fi%%
+    \strut\tmpsceneleft\smash{\raisebox{-.108\nvt@em}{\usebox0}}\tmpsceneright\strut\par%%
   \else%%
-    \nvt@err{Command \string\scenetext\space cannot be nested in itself,^^J%%
-      \spii or used in \string\styleN (N=1,2,3,4), \string\sceneimage, or block environment.}%%
+    \nvt@err{Command \string\scene\space cannot be nested in itself,^^J%%
+      \spii or used in \string\styleN (N=1-9), \string\image, or block environment.}%%
     \char"FFFD\obeyspaces%%
   \fi%%
   \endgroup\nopagebreak\blankline%%
@@ -499,9 +494,73 @@
 %% number is necessary. If any \next remains, you cannot move to preview or final mode.
 \newif\ifnvt@didnext %% Become true if 1 or more \next used.
 \newcommand\next{%%
-  \char"2188%% Two ## placed at this Unicode slot.
+  \#\#%% Two ## placed at this Unicode slot.
   \global\nvt@didnexttrue\directlua{nvt.countnext=nvt.countnext+1}%%
   \obeyspaces%%
+}%%
+%%
+
+
+%% RE-DEFINE \line:
+%%   The standard LaTeX \line is not needed, so it is re-defined. Novelette \line is an \hrule
+%% with minimum and maximum dimensions, vertically padded to always occupy half-baselineskip.
+%%   To track possible layout changes, the width must be measured in normal em. The thickness
+%% is a number without units (requesting units would likely cause user confusion).
+\def\line#1{%%
+  \def\tmpshow{1}\def\tmpleft{\hfill}\def\tmpright{\hfill}%%
+  \def\tmpwidth{10em}\def\tmpthick{.76pt}%%
+  \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@infootnote\def\tmpok{0}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%
+  \ifnum\tmpok=1\relax%%
+    \par\vspace*{-\nvt@bls}\strut\par%%
+    \directlua{nvt.parseline('\luaescapestring{#1}')}%%
+    \ifnum\tmpreturn=1\relax%%
+      \ifnum\tmpshow=1\relax%%
+        \vspace*{-.25\nvt@bls}%%
+        \strut\tmpleft\smash{\rule[-\tmpdrop]{\tmpwidth}{\tmpthick}}\tmpright\strut\par%%
+        \vspace{-.25\nvt@bls}%%
+      \else%%
+        \vspace*{-.25\nvt@bls}\strut\par\vspace*{-.25\nvt@bls}%%
+      \fi%%
+    \else%%
+      \nvt@err{Bad \string\line{align=A,width=W,thick=T}.^^J%%
+        \spii Novelette re-defines standard LaTeX \string\line. Format:^^J%%
+        \spiv A -> left right center. Default center.^^J%%
+        \spiv W -> must have units 'em', not 'pt' or any other. Default 10em.^^J%%
+        \spix Good: width=5.63em. Bad: width=14pt.^^J%%
+        \spix Recommended minimum width 4em.^^J%%
+        \spix If too wide, W is silently truncated to textwidth.^^J%%
+        \spix W=100em produces full-width line.^^J%%
+        \spiv T -> number 1-9, without units. May be decimal. Default 1.^^J%%
+        \spix Produces line thickness at multiples 0.75pt.}%%
+      \def\tmpbadline{%%
+        {\nvt@aff{Scale=.6}\char"2327 bad \textbackslash line \char"2327}%%
+      }%%
+      \vspace*{-.25\nvt@bls}%%
+      \strut\tmpleft\smash{\tmpbadline}\tmpright\strut\par%%
+      \vspace{-.25\nvt@bls}%%
+    \fi%%
+  \else%%
+    \nvt@err{Cannot use \string\line\space outside display zone, or within block}%%
+  \fi%%
+}%%
+%%
+
+
+%% Decorative Lines::
+\DeclareDocumentCommand\surf{}{%% wavy swung dash
+  \par\vspace*{\nvt@bls}\strut\par%%
+  \strut\hfill%%
+  \smash{{\normalfont\upshape\nvt@aff{Scale=2,RawFeature={+cv59}}\char"2053}}%%
+  \hfill\strut\par%%
+}%%
+\DeclareDocumentCommand\squid{}{%% inverted X with sidecars
+  \par\vspace*{\nvt@bls}\strut\par%%
+  \strut\hfill%%
+  \smash{{\normalfont\upshape\nvt@aff{Scale=2,RawFeature={+cv59}}\char"2756}}%%
+  \hfill\strut\par%%
 }%%
 %%
 
@@ -510,7 +569,7 @@
 %%   Novelette does not use many standard LaTeX commands, but instead uses other methods.
 \def\nvt@nocmd#1{%%
   \nvt@warn{Novelette has no command #1.^^J%%
-    \spii See these commands: \string\styleN for N=1,2,3,4,^^J%%
+    \spii See these commands: \string\styleN for N=1-9,^^J%%
     \spii\string\headstyle, and options for block environment.}
 }%%
 \def\footnotesize{\nvt@nocmd{\string\footnotesize}}

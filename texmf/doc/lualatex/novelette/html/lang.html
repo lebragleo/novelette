@@ -32,8 +32,22 @@ available in TeX. But neither <i>babel</i> nor <i>polglossia</i> is loaded. If y
 language&#8209;related features, then you should use something other than Novelette.</p> 
 
 
+<p><a id="lang"></a>&nbsp;</p>
+<h4 class="section">Setting: \lang{<i>code</i>}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<p>In preamble, <code>\lang{<i>code</li>}</code> sets the language used for hyphenation.
+It must be one of the codes listed below.</p>
+<p>Novelette is monolingual. You may write words and phrases in any language that the
+fonts support. But hyphenation will use the language chosen by <code>\lang</code>. If you
+have extended text in a different language, then either hyphenate it yourself, or locally disable
+hyphenation there.</p>
+<p>Language support is limited to hyphenation patterns. There is no automatic conversion
+of date/time, or anything else. Do it yourself.</p>
+
+
 <p><a id="list"></a>&nbsp;</p>
-<h4 class="section">List of Codes for \lang{<i>code</i>}</h4>
+<h4 class="section">List of Language Codes</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
 <p>These codes are case-insensitive: <code>en-US</code> and <code>en-us</code> are the same.</p>
@@ -67,22 +81,23 @@ language&#8209;related features, then you should use something other than Novele
 <h4 class="section">Language-Specific Notes</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
-<p>If no <code>\lang</code> is specified, or if <code>\lang{en}</code> unmodified by US or UK,
-then a generic American English pattern is used. Better to specify <code>en-US</code>
-or <code>en-UK</code>.</p>
 <ul>
+<li><p>English: If no <code>\lang</code> is specified, or if <code>\lang{en}</code> unmodified by
+US or UK, then a generic American English pattern is used. Better to specify <code>en-US</code>
+or <code>en-UK</code>.</p></li>
 <li><p>German: Pre-1996 German (of Germany) is not available. If you type the eszett, you get it;
 but the word may be incorrectly hyphenated. The Novelette fonts use short-arm <code>f</code>,
-so that there is no issue with incorrect ligatures.</p></li>
-<li><p>For French punctuation, which requires nonbreaking space before or after certain symbols:
+so there is no issue with incorrect ligatures.</p></li>
+<li><p>French: French punctuation requires nonbreaking space before or after certain symbols.
 Use <code>~</code> (asciitilde) there. In Novelette, it is a reduced width nonbreaking space.
 Example: <code>Zut~!</code></p></li>
 <li><p>Portuguese: If you need to place a hyphen at the end of a line, and at the beginning of
 the following line, try this: <code>\--</code> for the hyphen. That inserts a soft hyphen
-followed by an ordinary hyphen. Mid-line, only one of them prints.</p></li>
-<li><p> Catalan: The ele geminada is available. You may type the actual middot character
-(not period) between two L. Use <code>{\Lgem}</code> or <code>{\lgem}</code> to print all three
-characters (two L with middot between). Works uppercase, lowercase, small caps.
+(prints at end of line) followed by an ordinary hyphen (prints at start of next line).
+Mid-line, only one of them prints.</p></li>
+<li><p> Catalan: The <i>ele geminada</i> is available. You may type the actual middot character
+(not period) between two L. Or, use <code>{\Lgem}</code> or <code>{\lgem}</code> to print all
+three characters (two L with middot between). Works uppercase, lowercase, small caps.
 Although you may use the Ldot character, this is not best practice.</p></li>
 <li><p>Dutch: <code>{\IJacute}</code> and <code>{\ijacute}</code> place the acute over both
 characters. This is the only method available in Novelette. If you try

@@ -149,6 +149,45 @@ relevant Novelette variables.</p></li>
 </ul>
 
 
+<hr/>
+Overall structure of the Lua code:
+
+1. Novelette's LaTeX namespace is 'nvt@', and its Lua namespace is 'nvt'. All global variables
+(text, numerical, boolean) follow this pattern, whether or not the variables can be changed.
+Temporary LaTeX variables, which exist only within a macro, begin with '\tmp'. Temporary
+Lua variables use the standard 'local' within a function.
+
+2. Where Lua calculations need a length, 'nvt.in' and 'nvt.mm' convert to the equivalent
+TeX pt.
+
+3. A preamble setting reads its macro value, then passes it to Lua. It may also pass additional
+information such as where the macro was written (frontmatter? display zone? inside block?).
+
+4. If the macro was written in the wrong location (such as block within footnote), or if the macro
+can only be used once but was repeated, then Lua returns a negative value of '\tmpreturn'.
+No values are changed. This will trigger an error or warning.
+
+5. Otherwise, if the contents of the macro cannot be fully parsed (bad keys or bad values),
+then Lua returns '\tmpreturn' equal to 1. Readable values may be set, unreadable values
+unchanged.
+
+6. If the macro value can be parsed without error, the corresponding 'nvt' Lua values are
+changed. Lua uses 'tex.sprint' to send information back to LaTeX. It defines '\tmpreturn'
+equal to 1 (means good). And, it defines the corresponding LaTeX variables. In order for
+the @ symbol to be understood as a macro-name letter, Lua wraps the definitions in a
+LaTeX group with '\makeatletter'. So, the variable are returned as global values. In special
+cases, good values may be accompanied by '\tmpreturn' greater than 1, which tells LaTeX
+to do something on its own.
+
+7. If the macro was used in the wrong location (such as a block within a footnote), then
+Lua sends '\tmpreturn' -1. If the macro value could not be fully parsed, then '\tmpreturn' is 0.
+Whether or not any variables are set, depends on circumstances. Also, Lua sets 'good=false',
+which cannot be changed back to true; at the end of document, that signals a bad compile.
+
+<hr/>
+
+
+
 <p><a id="chapters"></a>&nbsp;</p>
 <h4 class="section">Why Not Automatic TOC?</h4>
 <h4 class="link"><a href="#top">

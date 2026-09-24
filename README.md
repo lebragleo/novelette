@@ -25,3 +25,7 @@ It comes with its own fonts, optimized for close agreement with the LuaLaTeX cod
 Be patient... The developer has much more material (including documentation) that
 has not yet been uploaded.
 
+UPDATE 24-SEP-2026 : Continued development. Moved some code from LaTeX to Lua.
+Font kerning not yet complete. Partial documentation. Eventually will add utilities
+and gallery.
+

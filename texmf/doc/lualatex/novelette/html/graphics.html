@@ -24,7 +24,7 @@
 <a href="#paths">Paths to Image Files</a> &nbsp;
 <a href="#dims">Image Dimensions</a> &nbsp;
 <a href="#image">Command: \image</a> &nbsp;
-<a href="#sceneimage">Command: \sceneimage</a> &nbsp;
+<a href="#scene">Scene Breaks</a> &nbsp;
 <a href="#scripts">Shell Scripts</a>
 </div>
 
@@ -166,8 +166,9 @@ will be adequate, but not very great.</p></li>
 
 <a id="image"></a>
 <h3>The \image Command (Also \image*)</h3>
-<p>Usage: <code>\image[option]{<i>PathFromMainDocumentTo/filename.png</i>}</code><br>
-Option: <code>[lines=<i>L</i>,align=<i>A</i>,float=<i>F</i>,tweak=<i>T</i>]</code>
+<p>Usage: <code>\image[<i>option</i>]{<i>PathFromMainDocumentTo/filename.png</i>}</code><p>
+<p>Option format: <code>[lines=<i>L</i>,align=<i>A</i>,float=<i>F</i>,tweak=<i>T</i>]</code>.
+Alternate option <code>[scene]</code> is described in the next section.</p>
 <ul>
 <li><p><code><i>L</i></code> is an integer &gt;= 1.</p>
 <p>If the image is located in a component with [single] option, then max <code><i>L</i></code>
@@ -217,21 +218,23 @@ the placeholder size is guessed at slightly smaller than the maximum possible si
 </ul>
 
 
-<a id ="sceneimage"></a>
-<h3>The \sceneimage Command (Also \sceneimage*)</h3>
-<p>Usage: <code>\sceneimage[<i>option</i>]{<i>PathFromMainDocumentTo/filename.png</i>}</code><br>
-Option: <code>[align=<i>A</i>]</code></p>
-<p>This command has a special purpose: It is one of several ways to separate scenes within
-a chapter. For details, see how components are structured.</p>
-<p>The command performs like <code>\image</code> and <code>\image*</code>,
-but with these exceptions:</p>
+<a id ="scene"></a>
+<h3>Using an Image as Scene Break</h3>
+<p>When <code>\image</code> has the single option <code>[scene]</p>, it is specially formatted
+for use as a scene break. This is one of several ways to separate scenes within a chapter or
+long story.</p>
+<p>Typically, the image will be rasterized text in a prominent font. Intead of black, it will be
+some shade of gray, so that it is not too prominent. The font does not need to be one of the
+Novelette fonts, as long as its license permits commercial usage.</p>
 <ul>
-<li><p>The only option is <code>[align=<i>A</i>]</code>, where <i>A</i> is one of
-<code>left right center</code>. Default center (but this is not necessarily best).</p></li>
+<li><p>Option <code>[scene]</code> cannot be combined with other options.</p>
+<li><p>The image does not float.</p>
+<li><p>Horizontal alignment is the <code>\scenestyle</code> setting, or default center.</p>
 <li><p>Maximum image width is 3.4in, which is more than any good-looking scene break needs.
 Maximum image height is 0.24in. These apply regardless of trim size or layout.</p></li>
-<li><p>The image never floats. It is automatically padded above and below, to occupy
-a total of 3 lines.</p></li>
+<li><p>The image is automatically padded to occupy a total of 3 lines. If you wish,
+use <code>\blankline</code> above and/or below.</p></li>
+<li><p>The following paragraph is not indented.</p></li>
 </ul>
 
 
