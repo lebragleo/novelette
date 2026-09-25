@@ -248,6 +248,37 @@ end
 --
 
 
+-- Parse \icon:
+nvt.parseicon = function (star,file) -----
+  local a, t, f, l, lx, n ; local img = 0 ; local ok = true
+  file = string.gsub(file, ' ', '') -----
+  if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
+    img = 1 ; if file == '' then img = 2 end
+    local sp = string.gsub(file, '%s', '') ; if sp == '' then img = 2 end
+    if string.find(file, '~') then img = 2 end
+    if string.find(file, '%.%.') then img = 2 end
+    if string.find(file, '\\') then img = 2 end
+    if string.find(file, '//') then img = 2 end
+    if string.find(file, ':') then img = 2 end
+    if not string.find(file, '%.png$') then img = 2 end
+    if 'link' == lfs.symlinkattributes(file, 'mode') then img = 2 end
+    file = string.gsub(file, '^%./', '') -- remove initial ./ if present
+    _, n = string.gsub(file, '/', '') ; if n > 5 then img = 2 end -- max 5 folder levels
+    if img ~= 1 then ok = false end
+  end
+  tex.sprint('\\def\\tmpisfile{' .. img .. '}')
+  if (nvt.mode == 'preview' or nvt.mode == 'final') and img == 1 then
+    tex.sprint('\\def\\tmpvalidate{1}')
+  end
+  if ok == true then
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
+end
+--
+
+
 -- Check that a \subdoc call does not re-use same path/filename:
 nvt.norepeatsubdoc = function (s)
   local n ; local ok = true
@@ -519,7 +550,7 @@ end
 --
 
 
--- Parse \setstyleN for N = 1-9: (also N=0 is a developer test)
+-- Parse \setstyleN for N = 0-9:
 nvt.parsesetstyle = function (N, s) -- style number, setting
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   local n, m, mm, mmm, t, tt, a, f, c, h, d ; local ok = true
@@ -610,7 +641,7 @@ end
 --
 
 
--- Parse \styleN for N = 1-9:
+-- Parse \styleN for N = 0-9:
 nvt.parsestyle = function (N, s) -- style number, option
   s = string.gsub(s, ' ', '')
   local h, d

@@ -167,6 +167,7 @@
 %% hyphenated as usual, and each paragraph is indented (you may use \noindent). If A is one of
 %% left, right, center, then no hyphenation and no indent.
 \newif\ifnvt@inblock %% True within block environment.
+\newif\ifnvt@smallblock %% True when block uses small text.
 \DeclareDocumentEnvironment{block}{O{}}{%%
   \par\strut\par\vspace{-\nvt@bls}%% Ensure fresh line.
   \ifnvt@infootnote\nvt@fatal{Cannot place block environment in a footnote, page \thepage.}\fi%%
@@ -207,7 +208,7 @@
         \spix Only display zone allows size=small.}%%
       \strut\char"FFFD \smcp{bad option for block environment} \char"FFFD\par%%
     \else%%
-      \ifnum\tmpblocksize=1\relax\nvt@small\vspace{\tmpsmtop}\fi%% headroom
+      \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
       \ifnum\tmpblockleft=-99\relax%% key at left
         \edef\tmpblockoffsetleft{\nvt@halfkeydiff}%%
         \ifx\nvt@goodkey\else%%
@@ -255,7 +256,7 @@
 %%
 
 
-%% STYLES: \styleN[option]{one line of content} where N is integer 1-9. (0 for developer test)
+%% STYLES: \styleN[option]{one line of content} where N is integer 0-9.
 %%   These commands may only be used in display zones. There is no particular meaning; they are
 %% merely commands for styling non-main text. You may use them repeatedly, in any order, in the
 %% same display zone. Although these commands are intended for such purposes as chapter titles,
@@ -266,11 +267,11 @@
 %%   There is no automatic chapter numbering (see \next command, for placeholder).
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
-    \spii inside \string\styleN (N=1-9), or \string\scene.}%%
+    \spii inside \string\styleN (N=0-9), or \string\scene.}%%
 }%%
 \def\nvt@badstyle#1{%%
   \nvt@err{Do not write \string\style{N}[option]{text}.^^J%%
-    \spii Write \string\styleN[option]{text} with N=1-9.}%%
+    \spii Write \string\styleN[option]{text} with N=0-9.}%%
     \char"FFFD\space%%
 }%%
 \def\style{\@ifnextchar\bgroup\nvt@badstyle\nvt@stylecmd}
@@ -280,16 +281,16 @@
   \directlua{nvt.parsestyle('\luaescapestring{#1}','\luaescapestring{#2}')}%%
   \ifnum\tmpreturn=-99\relax%%
     \nvt@fatal{Cannot use \string\styleN\space in preamble.^^J%%
-      Did you mean \string\setstyleN\space instead (N=1-9) ?}%%
+      Did you mean \string\setstyleN\space instead (N=0-9) ?}%%
   \fi%%
   \ifnum\tmpreturn=-1\relax%%
-    \nvt@err{Commands \string\styleN\space (N=1-9) may only be used within display zones.^^J%%
+    \nvt@err{Commands \string\styleN\space (N=0-9) may only be used within display zones.^^J%%
       \spii They may not be nested, or used within block environment.}%%
     \strut\char"FFFD\par%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad \string\styleN[option]{text}.^^J%%
-      \spii N must be integer 1-9. Not the letter N or n.^^J%%
+      \spii N must be integer 0-9. Not the letter N or n.^^J%%
       \spii Choices for font, scale, track, align, and case^^J%%
       \spiv are globally fixed by \string\setstyle[N]{choices} in preamble.^^J%%
       \spii Option [info] is the only local possibility:^^J%%
@@ -376,7 +377,7 @@
     \strut\tmpsceneleft\smash{\raisebox{-.108\nvt@em}{\usebox0}}\tmpsceneright\strut\par%%
   \else%%
     \nvt@err{Command \string\scene\space cannot be nested in itself,^^J%%
-      \spii or used in \string\styleN (N=1-9), \string\image, or block environment.}%%
+      \spii or used in \string\styleN (N=0-9), \string\image, or block environment.}%%
     \char"FFFD\obeyspaces%%
   \fi%%
   \endgroup\nopagebreak\blankline%%
@@ -533,8 +534,10 @@
         \spix Recommended minimum width 4em.^^J%%
         \spix If too wide, W is silently truncated to textwidth.^^J%%
         \spix W=100em produces full-width line.^^J%%
-        \spiv T -> number 1-9, without units. May be decimal. Default 1.^^J%%
-        \spix Produces line thickness at multiples 0.75pt.}%%
+        \spiv T -> number 0-9, without units. May be decimal. Default 1.^^J%%
+        \spix Larger T means thicker line. T=1 is 0.75pt.^^J%%
+        \spix 0<T<1 promoted to T=1. T>9 demoted to T=9.^^J%%
+        \spix T=0 reserves space, but does not print line.}%%
       \def\tmpbadline{%%
         {\nvt@aff{Scale=.6}\char"2327 bad \textbackslash line \char"2327}%%
       }%%
@@ -549,7 +552,7 @@
 %%
 
 
-%% Decorative Lines::
+%% Decorative Lines (always centered):
 \DeclareDocumentCommand\surf{}{%% wavy swung dash
   \par\vspace*{\nvt@bls}\strut\par%%
   \strut\hfill%%
@@ -565,11 +568,12 @@
 %%
 
 
+
 %% UNAVAILABLE COMMANDS:
 %%   Novelette does not use many standard LaTeX commands, but instead uses other methods.
 \def\nvt@nocmd#1{%%
   \nvt@warn{Novelette has no command #1.^^J%%
-    \spii See these commands: \string\styleN for N=1-9,^^J%%
+    \spii See these commands: \string\styleN for N=0-9,^^J%%
     \spii\string\headstyle, and options for block environment.}
 }%%
 \def\footnotesize{\nvt@nocmd{\string\footnotesize}}

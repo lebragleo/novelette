@@ -5,109 +5,36 @@
 \ProvidesPackage{novelette-graphics}[2026-08-20 Graphics]
 
 
-%% OVERVIEW:
+%% GRAPHICS:
 %%   Novelette does not use standard LaTeX graphics commands, such as \includegraphics. You cannot
 %% create vector (TiKz) drawings, or include eps/pdf files.
-%%
-%% A) Allowed Locations: You may never place an image in footnotes or page headers. You may never
-%% place an image inline with ordinary text; place it between paragraphs, where the image will be
-%% its own paragraph.
-%%   Suggestion: Your book's title page should be attractive. Since Novelette does not allow
-%% fonts other than its own, you may create a dramatic effect by creating all (or most) of the
-%% title page as an image, with rasterized text in decorative fonts.
-%%
-%% B) File Storage: Image files must be stored in the same folder as the main document, or in
-%% a subfolder from there. You may not load files via absolute path, or by using ../ to rise
-%% folder level, or by symlinks (soft links). The path may not use the ~ character. No spaces.
-%%   This ensures that when you make a backup copy of your main document folder, its images
-%% will also be copied.
-%%   For testing purposes, Novelette provides a few images in its own tex/lualatex/novelette
-%% folder. These images can be used by filename alone, without path.
-%%
-%% C) File Format: All graphics must be raster png format. They may be monochrome black/white
-%% at 1-bit per pixel, or single-channel grayscale (not RGB, no alpha) at 8-bits per pixel.
-%%   Recommended resolution (density) is 600 or more pixels/inch (up to 1200) for monochrome,
-%% 300 pixels/inch (rarely anything else) for grayscale.
-%%   Tech note: The images are not stored in PDF as png format, but are decompressed/recompressed
-%% to a png-like format internal to PDF.
-%%   In preview and final modes, Novelette inspects image files for PDF/X-1a:2001 conformance.
-%% They must meet the above requirements, and have no color profile or private metadata. Although
-%% graphics arts experts know how to do this when the image is created, most ordinary users
-%% (and some experts) get it wrong. So Novelette provides shell scripts that correct mistakes.
-%% See folder 'doc/lualatex/novelette/utilities' for instructions.
-%%
-%% D) Size: The maximum height of an \image must be specified by [lines=L] option of the \image
-%% command, for integer L. If you fail to specify [lines=L], it is an error.
-%%   This creates a gap of L normal text lines, in which the \image sits. If shorter than that,
-%% the \image is padded. If too tall to fit, error; then the \image is not printed, and a fitting
-%% placeholder prints instead.
-%%   The maximum width of an \image is the text line width.
-%%
-%% E) Horizontal Alignment: An image can be aligned to left, right, or center. This is specified
-%% by [align=A] option of the \image command. A is one of left, right, center. Default center.
-%%
-%% F) Vertical Alignment: When an image is shorter than the gap reserved by its [lines=L] option,
-%% it will be padded above and/or below. Option [tweak=T] adjusts the padding. [tweak=up] prints
-%% the image with all padding below; [tweak=down] prints with all padding above; [tweak==mid]
-%% (default) splits the padding.
-%%
-%% G) Floats: Pay attention! Novelette floats are similar to standard LaTeX floats, but have
-%% slightly different possible choices and behavior.
-%%   In some locations, an image may not float; a float request is ignored, and warning issued.
-%% No floats allowed in frontmatter, backmatter, or display zones. Elsewhere, which is between
-%% paragraphs of ordinary main text in mainmatter, an image may float.
-%%   Standard LaTeX allows each image to request one or more float possibilities. Novelette
-%% only allows one choice per image, set by [float=F] option of the \image command. F may be only
-%% one of: none, here, top, bottom. [float=none] is forced, where floats are disallowed.
-%% [float=here] is the default elsewhere, with automatic alternative 'top' if 'here' does not fit.
-%%   There are no page floats. Looks ugly in fiction. Instead, create a component (between others)
-%% containing the image. If the height of the image exceeds 20 lines, then the component must
-%% use the [single] option.
-%%
-%% H) General Advice: Print services recommend that line art use line width at least 0.75pt.
-%% That is useful advice, but it is not enforced by Novelette or by the printers.
-%%   Print services, and online user forums, insist that grayscale image avoid very light and
-%% very dark grays. Remember that your book will not be printed by a method that is intended
-%% for photographic reproduction. When you process images using Novelette's shell scripts,
-%% near-black will be forced to black, and near-white will be forced to white.
-%%   Novelette expects that your use of images will be rare. If your book is a graphic novel,
-%% or other image-intensive work, then Novelette is not for you.
-%%
-%% I) Placeholders: Novelette wants you to 'write now, do graphics later'.
-%%   In draft mode, the \image command does not look for its files. You may use empty braces where
-%% the file name should be, or write a brief reminder of what the image (when created) will mean.
-%% A placeholder (gray rectangle) will print. The placeholder will have the correct alignment,
-%% vertical lines displacement, and float. Only its width is arbitrary. Later, when you have
-%% the actual image, it will replace the placeholder at that exact location.
-%%   If you already have the image file, \image* (with asterisk) will print it, as long as it
-%% fits within its reserved number of lines. Else, error and placeholder. But the image file
-%% will not be tested for all conformance specifications, since that takes time.
-%%   In preview and final modes, \image and \image* are identical. The image must exist, must fit,
-%% and must meet all specifications. Else, error and placeholder.
-%%
-%% J) Text Color: In short, text cannot be color. It cannot be grayscale. All text must be black.
-%%   There is no 'gray ink' in the method that will be used to print your book. If Novelette
-%% allowed gray text, the printer would convert it to raster image. Although most printers can
-%% do that, online forums suggest that the results are unpredictable, and outside your control.
-%%   If you need gray text, rasterize it to a png image, instead of letting the printer do it.
-%% Be sure that the text is bold or heavy, and not too small. Test the result on a home printer,
-%% using only black ink (no CMY ink).
-%%   Tech note: Large-volume commercial presses may have gray ink, even several shades of gray!
-%% They are 'spot colors' pre-mixed to specifications, not CMYK. But this is not available to you.
-%%   Developer note: In 'dev' mode, Novelette applies gray shades to certain areas, so that
-%% layout and alignment can be visualized. This shading is not available to ordinary users.
+%%   There are two graphics commands: \image and \icon. In all cases, the graphics file must be
+%% png raster format, monochrome or true grayscale. It must state its resolution (density).
+%%   In preview and final modes, the file must also pass conformance tests. Novelette provides
+%% shell scripts, using ImageMagick, that process files to ensure conformance. These scripts
+%% are in the documentation utilities folder.
+%%   Files must be located in the same folder as the main document, or (better) in a subfolder
+%% relative to the main document. File paths are always relative to the main document, even if
+%% the file is called by a sub-document.
+%%   You may never place graphics in footnotes or page headers. Only \icon may be used inline
+%% with text; \image and \sceneimage create their own paragraphs.
+%%   All three graphics commands have starred and unstarred versions. In preview and final modes,
+%% there is no difference: each file is carefully inspected.
+%%   In draft mode, an unstarred command does not look for its file. Instead, it prints a gray
+%% placeholder rectangle. If starred, it prints the file if it fits its area.
+%%   If a file is too wide or tall for its area, it is not printed. Instead, a placeholder
+%% rectangle prints where the file would print, and the document is demoted to draft mode.
 
 
 %% IMAGE: \image[option]{path/to/filename.png}  also starred version.
 %%   The optional argument is not truly optional, because it must at least set the number of lines
 %% that the image will displace. The default (3 lines) is a placeholder, and is an error.
-%%   In draft mode, the  mandatory argument may be left empty, or you may write a very short
-%% description (such as "map of Whereville"). This is because \image will not look for a file.
-%%   But the starred \image* always looks for a file. In preview and final modes, you must provide
-%% the file, whether \image or \image*.
+%%   Note that Novelette handles floats using its own syntax. You may provide at most one
+%% of the float choices. Some areas disallow floats. There are no "float pages" that accumulate
+%% several floats. A full-page float is discouraged (better to use a single-page component),
+%% but if you use it, the image appears alone on its page.
 \def\ftype@figure{1} %% Standard.
 \def\nvt@imgrulewd{0pt} %% Nonzero in dev mode. Applies to strut that enforces lines=L.
-\def\nvt@offspec{{\upshape\normalfont\nvt@aff{RawFeature={+cv99}}\char"FFFD}} %% An error symbol.
 \DeclareDocumentCommand\image{sO{}m}{%%
   \begingroup%%
   \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
@@ -116,7 +43,7 @@
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnum\tmpok=0\relax%%
     \nvt@err{Cannot place \string\image\space in footnote or page header.^^J%%
-      Cannot place \string\image\space in \string\styleN (N=1,2,3,4) %%
+      Cannot place \string\image\space in \string\styleN (N=0-9) %%
       or \string\scene, or block environment.}%%
     {\char"FFFD}%%
   \fi%%
@@ -126,20 +53,15 @@
     \ifnvt@indisplay\def\tmpfloat{0}\else\def\tmpfloat{1}\fi%%
     \ifnvt@infrontmatter\def\tmpfloat{0}\fi%%
     \ifnvt@inbackmatter\def\tmpfloat{0}\fi%%
-    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph.
+    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
       {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
       {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
-%%    \ifnum\tmplines>20\relax%%
-%%      \ifnvt@compsingle\else\def\tmpreturn{0}\fi%%
-%%    \fi%%
-%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad \string\image\space option.^^J%%
         \spii Format: [lines=L,align=A,float=F,tweak=T] or [scene,align=A]^^J%%
-        \spiv L -> Integer 1<=L<=20. Must be set.^^J%%
-        \spix Exception: In component with [single] option, max L= lines per page.^^J%%
+        \spiv L -> Integer 1<=L<=(lines per page). Must be set.^^J%%
         \spiv A -> left right center. Default center.^^J%%
         \spiv F -> none here top bottom. Choose only one.^^J%%
         \spix If here, then top is automatic backup.^^J%%
@@ -154,7 +76,6 @@
         \spiv Default alignment is set by \string\defaultscene, or center if unset.^^J%%
         \spiv No float. Special values are used for lines and tweak.}%%
     \fi%%
-%%
     \ifnum\tmpscene=1\relax\blankline\fi%%
     \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
     \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
@@ -162,11 +83,11 @@
     \ifnum\tmpalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
     \ifnum\tmpscene=0\relax%%
       \ifnum\tmplines=0\relax%%
-        \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=linesPerPage.}%%
+        \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=(lines per page).}%%
         \def\tmplines{3}%% Placeholder default. Almost always an incorrect value.
       \fi%%
     \fi%%
-    \ifnum\tmpisfile=0\relax\def\imgfake{1}\fi%%
+    \ifnum\tmpisfile=0\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
       \IfFileExists{#3}{%%
         \def\imgfake{0}%%
@@ -178,7 +99,7 @@
       }%%
     \fi%%
     \ifnum\tmpisfile=2\relax%%
-      \nvt@err{Bad image argument {#3}.^^J%%
+      \nvt@err{Bad image argument: {#3}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. Image filename does not have .png file extension.^^J%%
         \spiv 2. Path to image file is not relative to main document.^^J%%
@@ -237,32 +158,31 @@
 
 %% Real image (if bad, defaults to fake):
 \def\nvt@realimage#1{%%
-  \sbox0{#1}\def\imglabel{}%%
-  \edef\tmpht{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls}pt}%%
+  \def\imglabel{}%%
+  \def\tmpvalid{1}%%
+  \ifnum\tmpvalidate=1\relax\nvt@validateimage{#1}\fi%%
+  \ifnum\tmpvalid=0\relax%%
+    \nvt@warn{Image file #1 failed validation.^^J%%
+      See Novelette docs for how to fix this problem.^^J%%
+      Cannot produce preview or final mode, if not valid.}%%
+    \def\tmplabel{failed validation}\nvt@fakeimage%%
+  \else%%
+    \@ifundefined{#1 image:I}{%%
+      \saveimageresource attr{/Interpolate true}{#1}%%
+      \sbox0{\useimageresource\lastsavedimageresourceindex}%%
+      \expandafter\xdef\csname #1 image:I\endcsname
+        {\useimageresource\the\lastsavedimageresourceindex}%%
+      \wlog{<#1, id=\the\lastsavedimageresourceindex, interpolate=true>}%%
+    }{%%
+      \sbox0{\csname #1 image:I\endcsname}%%
+    }%%
+  \fi%%
+  \edef\tmpht{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls + .004}pt}%%
   \edef\tmpfit{\fpeval{(\ht0 > \tmpht) + (\wd0 > \textwidth)}}%%
   \ifnum\tmpfit>0\relax%%
     \nvt@warn{Image #1 is too large.^^J%%
       \spii Reduce image width and/or height, or increase [lines=L] option.}%% %%%% \tmpscene ?
     \def\tmplabel{oversize image}\nvt@fakeimage%%
-  \else%%
-    \def\tmpvalid{1}%%
-    \ifnum\tmpvalidate=1\relax\nvt@validateimage{#1}\fi%%
-    \ifnum\tmpvalid=0\relax%%
-      \nvt@warn{Image file #1 failed validation.^^J%%
-        See Novelette docs for how to fix this problem.^^J%%
-        Cannot produce preview or final mode, if any image is not valid.}%%
-      \def\tmplabel{failed validation}\nvt@fakeimage%%
-    \else%%
-      \@ifundefined{#1 image:I}{%%
-        \saveimageresource attr{/Interpolate true}{#1}%%
-        \sbox0{\useimageresource\lastsavedimageresourceindex}%%
-        \expandafter\xdef\csname #1 image:I\endcsname
-          {\useimageresource\the\lastsavedimageresourceindex}%%
-        \wlog{<#1, id=\the\lastsavedimageresourceindex, interpolate=true>}%%
-      }{%%
-        \sbox0{\csname #1 image:I\endcsname}%%
-      }%%
-    \fi%%
   \fi%%
 }%%
 %%
@@ -291,7 +211,98 @@
 %%
 
 
-%% Image file validation:
+%% ICON: \icon{path/to/filename.png}
+%%   An icon occupies exactly 0.24in width, 0.18in height. Its upper two-thirds will print
+%% above the surrounding text baseline; lower one-third below baseline.
+%%   You must design the file so that it fits within that area. If smaller, it is automatically
+%% padded to the full area.
+%%   The \icon command may only be used in a display zone. It may be used within a \styleN,
+%% but will not be scaled. It may be used in a block environment, but only if the block does not
+%% use small text.
+\DeclareDocumentCommand\icon{sm}{%%
+  \begingroup%%
+  \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnvt@indisplay\else\def\tmpok{0}\fi%%
+  \ifnvt@smallblock\def\tmpok{0}\fi%%
+  \ifnum\tmpok=0\relax%%
+    \nvt@err{Cannot place \string\icon\space in footnote, page header, or \string\scene.^^J%%
+      Cannot place \string\icon\space in block environment with small text.}%%
+    {\char"FFFD}%%
+  \fi%%
+  \ifnum\tmpok=1\relax%%
+    \def\fps@figure{}\def\tmpvalidate{0}%%
+    \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
+    \IfBooleanTF{#1}%%
+      {\directlua{nvt.parseicon('star','\luaescapestring{#2}')}}%%
+      {\directlua{nvt.parseicon('','\luaescapestring{#2}')}}%%
+    \ifnum\tmpisfile=0\relax\def\iconfake{1}\else\def\iconfake{0}\fi%%
+    \ifnum\tmpisfile=1\relax%%
+      \IfFileExists{#2}{%%
+        \def\iconfake{0}%%
+      }{%%
+        \nvt@err{Missing icon file #2.^^J%%
+          \spii The path and filename have correct format, but the file is not there.^^J%%
+          \spii Either you mis-spelled the path or filename, or no such file.}%%
+        \def\iconfake{1}%%
+      }%%
+    \fi%%
+    \ifnum\tmpisfile=2\relax%%
+      \nvt@err{Bad icon argument: {#2}.^^J%%
+        \spii There are several possibilities:^^J%%
+        \spiv 1. Icon filename does not have .png file extension.^^J%%
+        \spiv 2. Path to icon file is not relative to main document.^^J%%
+        \spix Do not use path relative to sub-documents.^^J%%
+        \spix Do not use absolute path, or symlink (softlink).^^J%%
+        \spiv 3. Icon file is not in same folder as main document,^^J%%
+        \spix or in subfolder from main document (max 5 levels).^^J%%
+        \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
+        \spix You may use hyphen or underscore, but not space or tilde.}%%
+      \def\iconfake{1}%%
+    \fi%%
+    \ifnum\iconfake=0\relax%%
+      \nvt@realicon{#2}%%
+    \else%%
+      \sbox0{{\nvt@gray{8}\rule{.24in}{.18in}}}%%
+    \fi%%
+    \edef\tmpdesc{\fpeval{.33333*\ht0}pt}%%
+    \strut\smash{\raisebox{-\tmpdesc}{\usebox0}}%%
+  \fi%%
+  \endgroup%%
+}%%
+%%
+
+
+%% Real icon (if bad, defaults to fake):
+\def\nvt@realicon#1{%%
+  \def\tmpvalid{1}%%
+  \ifnum\tmpvalidate=1\relax\nvt@validateimage{#1}\fi%%
+  \ifnum\tmpvalid=0\relax%%
+    \nvt@warn{Icon file #1 failed validation.^^J%%
+      See Novelette docs for how to fix this problem.^^J%%
+      Cannot produce preview or final mode, if not valid.}%%
+    \sbox0{{\nvt@gray{8}\rule[-.06in]{.24in}{.18in}}}%%
+  \else%%
+    \@ifundefined{#1 image:I}{%%
+      \saveimageresource attr{/Interpolate true}{#1}%%
+      \sbox0{\useimageresource\lastsavedimageresourceindex}%%
+      \expandafter\xdef\csname #1 image:I\endcsname
+        {\useimageresource\the\lastsavedimageresourceindex}%%
+      \wlog{<#1, id=\the\lastsavedimageresourceindex, interpolate=true>}%%
+    }{%%
+      \sbox0{\csname #1 image:I\endcsname}%%
+    }%%
+  \fi%%
+  \edef\tmpfit{\fpeval{(\ht0 > .184in) + (\wd0 > .244in)}}%%
+  \ifnum\tmpfit>0\relax%%
+    \nvt@warn{Icon #1 is too large.^^J%%
+      \spii Max width 0.24in, height 0.18in.}%%
+  \fi%%
+}%%
+%%
+
+
+%% Image or Icon file validation:
 \def\nvt@validateimage#1{%%
   \directlua{nvt.validateimage('\luaescapestring{#1}')}%%
 }%%
