@@ -18,44 +18,24 @@
 
 
 <div id="navbar">
-<a href="#overview">Overview</a> &nbsp;
-<a href="#required">Required&nbsp;Software</a> &nbsp;
-<a href="#testtex">TeX&nbsp;Test&nbsp;File</a> &nbsp;
-<a href="#novelette">Installing&nbsp;Novelette</a> &nbsp;
-<a href="#testnovelette">Novelette&nbsp;Test&nbsp;File</a>
+<a href="#top">Overview</a> &nbsp;
+<a href="#required">Required TeX Support</a> &nbsp;
+<a href="#testtex">LuaLaTeX Test File</a> &nbsp;
+<a href="#novelette">Installing Novelette</a> &nbsp;
+<a href="#testnovelette">Novelette Test File</a>
 </div>
 
 
-<a id="overview"></a>
 <h3>Overview</h3>
 <p>To use Novelette, you will need a only a small part of the enormous TeXlive software.
 You will need a program that can view PDF. If the book interior has images, you will need
 software for creating <i>png</i> images, and will probably need the ImageMagick program.</p>
 
 
-<h4>Writing</h4>
-<p>The content of your book, for processing by Novelette, must be plain text. That is,
-the text must not contain program-specific markup from word processors. The text must be encoded
-as Unicode <span class="nowrap">utf&#8209;8</span>, without byte order mark (no BOM).</p>
-<ul>
-<li><p>If you already wrote your book (with a word processor), do not depair. Simply load your
-files into the software, and export them as plain text, <span class="nowrap">utf&#8209;8</span>,
-no BOM. Any modern word processor can do that.</p></li>
-<li><p>The machine that you use for writing your text, and the machine that you use for
-processing it with Novelette, may use different operating systems. However, best results
-require you to edit your text after it has been processed, so be sure that you know how
-to do that on any machine.</p></li>
-<li><p>If your operating system is Windows, do not use Notepad. A good plain text editor is
-the free <i>Notepad++</i> software. Be sure it is configured for
-<span class="nowrap">utf&#8209;8</span> encoding, without BOM.</p></li>
-<li><p>On Linux, the Novelette developer uses the <i>nano</i> text editor.</p></li>
-<li><p>Caution: If you use a word processor, be sure that your text is saved/exported as
-<i>plain text,</i> not as LaTeX. You do not want the software to add its own LaTeX code!</p></li>
-</ul>
-
-
-<a id="required"></a>
-<h4>Required Software</h4>
+<p><a id="required"></a>&nbsp;</p>
+<h4 class="section">Required TeX Support</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>You need a working installation of TeX version 2024 or later. It must have:</p>
 <ul>
 <li><p>Essential programs and files,</p></li>
@@ -70,11 +50,14 @@ Linux subsytem for processing image files.</p></li>
 <p class="noindent">That is not a lot! It occupies less than 200Mb on the developer's storage,
 which is less than 5% of all TeXlive. So if you are new to TeX, be sure to install only what
 you need.</p>
-<p>Linux users may obtain TeXlive from the <a href="">TeX Users Group (TUG)</a> or sometimes
-it can be installed from your Linux distribution.</p>
-<p>Mac OS/X users can install <a href="">MacTeX</a>.</p>
-<p>Windows 10+ users can probably use MiKTeX (not tested), but if you are familiar with the
-Linux subsystem and know how to configure it for GUI, do it this way.</p>
+<p>Linux users may install <a href="https://tug.org/texlive/quickinstall.html">TeX Live</a>,
+or sometimes it can be installed from your Linux distribution. Prefer TeXLive, since some
+Linuz distros have out-of-date code.</p>
+<p>Mac OS/X users can install <a href="https://tug.org/mactex/">MacTeX</a>.</p>
+<p>Windows 10+ users may try <a href="https://tug.org/texlive/windows.html">TeX Live</a>
+or <a href="https://miktex.org/">MiKTeX</a>. But if you are familiar with
+the Linux subsystem and know how to configure it for GUI, do it on Linux. Support for
+MinGW/Msys is unknown.</p>
 <p>If your operating system is Android, do not despair! Install the
 <a href="https://f-droid.org/en/packages/com.termux/">Termux app from F-Droid</a>.
 It does not require root privilege. Install <i>xfce4</i> and <i>tigervnc</i> into Termux.
@@ -96,8 +79,10 @@ Although ImageMagick is available for Windows, Novelette's shell scripts are not
 used by Windows scripting host.</p>
 
 
-<a id ="testtex"></a>
-<h4>TeX Test File</h4>
+<p><a id="testtex"></a>&nbsp;</p>
+<h4 class="section">LuaLaTeX Test File</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>After satisfactory TeX installation, copy this code, and paste it into a plain text
 editor. Save the file as <code>test.tex</code> in your home directory:</p>
 <div class="code"><!-- Copy code from the web browser, not from this html file. -->
@@ -127,8 +112,10 @@ launching TeX from the directory where you placed that file.</p>
 <p>If you cannot make that work, then you cannot install Novelette.</p>
 
 
-<a id ="novelette"></a>
-<h4>Installing Novelette</h4>
+<p><a id="novelette"></a>&nbsp;</p>
+<h4 class="section">Installing Novelette</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>If Novelette can be installed from TeXlive, do it that way.
 Its package name will be <code>novelette</code>. But to avoid possible confusion, be sure that
 its documentation is (essentially) what you see now.</p>
@@ -157,8 +144,10 @@ your own files do not know or care where TeX and Novelette reside.</p>
 You will have to decide whether to remove Novelette from <code>TEXMFHOME</code>, or not.</p>
 
 
-<a id="testnovelette"></a>
-<h4>Novelette Test File</h4>
+<p><a id="testnovelette"></a>&nbsp;</p>
+<h4 class="section">Novelette Test File</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Novelette has a built-in test file. From your home folder or desktop (not anywhere
 within Novelette's folders) command:</p>
 <div class="code"><code>lualatex novelette-test</code></div>
@@ -167,9 +156,15 @@ After the first time, that delay will not be repeated.</p>
 <p>The PDF is two pages long, even though its content is only one page. Novelette ensures that
 each PDF has an even number of pages, and that the final page is entirely blank. This feature
 can be disabled for individual documents.</p>
+<p>If that did not work... You are out of luck. The most likely problem is that you have
+multiple TeX installations that conflict with each other, or you changed the path to
+the TEXMFHOME folder.</p>
+
 
 <p>&nbsp;</p>
-<p>All good? Then <a href="intro.html">start creating your book.</a></p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree">&nbsp;</span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>&nbsp;</p>
 
 
