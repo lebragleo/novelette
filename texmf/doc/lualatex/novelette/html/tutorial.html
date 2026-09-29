@@ -8,21 +8,16 @@
 <body>
 <div id="master">
 
-<h4>Novelette Documentation</h4>
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
-<a href="installation.html"><!--
---><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
-<img src="images/tutorial.svg" width="16px" height="16px" alt=""/>TUTORIAL &nbsp;
-<a href="index.html"><!--
---><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
-</p></div>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Tutorial</h2>
 
-<h4 class="pagepath"><a href="home.html">Home</a><span class="downtree"></span></h4>
-<h1 class="pagename">Tutorial</h1>
 
-<div id="navbarb">
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
 <a href="#structure">File/Folder Structure</a> &nbsp; 
 <a href="#maindoc">Main Document</a> &nbsp;
@@ -49,7 +44,7 @@ or very long (one or more chapters). You decide.</p>
 <p><a id="structure"></a>&nbsp;</p>
 <h4 class="section">File and Folder Structure</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>All content must be kept in a single <i>main folder</i>, which has the main document.</p>
 <ul>
 <li><p>You may use sub-folders for the various sub-documents and images, but they do not need
@@ -89,7 +84,7 @@ MurderAtWhereville (main folder)
 <p><a id="maindoc"></a>&nbsp;</p>
 <h4 class="section">Main Document</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <a href="preamble.html">preamble</a> and <a href="document-body.html">document body</a>
 pages describe this in detail.</p>
 <ul>
@@ -118,7 +113,7 @@ pages describe this in detail.</p>
 <p><a id="subdocs"></a>&nbsp;</p>
 <h4 class="section">Sub-Documents</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Full discussion: <a href="sub-documents.html">sub-documents</a>.</p>
 <ul>
 <li><p>A typical sub-document looks like this:</p>
@@ -141,7 +136,7 @@ More content.
 <p><a id="components"></a>&nbsp;</p>
 <h4 class="section">Components</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Full discussion: <a href="components.html">components</a>.</p>
 <p>All printable content must be contained within a <code>component</code> environment.
 Above, the example sub-document has two components of its own. It also includes
@@ -152,7 +147,7 @@ a subdoc, which will introduce at least one more component.</p>
 <p><a id="graphics"></a>&nbsp;</p>
 <h4 class="section">Graphics</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <a href="graphics.html">full discussion of graphics</a> is on another page.
 In general:</p>
 <p>Novelette disallows vector drawings. No TiKz, no EPS, no including other PDF. All graphics
@@ -167,13 +162,13 @@ do anything that is likely to cause those issues.</p>
 <p><a id="paths"></a>&nbsp;</p>
 <h4 class="section">File Paths</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>All file paths must follow these rules:</p>
 <ul>
 <li><p>All paths are <i>relative to the main document</i>, no matter which file calls
 another file.</p></li>
 <li><p>Absolute paths, and symbolic links, are prohibited.</p></li>
-<li><p>Paths and filenames may not contain spaces.</p>
+<li><p>Paths and filenames may not contain spaces.</p></li>
 <li><p>Paths and filenames may not contain the asciitilde (~) or backslash, and may not contain
 any character that is not universally accepted as valid by Linux, OS/X, and Windows 10+.</p></li> 
 <li><p>Paths and filenames may contain hyphen and underscore.</p></li>
@@ -186,7 +181,7 @@ such as <code>\chapterfolder</code>/chapter-1.tex.</p></li>
 <p><a id="gallery"></a>&nbsp;</p>
 <h4 class="section">Gallery of Sample Files</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>In the Novelette documentation folder, the <i>gallery</i> folder contains documents that
 you can compile with Novelette, and compare the PDF to the code.</p>
 <p>You may learn more useful information by reading that code, and imitating it, than
@@ -194,9 +189,9 @@ you will learn by reading these tutorial pages!</p>
 
 
 <p>&nbsp;</p>
-<h4 class="section"><a href="home.html">Home</a><span class="uptree"></span></h4>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree">&nbsp;</span></h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>&nbsp;</p>
 
 

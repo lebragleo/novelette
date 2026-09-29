@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Display Zone</title>
+</head>
+<body>
+<div id="master">
+
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span><!--
+--><a href="components.html">Components</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Display Zone</h2>
+
+
+<div id="navbar">
+<a href="#top">Overview</a> &nbsp;
+<a href="#image">Images</a> &nbsp;
+<a href="#footnote">Footnotes</a> &nbsp;
+<a href="#vspace">Vertical Spacing</a> &nbsp;
+<a href="#style">\style<i>N</i></a> &nbsp;
+<a href="#block">Blocks</a> &nbsp;
+<a href="#title">Example: Title Page</a> &nbsp;
+<a href="#chapter">Example: New Chapter</a>
+</div>
+
+
+
+<h3>Overview</h3>
+<p>Every <i>component</i> environment starts with a <i>display zone</i>. In some places, such as
+the book title page, this zone occupies the entire component. In other places, especially
+new chapters, you use <code>\maintext</code> to end the zone somewhere in the middle of the
+component's first page.</p>
+<p>Within a display zone, you may use a variety of decorative effects that are unavailable
+elsewhere. Standard LaTeX commands, such as <code>\large</code> and <code>\raggedright</code>,
+do not work in Novelette. Instead, you must use Novelette's own commands and options.
+This provides a consistent interaction between the code and the fonts.</p>
+<p>Remember that Novelette is for printed, popular fiction. If the Novelette styles cannot
+do what you want, then either use some other document class, or reduce <i>what you want</i>
+to <i>what you need</i>.</p>
+
+
+<p><a id="image"></a>&nbsp;</p>
+<h4>Images in Display Zones</h4>
+<p>You may place <a href="graphics.html">images</a> in a display zone.</p>
+<ul>
+<li><p>An image may not float. If you attempt to float, then a warning is issued,
+and the float is not obeyed.</p></li>
+<li><p>An image may occupy a full page. This is useful for such things as maps,
+where the image is an entire single-page component.</p></li>
+</ul>
+
+
+<p><a id="footnote"></a>&nbsp;</p>
+<h4>Footnotes in Display Zones</h4>
+<p>You may write <a href="footnotes.html">footnotes</a> in most display zones.</p>
+<ul>
+<li><p>You may not write footnotes anywhere in <a href="frontmatter.html">front matter</a>
+or in <a href="backmatter.html">back matter</a>, whether or not within a display zone.</p></li>
+<li><p>The text of the footnote will appear at the bottom of the page (not the bottom of the
+display zone).</p></li>
+<li><p>No marker prints, and the marker count is not incremented. No label prints at the
+footnote text. This is standard book design.</p></li>
+<li><p>Display zone footnotes are rare. Generally, they are only used when the note applies
+to an entire chapter, rather than to a particular sentence or paragraph. For example:</p>
+<p>\style3{12}</p>
+<p>\style4{Myron and Bertha}</p>
+<p>\footnote{This chapter is based on \textit{Romeo and Juliet}.}</p></li>
+</ul>
+
+
+<p><a id="vspace"></a>&nbsp;</p>
+<h4>Vertical Spacing</h4>
+<p>Display zones usually consist of styled text, vertically separated with a large amount of
+white space. Use <code>\blankline</code> and <code>\vspace</code> commands for that purpose.</p>
+<ul>
+<li><p>Important: Measure vertical space with units of <code>\baselineskip</code> rather than
+units of <code>pt</code> or anything else.</p></li>
+<li><p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p></li>
+</ul>
+
+
+<p><a id="style"></a>&nbsp;</p>
+<h4>\style<i>N</i>[<i>option</i>]{<i>text</i>} where N = integer 0-9.</h4>
+<p>These commands are used for printing the book title, subtitle, and author; chapter titles
+and chapter subtitles; and similar purposes.</p>
+<p>Each <code>\style<i>N</i></code> (for <i>N</i> = 0 to 9) applies the font, scale, track, align,
+and case that were set by the corresponding <code>\setstyle<i>N</i></code>
+in <a href="preamble.html">preamble</a>.</p>
+<ul>
+<li><p><code>\style<i>N</i></code> requires <i>N</i> to be an integer 0-9.</p></li>
+<li><p>These commands may only be used within a display zone, but not within
+a <a href="block-env.html">block environment</a>.</p></li>
+<li><p>You may not nest styles within styles.</p></li>
+<li><p>There is no particular meaning or hierarchy. <code>\style1</code> may be more prominent,
+or less prominent, than <code>\style2</code>.</p></li>
+<li><p>The styled text must fit on one line, without wrap.</p></li>
+<li><p>You may repeat the various <code>\style<i>N</i></code> in any order,
+in any display zone.</p></li>
+<li><p>The only option is <code>[info]</code>. This measures the width of the typeset text, and
+writes the width to Terminal (console). It is measured in normal, unscaled <i>em</i>. Example:</p>
+<p><i>Info: PDFpage 56 \style4 width 12.84em.</i></p></li>
+<li><p>If the style setting is <code>font=main,case=none</code> then the text may use Italics.
+Write the <code>\textit{text}</code> command inside the <code>\style<i>N</i></code>.</p></li>
+</ul>
+
+
+<p><a id="block"></a>&nbsp;</p>
+<h4>Block Environments</h4>
+<p>If you place a <a href="block-env.html">block environment</a> in a display zone, you may use
+its option to choose normal or small text. Small text is especially useful for epigraphs.</p>
+
+
+<p><a id="titlepage"></a>&nbsp;</p>
+<h4>Example: Title Page</h4>
+<p>\begin{component}[single,recto]<br>
+\vspace{4\baselineskip}<br>
+\style1{The Conspiracy}<br>
+\vspace{1.5\baselineskip}<br>
+\style3{Act Four}<br>
+\vspace{4.3\baselineskip}{Fay Cawthor}<br>
+\vfill<br>
+\style6{Potboiler Press • London Paris}<br>
+\end{component}</p>
+
+
+
+<p><a id="chapter"></a>&nbsp;</p>
+<h4>Example: New Chapter</h4>
+<p>\begin{component}<br>
+\vspace{3\baselineskip}<br>
+\style1{8} % chapter number<br>
+\vspace{.7\baselineskip}<br>
+\style4{Jack's Revenge} % chapter subtitle<br>
+\vspace{3\baselineskip}<br>
+\maintext % end of display zone<br>
+\init{J}\Smcp{ack was angry.} Someone had stepped on his blue suede shoes,
+and a crime like that could not be forgiven. <i>etc...</i><br>
+<i>etc...</i><br>
+\end{component}</p>
+
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>

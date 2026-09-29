@@ -8,129 +8,107 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">Home</a>
-&nbsp; <a href="installation.html">Installation</a>
-&nbsp; <a href="intro-00.html">Creating Your Book / GRAPHICS</a>
-&nbsp; <a href="intro-99.html">INDEX</a>
-</div>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Graphics</h2>
 
-<h2>Novelette Documentation - Graphics</h3>
 
-<div id="navbarb">
+<div id="navbar">
 <a href="#overview">Overview</a> &nbsp;
-<a href="#specs">Print&#8209;Ready Specifications</a> &nbsp;
-<a href="#best">Best Pracices</a> &nbsp;
+<a href="#format">Format: <i>png</i></a> &nbsp;
+<a href="#path">Path/Filename</a> &nbsp;
 <a href="#paths">Paths to Image Files</a> &nbsp;
 <a href="#dims">Image Dimensions</a> &nbsp;
 <a href="#image">Command: \image</a> &nbsp;
 <a href="#scene">Scene Breaks</a> &nbsp;
+<a href="#icon">Command: \icon</a> &nbsp;
 <a href="#scripts">Shell Scripts</a>
 </div>
 
 
-<a id="overview"></a>
+<p><a id="overview"></a>&nbsp;</p>
 <h3>Overview</h3>
-<p>Novelette does not use the standard LaTeX <code>\includegraphics</code> command. You cannot
-include any of these formats: <i>pdf eps svg jpg</i>. You cannot draw <i>TiKz</i> diagrams,
-or use <i>pstricks</i> drawings. Instead, you are limited to monochrome or grayscale
-raster <i>png</i> images.</p>
-<p>You must declare how much space each image will occupy, in terms of the integer number of
-text lines that it displaces. In draft mode, Novelette does not look for an image file,
-but prints a placeholder at its declared size. Since the file does not need to exist, you may
-“write now, do graphics later”.</p>
-<p>Once you have an image, you may request that it print instead of its placeholder. As long as
-the image fits its declared size, its position will match the placeholder; text line breaks and
-page breaks will remain unchanged. If the image is smaller than declared (the usual situation),
-it is padded to fit its declared size. But if it is too large, error; the placeholder remains.</p>
-<p>Draft mode does not check image files for print-ready specifications. But when you switch
-to preview or final mode, each image is tested. Any failure demotes to draft mode. You can
-repair the image using scripts in Novelette's documentation utilities folder. By enforcing
-specifications, Novelette improves the likelihood that copies of your book, printed by various
-manufacturers, will be more consistent.</p>
-<p>Novelette is intended for text fiction, not picture books or graphic novels. Excessive
-image clutter will not look good; for that you need a page layout program.</p>
+<p>If your book has any graphics, be sure to read this page! Novelette does not use any of
+the standard LaTeX methods for graphics. In particular, the <code>\includegraphics</code>
+command is disabled.</p>
+<p>Novelette is intended for popular fiction, such as mystery novels, where the use of images
+is very rare. If your story requires many images, then use something other than Novelette.</p>
+<p>Novelette cannot create the book cover. For that, you need other software. But there is some
+useful information about covers <a href="#cover">lower on this page</a>.</p>
 
 
-<a id="specs"></a>
-<h3>Print-Ready Specifications</h3>
+<p><a id="format"></a>&nbsp;</p>
+<h4>Graphics Format: <i>png</i></h4>
+<p>The <i>png</i> (portable network graphics) raster image is the <i>only</i> format supported
+by Novelette. No exceptions. You cannot create TiKz drawings. You cannot include <i>eps</i>
+or <i>pdf</i> files.</p>
 <ul>
-<li><p>All image files must be <i>png</i> format, either monochome (1-bit per pixel),
-or single-channel grayscale without transparency (8-bits per pixel).</p></li>
-<li><p>The image files must state their resolution (density) in pixels/inch or pixels/cm.
-Most graphics programs do this automatically.</p></li>
-<li><p>In draft mode, most specifications are not checked (saves time). Do not be surprised
-if an image can be printed in draft mode, but is rejected in preview and final modes.</p></li>
-<li><p>In preview and final modes, images must meet additional print-ready specifications:
-no color profile, no transforms, no private metadata.</p>
-<p>Unless you have expertise with a professional graphics program (and even if you do!)
-it is unlikely that your images will meet these specifications. Novelette provides scripts
-in its documentation utilities folder, which will apply the specifications. Requires ImageMagick.
-Instructions accompany the scripts.</p>
+<li><p>Novelette does not have <code>\caption</code> or anything similar, and cannot draw a frame.
+If you need these, you must design them into the graphics file.</p></li>
+<li><p>Internally, each file must state its resolution (density). This is normal for
+graphics design software.</p>
+<p>Note: Resolution is usually described terms of pixels per inch. The <i>png</i> internal format
+convert it to pixels per centimeter. This is automatic; have no fear.</p></li>
+<li><p>Graphics color space must be either monochrome (black/white at 1&#8209;bit per pixel),
+or single-channel grayscale (8&#8209;bits per pixel).</p></li>
+<li><p>Preview and final modes require that the files pass <a href="#validation">validation</a>
+tests.</p></li>
+<li><p>In most cases, files that do not meet all of the above requirements can be easily repaired
+using <a href="#scripts">utility scripts</a> that come with Novelette.</p></li>
+<li><p>The file will print at its exact size, without rescale or other transform. Thus, a file
+that is 150x450 pixels at 300px/inch, will print at 0.5x1.5 inches.</p></li>
+<li><p>Best Practice: Design graphics for print&#8209;on&#8209;demand.</p>
+  <ul>
+  <li><p>A monochrome file (1&#8209;bit per pixel) should use 600&nbsp;pixels/inch resolution,
+      or greater (if your print service allows it).</p></li>
+  <li><p>A grayscale file should use 300&nbsp;pixels/inch. There is no advantage to using
+      a higher value, although some print services prefer a slightly higher value.</p></li>
+  <li><p>The technology does a poor job with smooth gradients, and a poor job for grays that
+      are close to white or black. When you process your files using Novelette's
+      <a href="#scripts">utility scripts</a>, grays close to white are forced to white,
+      and grays close to black are forced to black.</p></li>
+  <li><p>If possible, test your files by printing them with inkjet, and also by printing them
+      with toner (like photocopier, but can read digital files). Be sure that only
+      black ink is used!</p></li>
+  </ul></li>
 </ul>
 
 
-<a id="best"></a>
-<h3>Best Practices</h3>
+<p><a id="path"></a>&nbsp;</p>
+<h4>Path and Filename</h4>
+<p>Have you ever archived or copied a work containing many files, only to discover that
+something is missing? Novelette feels your pain. For that reason, you must follow these rules:</p>
 <ul>
-<li><p>In the same folder as your main document, create a subfolder containing the
-native-format graphics files for all your images. Then, if you need to change anything,
-you know where the originals are kept. This is especially important if someone else
-creates graphics for you: Be sure to request native format, as well as exported
-<i>png</i> format files.</p></li>
-<li><p>In the same folder as your main document, create a subfolder containing all the
-finished <i>png</i> images that will be used in the book interior. This folder may
-contain its own subfolders, with images sorted as you wish. Maximum 5 levels down from
-the main document.</p></li>
-<li><p>In the same folder as your main document, create a subfolder containing whatever
-is needed for the book cover. Although Novelette does not do cover artwork, you need
-to be sure that the cover files travel with the rest of the book.</p></li>
-<li><p>For monochrome, design images at <i>600px/in</i> or greater. Maximum <i>1200px/in</i>.
-For grayscale, the most common value is <i>300px/in</i>. Usually, there is no advantage to higher
-grayscale resolution. If your print service requests specific values, use them.</p></li>
-<li><p>Grays near-black and near-white do not print as expected. Do not expect photo-quality
-grays, because the printing process (and paper) used for your book will not be the same
-as ordinary home and office printers. Design your images with this in mind.</p></li>
-<li><p>Line art (drawings) will look best when lines (and gaps between them) are about
-0.75pt wide, or more. That is 3 pixels for grayscale at 300px/in, or 6 pixels for monochrome
-at 600px/in.</p></li>
-<li><p>In a grayscale image, these will be hard to read: gray text, text against a
-gray background, light text against a dark background. If necessary, use larger font size,
-heavy (bold) fonts, or fonts (such as sans-serif) without fine details.</p></li>
-<li><p>Novelette does not provide captions or borders. If you need those things, you must design
-them into the images. There are no transforms; images cannot be flipped, rotated, cropped,
-or scaled within Novelette.</p></li>
+<li><p>File names must have the lowercase <i>.png</i> file extension.</p></li>
+<li><p>File paths are always <i>relative to the main document</i>, even if the files are called
+by a sub-document.</p></li>
+<li><p>The names and paths may not contain spaces, or any character that is not a valid
+path/file name in all modern operating systems. No backslash! You may use hyphen or
+underscore.</p></li>
+<li><p>No absolute paths: No Linux <code>/home/john/</code>. No Windows <code>C://john</code>.
+No asciitilde <code>~</code>.</p></li>
+<li><p>No symlinks (softlinks).</p></li>
+<li><p>Files must be located in the same folder as the main document, or in a subfolder
+(maximum 5 levels) down from the main document.</p></li>
+<li><p>You cannot use <code>\graphicspath</code> to change anything.</p></li>
+<li><p>Best Practice: Within the main document folder, create another folder for storing
+native-format graphics files. Then, if you ever need to edit them, you have the originals
+where they can easily be found.</p></li>
 </ul>
 
 
-<a id="paths"></a>
-<h3>Paths to Image Files</h3>
-<p>These are essentially the same rules used for sub-documents:</p>
-<ul>
-<li><p>An image file <i>must</i> be located in the same folder as the main document, or in
-a subfolder from there.</p></li>
-<li><p>When using sub-documents, all paths to images are <i>relative to the main document</i>,
-not relative to the sub-document files. Thus, any sub-document may call any image, with proper
-path from main document.</p></li>
-<li><p>The paths and filenames may contain letters (case-sensitive), numerals, hyphen, underscore,
-and period. They may not contain spaces, asciitilde, backslash, or other characters that are not
-platform-independent paths or file names.</p></li>
-<li><p>Do not use any LaTeX code in the path or filename. For example, if the actual filename is
-<i>dèjá.png</i> then do not request <i>d\`ej\'a.png</i>.<p></li>
-</li><p>Since all paths must be relative to the main document, any path beginning with
-<code>/</code> or <code>C://</code> (or something similar) will be rejected. And since any path
-must not lead outside the main document folder, any path containing <code>../</code> will be
-rejected. Any path that resolves to a symlink (softlink) will be rejected.</p></li>
-<li><p>For developer testing purposes, Novelette contains a few generic images in the same
-folder as <i>novelette.cls</i>. These can be used by filename alone, without path. But an
-ordinary user is unlikely to need them.</p></li>
-</ul>
+
+
 
 
 <a id="dims"></a>
-<h3>Image Dimensions</h3>
-<p>This applies to ordinary images, using the <code>\image</code> command.
-The <code>\sceneimage</code> command has different requirements.</p> 
+<h4>Image Dimensions</h4>
+<p>This applies to ordinary images, using the <code>\image</code> command.</p> 
 <ul>
 <li><p>Run a test document with your Preamble settings, in draft mode. The Terminal Summary will
 show the textwidth, font em size, and baselineskip. These are specific to your settings.
@@ -165,21 +143,24 @@ will be adequate, but not very great.</p></li>
 
 
 <a id="image"></a>
-<h3>The \image Command (Also \image*)</h3>
-<p>Usage: <code>\image[<i>option</i>]{<i>PathFromMainDocumentTo/filename.png</i>}</code><p>
-<p>Option format: <code>[lines=<i>L</i>,align=<i>A</i>,float=<i>F</i>,tweak=<i>T</i>]</code>.
-Alternate option <code>[scene]</code> is described in the next section.</p>
+<h4>The \image Command (Also \image*)</h4>
+<p>Usage: <code>\image[<i>option</i>]{<i>PathTo/filename.png</i>}</code></p>
+<p>There are two possible formats for the option: If it contains the keyword <i>scene</i>,
+then see the <a href="#scene">next section</a>. When it does not contain <i>scene</i>,
+use this format:</p>
+<p>Option: <code>[lines=<i>L</i>,align=<i>A</i>,float=<i>F</i>,tweak=<i>T</i>]</code>.
 <ul>
-<li><p><code><i>L</i></code> is an integer &gt;= 1.</p>
-<p>If the image is located in a component with [single] option, then max <code><i>L</i></code>
-is lines per page. Elsewhere, max <code><i>L</i></code> is <code><i>20</i></code>.</p>
-<p>Although it is written as an option, each image must declare its number of lines. There is no
-default value.</p>
-<p>Whether or not the image floats, it will displace that number of lines of main text
-(or the equivalent).</p></li>
+<li><p><code><i>L</i></code> is an integer 1&lt;L&lt;(lines per page).</p>
+<p>Although it is written as an option, each image must declare its number of lines. This is
+the amount of vertical space that the image will use.</p>
+<p>If the image does not fit in its reserved space, it is a problem. It will not be printed
+somewhere else. Instead, a gray placeholder rectangle prints where the image should print,
+occupying the reserved amount of vertical space.</p>
+<p>If the image is shorter than its reserved space, it will be automatically padded to occupy
+the full space.</p></li>
 <li><p><code><i>A</i></code> is one of <code>left right center</code>.</p>
 <p>Horizontal alignment. Default <code>center</code>.</p></li>
-<li><p><code><i>F</i></code> is one of <code>none here top bottom</code>.<p>
+<li><p><code><i>F</i></code> is one of <code>none here top bottom</code>.</p>
 <p>In frontmatter, backmatter, and component display areas, only <code>none</code> permitted;
 it is the default.</p>
 <p>In main text, the default is <code>here</code>. Novelette automatically uses <code>top</code>
@@ -190,13 +171,13 @@ This should never be done in the middle of a chapter, where it would break the t
 <li><p><code><i>T</i></code> is one of <code>up down mid</code>.</p>
 <p>When the height of an image is less than its maximum (for any particular lines=L), it will be
 padded above and/or below. Tweak changes where padding is applied. Choice <code>up</code> moves
-the image as high as it can go (all padding beneath). Choice <code>down</up> moves the image
+the image as high as it can go (all padding beneath). Choice <code>down</code> moves the image
 as low as it can go (all padding above). Choice <code>mid</code> is the default, which splits
 the padding.</p>
 <p>Tweak does not change where an image floats, and does not change the number of displaced
 lines.</p></li>
 </ul>
-<p class="noindent">Mandatory: <code>{<i>PathFromMainDocumentTo/filename.png</i>}</code></p>
+<p class="noindent">Mandatory: <code>{<i>PathTo/filename.png</i>}</code></p>
 <ul>
 <li><p>In draft mode, unstarred <code>\image</code> does not look for an image file. It prints
 a placeholder, whether or not the file exists. You may use empty braces, or write a short note,
@@ -218,18 +199,18 @@ the placeholder size is guessed at slightly smaller than the maximum possible si
 </ul>
 
 
-<a id ="scene"></a>
-<h3>Using an Image as Scene Break</h3>
-<p>When <code>\image</code> has the single option <code>[scene]</p>, it is specially formatted
+<p><a id ="scene"></a>&nbsp;</p>
+<h4>Using an Image as Scene Break</h4>
+<p>When <code>\image</code> has the single option <code>[scene]</code>, it is specially formatted
 for use as a scene break. This is one of several ways to separate scenes within a chapter or
 long story.</p>
 <p>Typically, the image will be rasterized text in a prominent font. Intead of black, it will be
 some shade of gray, so that it is not too prominent. The font does not need to be one of the
 Novelette fonts, as long as its license permits commercial usage.</p>
 <ul>
-<li><p>Option <code>[scene]</code> cannot be combined with other options.</p>
-<li><p>The image does not float.</p>
-<li><p>Horizontal alignment is the <code>\scenestyle</code> setting, or default center.</p>
+<li><p>Option <code>[scene]</code> cannot be combined with other options.</p></li>
+<li><p>The image does not float.</p></li>
+<li><p>Horizontal alignment is the <code>\scenestyle</code> setting, or default center.</p></li>
 <li><p>Maximum image width is 3.4in, which is more than any good-looking scene break needs.
 Maximum image height is 0.24in. These apply regardless of trim size or layout.</p></li>
 <li><p>The image is automatically padded to occupy a total of 3 lines. If you wish,

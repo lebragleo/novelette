@@ -8,21 +8,25 @@
 <body>
 <div id="master">
 
-<h4>Novelette Documentation</h4>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Components</h2>
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16" height="16" alt=""/>Home</a> &nbsp;
-<a href="install.html"><!--
---><img src="images/install.svg" width="16" height="16" alt=""/>Installation</a> &nbsp;
-<a href="tutorial.html"><!--
---><img src="images/tutorial.svg" width="16" height="16" alt=""/>Tutorial</a> &nbsp;
-<a href="index.html"><img src="images/index.svg" width="16" height="16" alt=""/>Index</a>
-</p></div>
 
-<h2>Tutorial &gt; Components</h2>
-
-<div id="navbarb">
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
+<a href="#environment">Component Environment</a> &nbsp;
+<a href="#displayzone">Display Zone</a> &nbsp;
+<a href="#maintext">Main Text</a> &nbsp;
+<a href="#guide">Guide Mark</a> &nbsp;
+<a href="#option">Component [option]</a> &nbsp;
+<a href="#legal">[class=legal]</a> &nbsp;
+
 </div>
 
 
@@ -63,6 +67,7 @@ Use placeholder <code>\next</code> until you know the numbers.</p></li>
 </ul>
 
 
+<p><a id="displayzone"></a>&nbsp;</p>
 <h4>Display Zone</h4>
 <p>Each component begins with a <i>display zone</i>. It may be empty, but that is unusual.
 It may occupy the entire component, which is typical for the title page and other special
@@ -70,21 +75,11 @@ pages.</p>
 <p>Most often, the display zone occupies part of the component's first page, followed by
 main text lower on that page. Then, the main text continues to additional pages. This is
 typical for chapters.</p>
-<p>Within the display zone, you may:</p>
-<ul>
-<li><p>Use the <code>\style<i>N</i></code> (N=1-9) commands, described below.</p></li>
-<li><p>Place <i>non-floating</i> images.</p></li>
-<li><p>Use <code>\footnote</code> where allowed, but it will not print a marker.</p></li>
-<li><p>Place the <i>block</i> environment, with normal or small text.</p></li>
-<li><p>Write ordinary text, but <i>not</i> the text of your story.</p></li>
-</ul>
-<p class="noindent">>In most cases, the content of a display zone is widely spread vertically,
-using <code>\blanline</code> and/or <code>\vspace</code> where needed.</p>
-<p>If you use <code>\vspace</code>, write its value in units of <code>\baselineskip</code>.
-Do not use units of <code>pt</code> or any other measure.</p>
-<p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p>
+<p>Within the display zone, you may use styling commands that are unavailable elsewhere.
+Full description is <a href="display-zone.html">provided here</a>.</p>
 
 
+<p><a id="maintext"></a>&nbsp;</p>
 <h4>Main Text</h4>
 <p>The <code>\maintext</code> command ends the display zone. If the display occupies
 the entire component, do not write <code>\maintext</code>.</p>
@@ -99,11 +94,13 @@ to restore the baseline to grid, then automatically adds that space.</p>
 <li><p>Place images. They may float, where allowed.</p></li>
 <li><p>Use <code>\footnote</code> where allowed. Its marker prints.</p></li>
 <li><p>Use <code>\scene</code> where allowed.</p></li>
-<li><p>Place the <i>block</i> environment, but it must have normal text, not small.</p></li>
+<li><p>Place the <a href="block-env.html">block environment</a>, but it must have normal text,
+not small.</p></li>
 <li><p>Write ordinary text. Usually (not always) this is the text of your story.</p></li>
 </ul>
 
 
+<p><a id="guide"></a>&nbsp;</p>
 <h4>Guide Mark</h4>
 <p>The content and spacing of the display zone, determines where the first line after
 <code>\maintext</code> will print. Standard practice (not mandatory) is to tweak the
@@ -119,6 +116,7 @@ no guide.</p>
 <p>You choose whether or not to obey the guide. Missing it is not a problem.</p>
 
 
+<p><a id="option"></a>&nbsp;</p>
 <h4>Component Option</h4>
 <p>Most components do not need an option.</p>
 <p><code>\begin{component}[class=<i>C</i>,style=<i>S</i>,guide=<i>G</i>]</code></p>
@@ -155,6 +153,7 @@ no guide.</p>
 </ul>
 
 
+<p><a id="legal"></a>&nbsp;</p>
 <h4>Component [class=legal]</h4>
 <p>This is a special case. The content of the component is neither display nor main text,
 but has its own set of rules, optimized for showing basic legal information.</p>
@@ -170,7 +169,7 @@ PDF metadata. It is your responsibility to ensure that the information matches.<
 a sub-document, because its page numbers are unknown.</p></li>
 <li><p>The <code>\maintext</code> command, if used, will be ignored.</p></li>
 <li><p>You may use Italics and small caps.</p></li>
-<li><p>You may <i>not</i> use the <i>block</i> environment.</p></li>
+<li><p>You may <i>not</i> use the block environment.</p></li>
 <li><p>You may <i>not</i> use any <code>\styleN \scene \init \dcap</code>.</p></li>
 <li><p>Numerals will always be lining. Requests for oldstyle will be ignored.</p></li>
 <li><p>You may use <i>non-floating</i> images. Do not write essential copyright information
@@ -186,14 +185,14 @@ than the full textwidth. Do not allow lines to wrap!</p></li>
 </ul>
 
 
-<h4>\style<i>N</i>[<i>option</i>]{<i>one line of text</i>} where <i>N</i>=1-9</h4>
-<p>There are nine commands of the form <code>\style1</code> through <code>\style9</code>.
+<h4>\style<i>N</i>[<i>option</i>]{<i>one line of text</i>} where <i>N</i>=0-9</h4>
+<p>There are ten commands of the form <code>\style0</code> through <code>\style9</code>.
 Each of them can style <i>one line of text</i> according to the corresponding
 <code>\scenestyle<i>N</i></code> setting in preamble.</p>
 <ul>
 <li><p>The <i>one line of text</i> is just that: no line breaks or wrap. Do not write
 <code>\par</code> within the <code>\style<i>N</i></code> command.</p></li>
-<li><p>These commands may only be used in display zones, but not within <i>block</i>
+<li><p>These commands may only be used in display zones, but not within block
 environments.</p></li>
 <li><p>There is no hierarchy. You decide whether <code>\style1</code> is more or less important,
 and more or less prominent, than <code>\style2</code>.</p></li>
@@ -223,11 +222,14 @@ in Novelette. So the command is re&#8209;written with custom syntax:</p>
         for that style. Then request a suitable line width
         (may be more, less, or the same value).</p></li>
     </ul></li>
-<li><p><i>T</i> -> number without units 1-9. May be decimal.</p>
+<li><p><i>T</i> -> number without units 0-9. May be decimal.</p>
     <ul>
     <li><p>T=1 is the thinnest available line, 0.75pt. Print services prefer this minimum,
     for best appearance.</p></li>
     <li><p>T=9 is 6.75pt.</p></li>
+    <li><p>T=0 reserves the space, but does not print a line.</p></li>
+    <li><p>0&lt;T&lt;1 is silently promoted to T=1.</p></li>
+    <li><p>T&gt;9 is silently demoted to T=9.</p></li>
     </ul>
 </ul>
 <p class="noindent">When identical <code>\line</code> are used above and below

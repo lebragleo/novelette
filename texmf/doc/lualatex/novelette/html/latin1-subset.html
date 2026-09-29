@@ -8,22 +8,19 @@
 <body>
 <div id="master">
 
-<h4>Novelette Documentation</h4>
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
-<a href="install.html"><!--
---><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
-<a href="tutorial.html"><!--
---><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &gt;
-<a href="preamble.html">Preamble</a> &nbsp;
-<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
-</p></div>
-
-<h2>Characters Allowed in Metadata</h3>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="preamble.html">Preamble</a><span class="downtree">&nbsp;</span><!--
+--><a href="metadata.html">Metadata</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Characters Allowed in Metadata</h2>
 
 
-<div id="navbarb">
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
 <a href="#table">Character Table</a> &nbsp;
 <a href="#special">Special Cases</a>
@@ -74,62 +71,63 @@ The characters allowed in these settings are a subset of Latin&#8209;1.</p>
 <p><a id="special"></a>&nbsp;</p>
 <h4 class="section">Special Cases</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>What Novelette allows, what book services allow, and what you <i>should</i> do,
 may not perfectly agree. Here are some rules and suggestions:</p>
 <ul>
 <li><p>All metadata:</p>
-<ul>
-<li><p>If you use any of # &amp; @ characters, they must be escaped by backslash:
-<code>\# \&amp; \@</code>.</p></li>
-<li><p>Except as described above, you cannot use the backslash character for any purpose.
-No macros. No codes such as <code>\'E</code> for Eacute.</p></li>
-<li><p>If you use parentheses, they must (properly match).</p></li>
-<li><p>No quotes of any kind. The quotesingle character may be used only as an apostrophe,
-and that's a fact.</p></li>
-<li><p>No guillemets.</p></li>
-<li><p>You cannot use dashes, or <code>--</code> or <code>---</code> to create dashes.</p></li>
-<li><p>For inverted exclamation and question marks, paste the characters from a Unicode
-character map. Do not LaTeX codes.</p></li>
-</ul></li>
+  <ul>
+  <li><p>If you use any of # &amp; @ characters, they must be escaped by backslash:
+      <code>\# \&amp; \@</code>.</p></li>
+  <li><p>Except as described above, you cannot use the backslash character for any purpose.
+      No macros. No codes such as <code>\'E</code> for Eacute.</p></li>
+  <li><p>If you use parentheses, they must (properly match).</p></li>
+  <li><p>No quotes of any kind. The quotesingle character may be used only as an apostrophe,
+      and that's a fact.</p></li>
+  <li><p>No guillemets.</p></li>
+  <li><p>You cannot use dashes, or <code>--</code> or <code>---</code> to create dashes.</p></li>
+  <li><p>For inverted exclamation and question marks, paste the characters from a Unicode
+      character map. Do not LaTeX codes.</p></li>
+  </ul></li>
 <li><p>Title, Subtitle, Author:</p>
-<ul>
-<li>Metadata must agree with print. If you register <i>Murder at Plonk</i> as title, then you
-cannot print <i>Murder @ Plonk</i> on the cover, title/copyright pages, or page headers.</p></li>
-<li><p>The middot (periodcentered) character may only be used if necessary in Catalan,
-and only if your distributor allows it. Avoid this character, if possible.</p></li>
-<li><p>Novelette disallows monetary units and percent, even though some distributors allow them.
-In general, books with those symbols are nonfiction investment advice, which is not a Novelette
-genre. You may spell the words: <i>The Three-Dollar Thief</i>
-or <i>Eighty Percent Good</i>.</p></li>
-<li><p>The semicolon is allowed, but discouraged, as it is likely to cause confusion. The only
-well-known book with a semicolon in its title is <i>Moby-Dick; or, The Whale</i>.</p></li>
-<li><p>The asterisk is sometimes used as a trick for bad language:
-<i>Sh*tty Story</i>. The only well-known book with asterisk in its title
-(long before it became a TV series) is <i>M*A*S*H</i>.</p></li>
-<li><p>The colon is normally used to separate title from subtitle, when they appear
-as a unit. If you register your book with title <i>This</i> and subtitle <i>That</i>,
-it is likely to be listed in the distribution database as <i>This : That</i>. Confusion
-will result, if either the title or subtitle contains its own colon.</p></li>
-<li><p>The numbersign is normally used only to indicate books in a series, such as
-<i>The Blonk (Potboiler #5)</i>.</p></li>
-<li><p>The forward slash is sometimes used to indicate alternate titles, for example
-when there are two short books printed as one book: <i>The Plague / The Cure</i>.
-But that is discoured by print-on-demand, because you cannot place only <i>The Plague</i>
-or only <i>The Cure</i> as page headers.</p></li>
-<p>If the metadata needs a fraction, best practice is to spell it out: <i>Three-Fourths</i>,
-not <i>3/4</i>.</p></li>
-<li><p>The Novelette developer does not know whether a French book titled <i>Zut!</i>
-should use <i>Zut!</i> or <i>Zut&nbsp;!</i> in metadata. If you must provide space, use the
-ordinary space character, not a non&#8209;breaking space.</p></li>
-</ul></li>
+  <ul>
+  <li><p>Metadata must agree with print. If you register <i>Murder at Plonk</i> as title, then you
+      cannot print <i>Murder @ Plonk</i> on the cover, title/copyright pages,
+      or page headers.</p></li>
+  <li><p>The middot (periodcentered) character may only be used if necessary in Catalan,
+      and only if your distributor allows it. Avoid this character, if possible.</p></li>
+  <li><p>Novelette disallows monetary units and percent, even though some distributors allow them.
+      In general, books with those symbols are nonfiction investment advice, which is not
+      a Novelette genre. You may spell the words: <i>The Three-Dollar Thief</i>
+      or <i>Eighty Percent Good</i>.</p></li>
+  <li><p>The semicolon is allowed, but discouraged, as it is likely to cause confusion. The only
+      well-known book with a semicolon in its title is <i>Moby-Dick; or, The Whale</i>.</p></li>
+  <li><p>The asterisk is sometimes used as a trick for bad language:
+      <i>Sh*tty Story</i>. The only well-known book with asterisk in its title
+      (long before it became a TV series) is <i>M*A*S*H</i>.</p></li>
+  <li><p>The colon is normally used to separate title from subtitle, when they appear
+      as a unit. If you register your book with title <i>This</i> and subtitle <i>That</i>,
+      it is likely to be listed in the distribution database as <i>This : That</i>. Confusion
+      will result, if either the title or subtitle contains its own colon.</p></li>
+  <li><p>The numbersign is normally used only to indicate books in a series, such as
+      <i>The Blonk (Potboiler #5)</i>.</p></li>
+  <li><p>The forward slash is sometimes used to indicate alternate titles, for example
+      when there are two short books printed as one book: <i>The Plague / The Cure</i>.
+      But that is discoured by print-on-demand, because you cannot place only <i>The Plague</i>
+      or only <i>The Cure</i> as page headers.</p>
+      <p>If the metadata needs a fraction, best practice is to spell it out: <i>Three-Fourths</i>,
+      not <i>3/4</i>.</p></li>
+  <li><p>The Novelette developer does not know whether a French book titled <i>Zut!</i>
+      should use <i>Zut!</i> or <i>Zut&nbsp;!</i> in metadata. If you must provide space, use the
+      ordinary space character, not a non&#8209;breaking space.</p></li>
+  </ul></li>
 </ul>
 
 
 
 <h4 class="section">&nbsp;</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>&nbsp;</p>
 
 

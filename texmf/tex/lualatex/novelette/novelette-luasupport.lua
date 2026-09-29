@@ -554,7 +554,7 @@ end
 nvt.parsesetstyle = function (N, s) -- style number, setting
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   local n, m, mm, mmm, t, tt, a, f, c, h, d ; local ok = true
-  N = tonumber(N) ; if not N or N < 0 or N > 1 then ok = false end
+  N = tonumber(N) ; if not N then ok = false end
   if nvt.didstyle[N] == true then ok = false else nvt.didstyle[N] = true end
   if nvt.preamble == false then ok = false end
   if ok == true and string.find(s, 'scale=') then
@@ -877,12 +877,29 @@ end
 --
 
 
--- Parse \entry option:
-function nvt.parseentry (s)
+-- Parse toc environment option:
+nvt.parsetoc = function (s)
+  s = string.gsub(s, ' ', '')
+  s = tonumber(s)
+  if s and s >= 0 and s <= 8 then
+    local r = s + 0.6
+    tex.sprint('\\def\\tmptocl{' .. s .. '}\\def\\tmptocr{' .. r .. '}\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
+end
+--
+
+
+-- Parse \padentry option:
+function nvt.parsepad (s)
   s = string.gsub(s,' ','') ; if s == '' then s = 0 end
-  s = tonumber(s) or -1
-  if (s < 0) or (s > 2) then s = -1 end
-  tex.sprint('\\def\\tmppad{' .. s .. '}') ; if s == -1 then nvt.good = false end
+  s = tonumber(s)
+  if not s or (s < 0) or (s > 1) then
+    tex.sprint('\\def\\tmppad{0}\\def\\tmpreturn{0}') ; nvt.good = false
+  else
+    tex.sprint('\\def\\tmppad{' .. s .. '}\\def\\tmpreturn{1}')
+  end
 end
 --
 
@@ -926,13 +943,13 @@ function nvt.parseblock (s,d)
     l = string.gsub(s, '/.*', '') ; ln = tonumber(l)
     r = string.gsub(s, '.*/', '') ; rn = tonumber(r)
     if l == 'k' and r == 'k' then
-      tex.sprint('\\def\\tmpblockleft{-99}\\def\\tmpblockright{-99}')
+      tex.sprint('\\def\\tmpkeyleft{1}\\def\\tmpkeyright{1}')
       s = string.gsub(s, 'k/k', '')
     elseif l == 'k' and rn and rn >= 0 and rn <= 8 then
-      tex.sprint('\\def\\tmpblockleft{-99}\\def\\tmpblockright{' .. r .. '}')
+      tex.sprint('\\def\\tmpkeyleft{1}\\def\\tmpblockright{' .. r .. '}')
       s = string.gsub(s, 'k/' .. r, '')
     elseif r == 'k' and ln and ln >= 0 and ln <= 8 then
-      tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpblockright{-99}')
+      tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpkeyright{1}')
       s = string.gsub(s, l .. '/k', '')
     elseif ln and rn and ln >= 0 and rn >= 0 and ln <= 8 and rn <= 8 then
       tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpblockright{' .. r .. '}')

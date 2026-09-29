@@ -9,24 +9,22 @@
 <div id="master">
 
 
-<h4>Novelette Documentation</h4>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Front Matter</h2>
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
-<a href="install.html"><!--
---><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
-<a href="tutorial.html"><!--
---><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
-<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
-</p></div>
 
-<h2>Tutorial &gt; Front Matter</h2>
-
-<div id="navbarb">
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
+</div>
 
 
-<h4>Overview</h4>
+<h3>Overview</h3>
 <p>Front matter precedes your story. It contains information about the book: title, author,
 copyright, and often other things that are not part of the story itself.</p>
 <p>Professional nonfiction often has extended front matter, where the author (or others)
@@ -74,7 +72,7 @@ it is simply blank.</p>
 are the service for all of them.</p></li>
 <li><p>This is <i>not</i> the place to write about yourself, or your inspiration and experiences
 for writing the story!</p></li>
-<ii><p>If you have high-quality line art related to the story's theme, you may put it here.
+<li><p>If you have high-quality line art related to the story's theme, you may put it here.
 But avoid poor drawings. Photographs can be used, but they will not print well with the
 technology used for your book, so avoid them.</p></li>
 <li><p>You may place a map, a diagram of the crime scene, a family history, a drawing of
@@ -123,8 +121,9 @@ to ensure that line do not wrap or span the full textblock width.</p></li>
 <li><p>The block of text appears slightly below the vertical center of the page.</p></li>
 <li><p>Hyphenation is disabled. Oldstyle numerals are disabled.</p></li>
 <li><p>You may use Italics and small caps. But you may not use <code>\styleN</code>
-(N=1,2,3,4) or any other styling commands.</p></li>
-<li><p>You may not use the block environment, because the page already is within a block.</p></li>
+(N=0-9) or any other styling commands.</p></li>
+<li><p>You may not use the <a href="block-env.html">block environment</a>, because the page
+already is within a block.</p></li>
 <li><p>Paragraphs are not indented, and there is a line gap between paragraphs.</p></li>
 </ul></li>
 <li><p>Write the title, subtitle, and author.<br>
@@ -164,7 +163,7 @@ a different author. Don't do it. You are not in the business.</p>
 some wealthy nobleman, in hopes of getting a subsidy. Obsolete, but a dedication is still
 used for other purposes. It is simply a short <a href="verse.html">epigraph</a>.</p></li>
 <li><p>Short table of contents. Unusual, but possible. Most popular fiction has no table,
-unless it is a collection of short stories.<p>
+unless it is a collection of short stories.</p>
 <p>Novelette cannot automatically create a table of contents. If you need one, you must do it
 yourself. <a href="table-of-contents.html">Here is how.</a></p></li>
 <li><p>Brief author's note. Unusual, but possible. Might be useful if your novel is a historical

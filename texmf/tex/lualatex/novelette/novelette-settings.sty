@@ -257,7 +257,7 @@
 %% CONTENT OF HEADER TEXTS:
 %%   If layout uses a header, these settings determine what prints there. Regardless of layout,
 %% default behavior does not print headers in frontmatter or backmatter, or above the first page
-%% of a component (for this, local over-ride with component option).
+%% of a component (for these, local over-ride with component option).
 %%   The header texts may use commands such as \smcp and \textit, in the usual fashion. They will
 %% be applied if the header font has them; otherwise, they will be silently ignored.
 %%   Most print-on-demand services insist that the title and author be the same, wherever they
@@ -273,16 +273,18 @@
 \def\nvt@rectohead{Recto Header Text} %% Default.
 \newif\ifnvt@didversohead
 \newif\ifnvt@didrectohead
-\def\versohead#1{%% Ignored when page payout has no header.
+\DeclareDocumentCommand\versohead{m}{%% Ignored when page payout has no header.
   \ifnvt@didversohead
-    \nvt@warn{Duplicate setting for \string\versohead. First obeyed, others ignored.}
+    \nvt@warn{Multiple setting for \string\versohead\space in preamble, or in same component.^^J%%
+       First obeyed, others ignored.}
   \fi
   \nvt@didversoheadtrue
   \def\nvt@versohead{#1}
 }%%
-\def\rectohead#1{%% Ignored when page payout has no header.
+\DeclareDocumentCommand\rectohead{m}{%% Ignored when page payout has no header.
   \ifnvt@didrectohead
-    \nvt@warn{Duplicate setting for \string\rectohead. First obeyed, others ignored.}
+    \nvt@warn{Multiple setting for \string\rectohead\space in preamble, or in same component.^^J%%
+       First obeyed, others ignored.}
   \fi
   \nvt@didrectoheadtrue
   \def\nvt@rectohead{#1}%%
@@ -291,8 +293,8 @@
 %% lines \nvt@didversoheadtrue, and \nvt@didrectoheadtrue, then you can re-set the header texts
 %% using \versohead and \rectohead between components. Do that at your own risk!
 %% Print-on-demand often insists that page header texts must not change.
-\@onlypreamble\versohead
-\@onlypreamble\rectohead
+%%%%%\@onlypreamble\versohead
+%%%%%\@onlypreamble\rectohead
 %%
 
 

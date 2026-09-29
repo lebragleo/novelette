@@ -11,58 +11,6 @@
 %% or warning, and the effect will be ignored.
 
 
-%% TABLE OF CONTENTS:
-%%   Most popular fiction does not have a table of contents. But if your book is a collection
-%% of short stories, or a novel with distinctive chapter names, then it might have the table.
-%%   Novelette cannot generate a table of contents. If you need one, you must design it yourself,
-%% and must manually write the page numbers after you know them (when almost finished).
-%%   The \next command is a placeholder. It prints ## there. Later, you will replace each \next
-%% with actual page numbers. If you request preview or final mode, any \next is an error.
-%%   To create the table, use a component, with option [toc]. The table name, and possibly other
-%% material, must precede \maintext. Then use a block environment to hold the table entries.
-%% The block may be [center] or symmetric side offsets. If using offsets, you will needto
-%% decide how much to use, depending on the length of entry texts.
-%%   Use the \entry{name}{page} command to create nice-looking entries. If the block is [center]
-%% then 6 spaced dots will separate the name from the page number (temporarily \next).
-%% If the block uses offsets, then the number of dots will be whatever is needed per-line.
-%% When an entry requires a short description, write it beneath its \entry.
-%%   Command \padentry{number} may be used, prior to the first \entry. The number is decimal
-%% from 0 to 1. This addes that amount of baselinekip above each \entry. For example,
-%% \padentry{0.5} adds half a baselineskip gap above each \entry. This is useful if you wish to
-%% stretch the table. for better visual balance.
-%%   You may use \image, but not within a block environment, so place any \image before or after
-%% the block of entries.
-%%   If your book has both a dedication and a table of contents, the table is second. However,
-%% if the decidation is short, you may cheat: Write it between the table name and the entries,
-%% instead of using a separate dedication page.
-%%   The table may extend to a second page (or more).
-\def\nvt@entrypad{0pt} %% Default.
-\DeclareDocumentCommand\padentry{m}{%% Argument is a decimal 0-2, multiple of baselineskip.
-  \ifnvt@indisplay%%
-    \directlua{nvt.parseentry('\luaescapestring{#1}')}%%
-    \ifnum\tmpreturn=0\relax%%
-      \nvt@warn{Bad \string\padentry. Ignored. ^^J%%
-        Syntax: \string\padentry{decimal number from 0 to 2}.}%%
-    \fi%%
-  \else%%
-    \nvt@warn{Cannot use \string\padentry\space outside display zone. Ignored.}%%
-  \fi%%
-}%%
-\DeclareDocumentCommand\entry{mmm}{%% \entry{integer}{name}{page} -> 24. Revenge . . . 228
-  \ifnvt@indisplay%%
-    \sbox0{0#1.#2 . . . 00#3}\edef\tmpl{\fpeval{\wd0>\linewidth}}%%
-    \ifnum\tmpl=1\relax\nvt@warn{\string\entry{#1}{#2} too long for one line.}\fi%%
-    \par\vspace*{\nvt@entrypad}\strut#1 \dotfill\space#2\strut\par%%
-  \else%%
-    \nvt@warn{Cannot use \string\entry\space outside display zone.}%%
-    \par\strut\sbox1{\char"FFFD\relax entry}%%
-    \char"FFFD\relax entry\hspace{-\wd1}\smash{\rule[-.25em]{\wd1}{1pt}}%%
-    \space cannot be used here.\par%%
-  \fi%%
-}%%
-%%
-
-
 %% BLANK PAGE: Never inserted automatically. For your own use, but only if necessary.
 \newcommand\blankpage{%%
   \clearpage\nvt@thispagestyle{empty}\null\clearpage\stepcounter{nvt@expectpage}%%
@@ -151,8 +99,8 @@
 %%   The block environment may be used for block quotes, epigraphs, poems, and other situations
 %% where the text is distinctive. The block may contain one or more paragraphs, and may span pages
 %% You may not place images within the block, or nest one block within another.
-%%   If a block is within a display zone, you may choose size=normal or size=small. Elsewhere,
-%% only size=normal (default) may be used.
+%%   If a block is within a display zone, or in backmatter, then you may choose size=normal or
+%% size=small. Elsewhere, only size=normal (default) may be used.
 %%   The sides of the block are offset from the margins by L/R. When L and/or R is a number,
 %% docimals are allowed, but integers are strongly preferred. The number is the multiple of
 %% normal paragraph indents, by which that side of the block is offset from the margin.
@@ -178,14 +126,18 @@
     \spii How to fix: Use separate blocks, each with its own options.}%%
     \strut\char"FFFD \smcp{bad nested block environment} \char"FFFD\par%%
   \else%%
-    \begingroup\def\tmpblockleft{2}\def\tmpblockright{0}%%
+    \begingroup\def\tmpblockleft{2}\def\tmpblockright{0}\def\tmpkeyleft{0}\def\tmpkeyright{0}%%
     \ifnvt@indisplay%%
       \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
     \else%%
-      \directlua{nvt.parseblock('\luaescapestring{#1}','M')}%%
+      \ifnvt@inbackmatter%%
+        \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
+      \else%%
+        \directlua{nvt.parseblock('\luaescapestring{#1}','M')}%%
+      \fi%%
     \fi%%
     \ifnum\tmpblocksize=-2\relax%%
-      \nvt@warn{Block option [size=small] ignored outside display zone.}%%
+      \nvt@warn{Block option [size=small] ignored outside display zone or backmatter.}%%
       \def\tmpblocksize{0}%% normal size
     \fi%%
     \ifnum\tmpreturn=0\relax%%
@@ -209,7 +161,7 @@
       \strut\char"FFFD \smcp{bad option for block environment} \char"FFFD\par%%
     \else%%
       \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
-      \ifnum\tmpblockleft=-99\relax%% key at left
+      \ifnum\tmpkeyleft=1\relax%% key at left
         \edef\tmpblockoffsetleft{\nvt@halfkeydiff}%%
         \ifx\nvt@goodkey\else%%
           \nvt@err{Width of \string\key{text} is greater than textwidth,^^J%%
@@ -219,7 +171,7 @@
       \else%% numerical value at left
         \edef\tmpblockoffsetleft{\fpeval{\tmpblockleft*\nvt@parindent}pt}%%
       \fi%%
-      \ifnum\tmpblockright=-99\relax%% key at right
+      \ifnum\tmpkeyright=1\relax%% key at right
         \edef\tmpblockoffsetright{\nvt@halfkeydiff}%%
         \ifx\nvt@goodkey\else%%
           \nvt@err{Width of \string\key{text} is greater than textwidth,^^J%%
@@ -251,6 +203,57 @@
     \par\ifnum\tmpblockalign=1\relax\nvt@endcenter\fi%%
     \endgroup%%
     \vspace*{-\nvt@bls}\strut\par%% Ensure enough space beneath small block.
+  \fi%%
+}%%
+%%
+
+
+%% TABLE OF CONTENTS ENVIRONMENT: \begin{toc}[N] ... \end{toc}
+%%   The table may extend to a second page (or more). As an alternative to the toc environment,
+%% you may use a block environment with [N/N,align=center] option.
+\newif\ifnvt@intoc %% True within toc environment.
+\DeclareDocumentCommand\toc{O{0}}{%% Substitute for \begin{toc}[option].
+  \begingroup\nvt@intoctrue%%
+  \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
+  \ifnum\tmpreturn=1\relax%%
+    \begin{block}[\tmptocl/\tmptocr]%%
+  \else%%
+    \nvt@warn{Could not parse toc environment option.^^J%%
+      Using defaults. Option must be number >=0 and <=8.}%%
+    \begin{block}[0/.6]%% Slightly asymmetrical: chapter numbers avg fewer digits than pages.
+  \fi%%
+}%%
+\def\endtoc{\end{block}\endgroup}
+%%
+\def\nvt@padentry{0} %% Default.
+\DeclareDocumentCommand\padentry{m}{%% Argument is a decimal 0-1, multiple of baselineskip.
+  \ifnvt@intoc%%
+    \directlua{nvt.parsepad('\luaescapestring{#1}')}%%
+    \ifnum\tmpreturn=0\relax%%
+      \nvt@warn{Bad \string\padentry. Ignored.^^J%%
+        Syntax: \string\padentry{decimal number from 0 to 1}.}%%
+    \else%%
+      \edef\nvt@padentry{\tmppad}%%
+    \fi%%
+  \else%%
+    \nvt@warn{Cannot use \string\padentry\space outside toc environment. Ignored.}%%
+  \fi%%
+}%%
+\DeclareDocumentCommand\entry{mmm}{%% \entry{number}{name}{page} -> 24. Revenge . . . 228
+  \par%%
+  \ifnvt@intoc%%
+    \vspace*{\nvt@padentry\nvt@bls}%%
+    \sbox0{#2}%%
+    \edef\tmpl{\fpeval{\wd0>(.9*\linewidth - 4em)}}%%
+    \ifnum\tmpl=1\relax%%
+      \nvt@warn{\string\entry\space is too wide for one line.}%%
+      \strut\char"FFFD\space\string\entry is too wide.\par%%
+    \else%% Box for chapter numbers widened to accomodate roman numerals.
+      \makebox[\linewidth]{\strut\makebox[1.6em][r]{{\nvt@aff{+cv10}#1}}. #2 {\dotfill} #3}\par%%
+    \fi%%
+  \else%%
+    \nvt@warn{Cannot use \string\entry\space outside toc environment.}%%
+    \par\char"FFFD\space\string\entry\space cannot be used here.\par%%
   \fi%%
 }%%
 %%
@@ -567,6 +570,31 @@
 }%%
 %%
 
+
+%% ENDNOTE:
+%%   Novelette is not intended for books that have many footnotes, or footnotes that must use
+%% academic citation styles.
+%%   If you are writing nonfiction, and it reads like fiction (continuous story), then use
+%% the \endnote command in backmatter. Only use footnotes for the rare author comment that
+%% must be seen immediately. Endnotes have no marker in main text, and the existence of an endnote
+%% is normally not mentioned in main text.
+%%   This format (or one like it) is actually used in some well-known popular nonfiction.
+%% Each endnote writes its page number (italic or arabic) at left margin, then block-indents
+%% the excerpt and note. The excerpt is a few words of main text, so the reader can locate it
+%% on its page. Novelette places the excerpt in angle brackets. followed by colon. After that,
+%% you write the note. If multi-paragraph, indented as usual.
+\DeclareDocumentCommand\endnote{mm+m}{%% {bookpage}{excerpt}{note}
+  \ifnvt@inbackmatter%%
+    \begin{block}[2/0,size=small]%%
+    \strut\hspace{-2\nvt@parindent}\makebox[2\nvt@parindent]{#1\hfill}%%
+    {\char"2329}#2{\char"232A}\,:\space\,{#3}%%
+    \end{block}%%
+  \else%%
+    \nvt@err{Command \string\endnote\space may only be used after \string\backmatter.}%%
+    \par{\char"FFFD} No \string\endnote\space allowed here.\par%%
+  \fi%%
+}%%
+%%
 
 
 %% UNAVAILABLE COMMANDS:

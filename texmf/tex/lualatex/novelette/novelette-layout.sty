@@ -180,11 +180,8 @@
   \global\nvt@setmattertrue%%
   \global\nvt@inmainmattertrue\global\nvt@inbackmattertrue\global\nvt@infrontmatterfalse%%
   \gdef\nvt@currentmatter{backmatter}%%
-  \IfBooleanTF{#1}{%%
-    \typeout{Alert: \string\backmatter* not used in Novelette. Used without asterisk.}
-  }{}%%
+  \IfBooleanTF{#1}{}{\@nameuse{ps@empty}}%%
   \clearpage%%
-  \@nameuse{ps@empty}%%
   \let\mainmatter\relax%%
   \let\backmatter\relax%%
   \nvt@blankverso%%

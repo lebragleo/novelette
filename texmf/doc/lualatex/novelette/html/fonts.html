@@ -8,16 +8,17 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">Home</a> &nbsp;
-<a href="installation.html">Installation</a> &nbsp;
-<a href="intro.html">Tutorials and How-To</a>/FONTS &nbsp;
-<a href="index.html">Alphabetic Index</a>
-</div>
 
-<h2>Novelette Documentation - Fonts</h2>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Novelette Fonts</h2>
 
-<div id="navbarb">
+
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
 <a href="#size">Size and Skip</a> &nbsp;
 <a href="#mainfont">Main Font</a> &nbsp;
@@ -27,7 +28,6 @@
 
 
 <h3>Overview</h3>
-
 <p>Novelette comes with its own fonts They are custom&#8209;designed for the purpose
 of print&#8209;on&#8209;demand popular fiction, and have properties that are known to Novelette.
 You may not add any other fonts, but you may use other software to create <i>png</i> images
@@ -67,7 +67,6 @@ font is designed for relaxed, continuous reading. It has Regular and Italic shap
 or BoldItalic.</p></li>
 <li><p>It is vaguely in the same class as Garamond or Bembo, but is not a clone or historical
 reproduction of any font.</p></li>
-<li><p>It may also be used in page headers, block environments, and display zones.</p></li>
 <li><p>The Regular shape includes small caps, oldstyle and lining numerals, and some
 special&#8209;purpose characters.</p></li>
 <li><p>The Italic shape has oldstyle and lining numerals, but not small caps.</p></li>
@@ -79,7 +78,8 @@ special&#8209;purpose characters.</p></li>
 <h4>NoveletteSerif10</h4>
 <ul>
 <li><p>NoveletteSerif10 is automatically substituted for NoveletteSerif12, in footnotes and in
-blocks with small text. You cannot select it manually.</p></li>
+<a href="block-env.html">block environments</a> with small text.
+You cannot select it manually.</p></li>
 <li><p>Except for some special characters, the character set and features are identical to
 NoveletteSerif12, for the Regular and Italic shapes.</p></li>
 <li><p>This font is very slightly heavier than NoveletteSerif12, but it looks correct at its
@@ -106,7 +106,7 @@ they are requested by \headstyle or \setstyleN in preamble.</p></li>
 <li><p>There are no Italics, although some of the fonts are naturally slanted.  Numerals are
 always lining. Many of these fonts do not have lowercase letters
 (if you type lowercase, you see uppercase).</p></li>
-<li><p>These fonts may be used in page header/footer, and the <code>\styleN</code> (N=1,2,3,4)
+<li><p>These fonts may be used in page header/footer, and the <code>\styleN</code> (N=0-9)
 commands. They may not be used anywhere else.</p></li>
 <li><p>If you need different decorative fonts, you cannot use them in Novelette.
 But you can create <i>png</i> raster images, using any fonts that are licensed for

@@ -8,100 +8,212 @@
 <body>
 <div id="master">
 
-<h4>Novelette Documentation</h4>
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/>Home</a> &nbsp;
-<a href="install.html"><!--
---><img src="images/install.svg" width="16px" height="16px" alt=""/>Installation</a> &nbsp;
-<a href="tutorial.html"><!--
---><img src="images/tutorial.svg" width="16px" height="16px" alt=""/>Tutorial</a> &nbsp;
-<a href="index.html"><img src="images/index.svg" width="16px" height="16px" alt=""/>Index</a>
-</p></div>
-
-
-<h4 class="pagepath"><a href="home.html">Home</a><span class="downtree"></span><!--
---><a href="tutorial.html">Tutorial</a><span class="downtree"></span><!--
---><a href="preamble.html">Preamble</a><span class="downtree"></span><!--
---><a href="preamble.html#examine">\examine</a><span class="downtree"></span></h4>
-<h1 class="pagename">Table of Contents</h1>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span><!--
+--><a href="frontmatter.html">Front Matter</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Table of Contents</h2>
 
 
-<div id="navbarb"><p class="noindent">
+<div id="navbar"><p class="noindent">
 <a href="#top">Overview</a> &nbsp;
+<a href="#general">General Information</a> &nbsp;
+<a href="#tocenv">The <i>toc</i> Environment</a> &nbsp;
+<a href="#entry">\entry{number}{name}{page}</a> &nbsp;
+<a href="#padentry">\padentry{value}</a> &nbsp;
+<a href="#tocsample">Example Using <i>toc</i></a> &nbsp;
+<a href="#blockenv">Alternative: <i>block</i> Environment</a> &nbsp;
+<a href="#blocksample">Example Using <i>block</i></a>
 </p></div>
 
 
-<h4>Overview</h4>
+<h3>Overview</h3>
 <p>Most popular fiction has no table of contents. The reader is expected to read through,
 perhaps placing a bookmark (or face the open book down) as a pause.</p>
-<p>A table of contents is used when the book (1) Is a collection of short stories, or
-(2) Has titled chapter so distinctive that they are self-contained episodes.</p>
+<p>A table of contents may be used when the book (1) Is a collection of short stories, or
+(2) Has titled chapters, so distinctive that they are self-contained episodes.</p>
 <p>Novelette has no automated table of contents, because that requires two-pass compiling
-(not the Novelette way of doing things). If you need a table, you must construct it yourself.
-This shows you how to do it.</p>
+(not the Novelette way of doing things). If you need a table, you must construct it yourself,
+then later insert the actual page numbers and other information.</p>
+<p>If you need to know where to place a Table of Contents within frontmatter, whether it
+should be recto or verso, what to list in the table and what not to list, and what material
+may follow the table: Search the Internet. Be aware that most of the results will apply to
+nonfiction. If you begin your search question with "book design" then you are more likely
+to get better answers.</p>
+<p>This documentation only shows you how to construct the table.</p>
 
 
-<h4>The Table is a Component</h4>
-<p>As with all other content, a table is contained in a component environment. Use the
-<code>[recto]</code> component option, to ensure that the table begins on a recto page.</p>
-<p>When you do not yet know page numbers (and perhaps do noy know chapter numbers),
-use the <code>{\next}</code> command. This prints a pair of numbersigns (##). The presence of
-any <code>{\next}</code> forces draft mode. The Summary will remind you.</p>
-<p>To proceed with preview or final mode, you must manually remove each <code>{\next}</code>,
-and substitute the actual value. The means you must be near finishing your work.</p>
-
-
-<h4>Table Design<h4>
-<p>Novelette does not care how your table looks. For simplicity, a few commands will help
-your design:</p>
+<p><a id="general"></a>&nbsp;</p>
+<h4 class="section">General Information</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Remember that you are writing for a popular audience, not academic research. Model your
+table(s) after what you see in printed books, with similar popular genres.</p>
 <ul>
-<li><p>Enclose the table in a <i>block</i> environment. Choose the side offsets so that
-the entries are not too wide, not too narrow.</p></li>
-<li><p>Use <code>\styleN</code> (N=1,2,3,4) for the table title.</p>
-<p>The title may be as simple as <i>Contents</i>. In some cases, the title may repeat
-the book title. For example, if your book is <i>The February County</i> with a dozen short
-stories about snow, you might use <i>The February County</i> instead of <i>Contents</i></p></li>
-<li><p>Command <code>\entrygap{<i>number</i>}</code> may appear before the table entries.
-The <i>number</i> is 0 to 1. Default 0.</p></li>
-<li><p><code>\entry{number}{name}{page}</code></p></li>
+<li><p>As with anything else, the table must be contained within a <i>component</i> environment.
+You will not need the <code>\maintext</code> command, because all of it should be in the
+display zone.</p></li>
+<li><p>The title of the table may be <i>Contents</i> or something else. If the book title is
+short, especially when it is a collection of short stories, you may use the book title as the
+table title.</p>
+    <p>Use a <code>\style<i>N</i></code> for the table title.</p></li>
+<li><p>If you have a very short Dedication or Epigraph that is not on a separate page,
+you may cheat, by placing it between the table title and the table entries. This is just a way
+to avoid excessive blank pages.</p></li>
+<li><p>The table does not need to be alone on its page. You may place other text and images.
+But do not place them inside the table.</p></li>
+<li><p>You may use more than one table.</p></li>
+<li><p>Novelette does not have automatic page numbering. Did Dickens, Goethe, Rabelais, or
+Cervantes have it? <i>No!</i> They wrote great books without it. So can you. Maybe.</p>
+<p>Use <code>{\next}</code> as a placeholder, wherever information (such as page number) is not
+yet known. It prints two numbersign characters (##), and sets an internal flag. Novelette will
+remind you when there are any <code>{\next}</code> in your document, and will not let you proceed
+to preview or final mode until you replace them with actual information.</p></li>
+</ul>
+
+
+<p><a id="tocenv"></a>&nbsp;</p>
+<h4 class="section">The <i>toc</i> Environment</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Novelette's <i>toc</i> environment is designed for the kind of table that has vertical sides,
+with chapter linked to page by a variable row of dots.</p>
+<p><code>\begin{toc}[<i>I</i>] <i>entries</i> \end{toc}</code></p>
 <ul>
+<li><p>Option <code>[<i>I</i>]</code> is the number of indents that both sides of the table
+    will be offset from the margins. Default 0.</p></li>
+<li><p>Commands <code>\entry</code> and <code>\padentry</code> may be used within the
+    <i>toc</i> environment. See below.</p></li>
+</ul>
 
 
-<h4>Sample Table</h4>
-<div class="code">
-\begin{component[recto]
-\blankline
-\begin{block}[3+3]
-\style3[scale=1.5]{The February County}
-\entrygap(0.2}
-\entry{1}{Wicked Flakes}{\next}
-\entry{2}{Yellow Snow}{\next}
-\entry{3}{Snowman's Surprise}{\next}
-\entry{4}{When Hell Freezes Over}{\next}
-\entry{5}{School's Out}{\next}
-\entry{6}{Slithering Sleet}{\next}
+<p><a id="entry"></a>&nbsp;</p>
+<h4 class="section">\entry{<i>number</i>}{<i>name</i>}{<i>page</i>}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>The <i>toc</i> environment allows you to write its entries with the <code>\entry</code>
+command. It takes three arguments: chapter number, chapter name, page number.</p>
+<ul>
+<li><p>If an entry (such as Prologue) does not have a chapter number,
+    leave those braces empty.</p></li>
+<li><p>The page number is its "bookpage," as seen in print.
+    It may be roman or arabic numerals.</p></li>
+<li><p>Each entry will span the width allowed by the <i>toc</i> side offsets. The chapter numbers
+are aligned right-justified in a column, followed by period and space. The chapter titles are
+in a left-justified column. A row of spaced dots links each title to its page number.
+The page numbers are in a right-justified column.</p></li>
+</ul>
 
-\end{block}
-\end{component}
+
+<p><a id="padentry"></a>&nbsp;</p>
+<h4 class="section">\padentry{value}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>The <i>toc</i> environment allows you to vertically spread its entries, so that a table
+with few entries is not crowded to the top of the page. Or, if the table requires a second page,
+it allows you to distribute the entries.</p>
+<ul>
+<li><p><code>\padentry{<i>value</i>}</code> applies a vertical gap to the top of each
+<code>\entry</code>. The <i>value</i> is a number from 0 to 1. May be decimal. Value 0 means
+no added gap. Value 1 is a blank line at full baseline skip. Default value 0.</p></li>
+<li><p>You may use <code>\padentry</code> immediately after the <i>toc</i> begins. If you have
+more than one table, then use <code>\padentry</code> for each of them.</p></li>
+</ul>
+
+
+<p><a id="tocsample"></a>&nbsp;</p>
+<h4 class="section">Example Using <i>toc</i> Environment</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<div class="code" style="clear:both;"><!-- Do not copy code from HTML. Copy it from browser. -->
+<code>\begin{component}[guide=0]<br/>
+\blankline\blankline<br/>
+\style3{The February Tales}<br/>
+\blankline<br/>
+\style5{\textit{for those who love it cold}}<br/>
+\blankline<br/>
+\begin{toc}[3]<br/>
+\padentry{0.5}<br/>
+\entry{1}{Wicked Flakes}{1}<br/>
+\entry{2}{Yellow Snow}{9}<br/>
+\entry{3}{Snowman's Surprise}{32}<br/>
+\entry{4}{When Hell Freezes Over}{68}<br/>
+\entry{5}{School's Out}{103}<br/>
+\entry{6}{Slithering Sleet}{142}<br/>
+\entry{7}{Snowball's Chance}{166}<br/>
+\entry{8}{Cold Fudge Sundae}{195}<br/>
+\entry{9}{Slick Talk}{218}<br/>
+\entry{10}{Out of Gas}{256}<br/>
+\end{toc}</code>
+</div>
+<p><b>Result of above code, using <i>toc</i>:</b><br/>&nbsp;</p>
+<div style="width:80%; margin-left:auto; margin-right:auto; text-align:center;">
+<img src="images/toc-toc.png" width="80%" alt="result of toc code"/>
 </div>
 
-<p><a id="whatare"></a>&nbsp;</p>
-<h4 class="section">What Are Typo Flaws?</h4>
+
+<p><a id="blockenv"></a>&nbsp;</p>
+<h4 class="section">Alternative: <i>block</i> Environment</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Instead of the <i>toc</i> environment, you may create a table of contents using the
+<i>block</i> environment.</p>
+<ul>
+<li><p>Use <code>[0/0,align=center]</code> for the <i>block</i> option.</p></li>
+<li><p>The <code>\entry</code> and <code>\padentry</code> commands are not available.</p></li>
+<li><p>Each entry should be a line of text, ending in <code>\par</code>. Typically, the
+line will contain chapter number, period, space, chapter name, three or more spaced periods,
+page number. Like this:</p>
+<p><code>12. Revenge Arrives . . . 223\par</code></p></li>
+</ul>
 
 
+<p><a id="blocksample"></a>&nbsp;</p>
+<h4 class="section">Example Using <i>block</i></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<div class="code" style="clear:both;"><!-- Do not copy code from HTML. Copy it from browser. -->
+<code>\begin{component}[guide=0]<br/>
+\blankline\blankline<br/>
+\style3{The February Tales}<br/>
+\blankline<br/>
+\style5{\textit{for those who love it cold}}<br/>
+\blankline<br/>
+\begin{block}[3/3,align=center]<br/>
+1. Wicked Flakes . . . 1\par<br/>
+2. Yellow Snow . . . 9\par<br/>
+3. Snowman's Surprise . . . 32\par<br/>
+4. When Hell Freezes Over . . . 68\par<br/>
+5. School's Out . . . 103\par<br/>
+6. Slithering Sleet . . . 142\par<br/>
+7. Snowball's Chance . . . 166\par<br/>
+8. Cold Fudge Sundae . . . 195\par<br/>
+9. Slick Talk . . . 218\par<br/>
+10. Out of Gas . . . 256\par<br/>
+\end{block}<br/>
+\end{component}</code>
+</div>
+<p><b>Result of above code, using <i>block</i>:</b><br/>&nbsp;</p>
+<div style="width:80%; margin-left:auto; margin-right:auto; text-align:center;">
+<img src="images/toc-block.png" width="80%" alt="result of block code"/>
+</div>
 
 
 
 <p>&nbsp;</p>
-<h4 class="section"><a href="home.html">Home</a><span class="uptree"></span><!--
---><a href="tutorial.html">Tutorial</a><span class="uptree"></span><!--
---><a href="preamble.html">Preamble</a><span class="uptree"></span><!--
---><a href="preamble.html#examine">\examine</a><span class="uptree"></span></h4>
+<h4 class="section">
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="uptree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="uptree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="uptree">&nbsp;</span><!--
+--><a href="frontmatter.html">Front Matter</a><span class="uptree">&nbsp;</span></h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>&nbsp;</p>
 
 

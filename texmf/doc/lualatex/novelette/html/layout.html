@@ -8,16 +8,18 @@
 <body>
 <div id="master">
 
-<div id="navbara">
-<a href="home.html">Home</a> &nbsp;
-<a href="installation.html">Installation</a> &nbsp;
-<a href="intro.html">Tutorials and How-To</a>&nbsp;
-<a href="index.html">Alphabetic Index</a>
-</div>
 
-<h2>Novelette Documentation - Trimsize and Layout</h2>
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="preamble.html">Preamble</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Trimsize and Layout</h2>
 
-<div id="navbarb">
+
+<div id="navbar">
 <a href="#top">Overview</a> &nbsp;
 <a href="#trimsize">Trim Size</a> &nbsp;
 <a href="#layout">Page Layout:</a>
@@ -94,51 +96,51 @@ for header and footer are still reserved.</p></li>
 the <a href="#headstyle">font style of the text and numbers,</a> and the
 <a href="#headstyle">page number decoration.</a></p></li>
 <li><p>Choices for <i>P</i> are: <code>marcen plain split center margin</code>.</p>
-<ul>
-<li style="margin-top:12px">
-<p><code>pagestyle=marcen</code> is the default. It provides header, no footer. Page number is at
-outside margin. Decoration, if used, appears near page number. Text of header is centered.</p>
-<p class="center" style="margin:6px;">
-<img src="images/layout-marcen-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-marcen-recto.jpg" width="46%" alt=""/><br>
-<small><i>textblock below header</i></small></p></li>
-<li style="margin-top:12px">
-<p><code>pagestyle=plain</code> provides footer, no header. Page number is centered
-in the footer. Decoration, if used, appears on both sides of page number.</p>
-<p class="center" style="margin:6px;">
-<small><i>textblock above footer</i></small><br>
-<img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
-<li style="margin-top:12px">
-<p><code>pagestyle=split</code> provides header and footer. Centered text in header. Centered page
-number in footer. Decoration, if used, appears on both sides of page number</p>
-<p class="center" style="margin:6px;">
-<img src="images/layout-split-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-split-recto.jpg" width="46%" alt=""/>
-</p>
-<p class="center">
-<small><i>textblock between header and footer</i></small></p>
-<p class="center" style="margin:6px;">
-<img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
-<li style="margin-top:12px">
-<p><code>pagestyle=center</code> provides header, no footer. Text, decoration (if used),
-and page number are centered in the header. Page number closest to outside.
-Note: If no decoration, a slash will separate text from page number.</p>
-<p class="center" style="margin:6px;">
-<img src="images/layout-center-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-center-recto.jpg" width="46%" alt=""/><br>
-<small><i>textblock below header</i></small></p></li>
-<li style="margin-top:12px">
-<p><code>pagestyle=margin</code> provides header, no footer. Page number at outside margin,
-decoration (if used), text of header. Mirrored verso/recto.</p>
-<p class="center" style="margin:6px;">
-<img src="images/layout-margin-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-<img src="images/layout-margin-recto.jpg" width="46%" alt=""/><br>
-<small><i>textblock below header</i></small></p></li>
-</ul></li>
+  <ul>
+  <li style="margin-top:12px">
+    <p><code>pagestyle=marcen</code> is the default. It provides header,
+    no footer. Page number is at outside margin. Decoration, if used, appears near page number.
+    Text of header is centered.</p>
+    <p class="center" style="margin:6px;">
+    <img src="images/layout-marcen-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-marcen-recto.jpg" width="46%" alt=""/><br/>
+    <small><i>textblock below header</i></small></p></li>
+  <li style="margin-top:12px">
+    <p><code>pagestyle=plain</code> provides footer, no header. Page number is centered
+    in the footer. Decoration, if used, appears on both sides of page number.</p>
+    <p class="center" style="margin:6px;">
+    <small><i>textblock above footer</i></small><br>
+    <img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+  <li style="margin-top:12px">
+    <p><code>pagestyle=split</code> provides header and footer. Centered text in header.
+    Centered page number in footer. Decoration, if used, appears on both sides of page number</p>
+    <p class="center" style="margin:6px;">
+    <img src="images/layout-split-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-split-recto.jpg" width="46%" alt=""/></p>
+    <p class="center"><small><i>textblock between header and footer</i></small></p>
+    <p class="center" style="margin:6px;">
+    <img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+  <li style="margin-top:12px">
+    <p><code>pagestyle=center</code> provides header, no footer. Text, decoration (if used),
+    and page number are centered in the header. Page number closest to outside.
+    Note: If no decoration, a slash will separate text from page number.</p>
+    <p class="center" style="margin:6px;">
+    <img src="images/layout-center-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-center-recto.jpg" width="46%" alt=""/><br/>
+    <small><i>textblock below header</i></small></p></li>
+  <li style="margin-top:12px">
+    <p><code>pagestyle=margin</code> provides header, no footer. Page number at outside margin,
+    decoration (if used), text of header. Mirrored verso/recto.</p>
+    <p class="center" style="margin:6px;">
+    <img src="images/layout-margin-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
+    <img src="images/layout-margin-recto.jpg" width="46%" alt=""/><br/>
+    <small><i>textblock below header</i></small></p></li>
+  </ul></li>
 </ul>
 <p class="toplink"><a href="#top">^TOP</a></p>
+
 
 <a id="glue"></a>
 <p class="noindent" style="margin-top:.5em"><code><b>glue=<i>G</i></b></code></p>

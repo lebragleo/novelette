@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="novelette.css">
+<title>Novelette Documentation - Block Environment</title>
+</head>
+<body>
+<div id="master">
+
+<h4 class="pagepath">Novelette Documentation<br/>
+<img src="images/home.svg" width="16" height="16" alt="home"/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="downtree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="downtree">&nbsp;</span><!--
+--><a href="components.html">Components</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="index.html">Index</a></h4>
+<h2 class="pagename">Block Environment</h2>
+
+
+<div id="navbar">
+<a href="#top">Overview</a> &nbsp;
+</div>
+
+
+
+<h3>Overview</h3>
+<p>The block environment may be used for block quotes, epigraphs, poetry (verse), and
+similar purposes. Althought standard LaTeX has these capabilities, only Novelette's own
+block environment may be used; the LaTeX standards will fail.</p>
+
+
+
+<h4>Block Environment</h4>
+<p>The <i>block</i> environment does many things. Its complicated options are described below.</p>
+<p>Use it for block quotes, epigraphs, poetry (verse), and other places where
+a block of text needs special treatment. If you need centered text, put it in a <i>block</i>,
+because Novelette disables the <i>center</i> environment and <code>\centering</code> command.</p>
+<p class="code"><code>\begin{block}[<i>option</i>]</code></p>
+<p class="code"><i>contents</i></p>
+<p class="code"><code>\end{block}</code></p>
+<ul>
+<li><p>You may <i>not</i> use <i>block</i> inside other styling commands. The parent element of
+<i>block</i> must be the <i>component</i> environment, before or after
+<code>\maintext</code>.</p></li>
+<li><p>You may <i>not</i> use <i>block</i> in a legal component, or in footnotes.</p></li>
+<li><p>You may <i>not</i> nest one <i>block</i> within another. If you need that effect, end one
+<i>block</i> before beginning a new <i>block</i>.</p></li>
+</ul>
+<p>Use the <code>[<i>option</i>]</code> to change the block side offsets (relative to margin),
+the alignment of text within the block, and whether the text size is normal or small.</p>
+<p>Format: <code>[<i>L</i>/<i>R</i>,align=<i>A</i>,size=<i>S</i>]</code></p> 
+<ul>
+<li><p>Alternative: <i>L</i> and <i>R</i> are both numbers (prefer integers).</p>
+  <ul>
+  <li><p>When <i>L</i> and <i>R</i> are both numbers, they set the left and right block offsets
+         relative to margins, as multiples of normal paragraph indent.</p>
+      <p>Example: <code>2/1</code> offsets the left side of the block at
+         twice the normal paragraph indent; the right side at one indent.</p></li>
+  <li><p>Limits: 0<=L<=8, 0<=R<=8.</p></li>
+  <li><p>Default is <code>2/0</code>.</p></li>
+  </ul></li>
+<li><p>Alternative: <code>k/k</code></p>
+  <ul>
+  <li><p>This requires prior <code>\key{<i>text</i>}</code> setting.</p></li>
+  <li><p>The width of the formatted key text is measured. The difference between full
+         linewidth and key width is split as left/right block offsets.</p></li>
+  <li><p>This is most useful for an epigraph, particularly when the key is the same as
+         the first line of block text.</p></li>
+  </ul></li>
+<li><p>Alternative: <code>k/number</code> or <code>number/k</code>.</p>
+  <ul>
+  <li><p>This requires prior <code>\key{<i>text</i>}</code> setting.</p></li>
+  <li><p>The width of the formatted key text is measured. The difference between full
+         linewidth and key width is halved, and applied only to one of left or right block
+         offset. The opposite offset is determined by the number of paragraph indents.</p></li>
+  <li><p>Using <code>k/0</code> is most useful for a poem (verse), when the key is the same as
+         an average line of the poem. Best when <code>align=left</code>.</p></li>
+  </ul></li>
+<li><p><code><i>A</i></code> sets how text is justified within the block.
+       Choices: left right center justify toc. Default justify.</p>
+    <p>If <i>A</i> is justify (default), then hyphenation and paragraph indent are applied
+       as usual. For any other choice, hyphenation is disabled within the block,
+       and there is no paragraph indent.</p>
+       <p>The special <code>[align=toc]</code> may be used for creating
+       a <a href="table-of-contents.html">table of contents</a>.</p></li>
+<li><p><code><i>S</i></code> choices are normal, small. Default normal.</p>
+    <p>Only display zones allow small. If small, font size and baselineskip are reduced
+       to the size of footnotes.</p></li>
+</ul>
+<p>The <code>\key{<i>text</i>}</code> command must be set prior to any <i>block</i> that needs it.
+The <i>block</i> does not need to follow immediately, because it remains in effect
+(whether or not it is used) until changed by another <code>\key</code>.</p>
+<ul>
+<li><p>The <i>text</i> may be styled with Italics, small caps, oldstyle.</p></li>
+<li><p>You cannot set <code>\key</code> within a <code>\styleN</code> or <code>\scene</code>
+command, or within a block.</p></li>
+<li><p>When it is needed by a subsequent <i>block</i>, the width of <i>text</i> is measured.
+It may be normal size, or small, depending on the <i>block</i> option.</p></li>
+<li><p>Only the width is used for calculations. The <i>text</i> is not printed.
+It may or may not appear in any <i>block</i>.</p></li>
+<li><p>The width may not exceed the textblock width. It may not wrap.</p></li>
+<li><p>The measurement is made without paragraph indent. If you need it measured with indent,
+write <code>\key{\indent <i>text</i>}</code>.</p></li>
+</ul>
+
+
+<h4>Epigraphs</h4>
+<p>An Epigraph is a brief, real or imaginary quotation. It may be used in frontmatter,
+to set the tone of the book. It may be used in display zones, to set the tone of particular
+chapters. Good epigraphs are very effective.</p>
+<p>If you use a real quotation, beware: Commercial publishers, who have the rights to several
+works by several authors, will often trade quotations amng them. This is why material
+by <i>Jane FamousAuthor</i> can be used as an epigraph, in a work by <i>John AlsoFamous</i>.
+But you are not in that league. Don't do it. Also remember that the author of a work is
+not necessarily its current copyright holder, so permissions may be useless.</p>
+<p>You can safely use material from works that are certainly in the public domain everywhere.
+Again, beware: Recent translations and edits may be copyrighted, even when their original
+texts are not.</p>
+
+
+<p>Poetry (Verse)</h4>
+
+
+<h4 class="section">&nbsp;</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>&nbsp;</p>
+
+
+</div><!-- end master -->
+</body>
+</html>
