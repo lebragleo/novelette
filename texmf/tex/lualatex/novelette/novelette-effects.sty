@@ -56,39 +56,37 @@
 %% by the width of a sample line of text, which may or may not be in the block itself.
 %%   Set \key{line of text} before the block that needs it. The key remains effective for
 %% additional blocks, until changed by another \key. To use it, choose the related block options.
-%%   The key text may use Italics, small caps, and other features allowed in ordinary main text.
+%%   The key text may use small caps, and other features allowed in ordinary main text.
 %% Limits: The key width must not exceed the textwidth, and may not be narrower than four normal
 %% paragraph indents.
 %%   The key width is measured within the block, taking size=normal|small into account,
 %% but without paragraph indent. If the key must be measured with paragraph indent,
 %% write \key{\indent line of text}.
+%%   If the block uses font=italic, then the key will be measured using all Italics. Otherwise,
+%% you may use \textit if it only applies to a few words in the key.
 %%   The key text does not print. Its only purpose is to provide a measurement. Typically, the
 %% key text will also be the first line of the block text (for an epigraph), or some average-width
 %% line (for a poem). But this is not required; the key text is not necessarily in the block.
-\edef\nvt@halfkeydiff{0pt} %% Placeholder.
-\newif\ifnvt@goodkey %% True when key width is at least 4*\nvt@parindent, but less than textwidth.
+\newlength\nvt@keywidth %% Calculated at each block that uses k option.
+\newif\ifnvt@goodkey %% True when key text does not use \\ or \par.
 \def\nvt@keyerr{%%
   \nvt@err{Bad \string\key. Only one line: no wrap or \noexpand\\ or \string\par.}%%
-  \nvt@goodkeyfalse%%
+  \global\nvt@goodkeyfalse%%
 }%%
+\def\nvt@keytext{} %% Default empty.
 \DeclareDocumentCommand\key{+m}{%% +m converted to m within definition.
   \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnvt@infootnote\def\tmpok{0}\fi%%
   \ifnvt@inheader\def\tmpok{0}\fi%%
   \ifnum\tmpok=1\relax%%
-    \begingroup\def\par{\nvt@keyerr}\def\\{\nvt@keyerr}%%
-    \sbox0{#1}%%
-    \edef\tmpbad{\fpeval{(\wd0 < 4*\nvt@parindent) + (\wd0 > \textwidth)}}%%
-    \ifnum\tmpbad=1\relax%%
-      \global\nvt@goodkeyfalse\xdef\nvt@halfkeydiff{\fpeval{2*\nvt@parindent}pt}%%
-    \else%%
-      \global\nvt@goodkeytrue\xdef\nvt@halfkeydiff{\fpeval{(\textwidth-\wd0)/2}pt}%%
-    \fi%%
+    \begingroup\setlength\parindent{0pt}\def\indent{\strut\hspace{\nvt@parindent}}%%
+    \def\par{\nvt@keyerr}\def\\{\nvt@keyerr}\def\linebreak{\nvt@keyerr}%%
+    \gdef\nvt@keytext{#1}\global\nvt@goodkeytrue%%
     \endgroup%%
   \else%%
     \nvt@err{Cannot set \string\key\space there. The setting cannot be within a block,^^J%%
-      \spii or within any type of styling command.}%%
+      \spii footnote, page header, or any type of styling command.}%%
     \global\nvt@goodkeyfalse%%
   \fi%%
 }%%
@@ -114,19 +112,22 @@
 %%   Within the block, align=A sets text justification. If not set, text is justified and
 %% hyphenated as usual, and each paragraph is indented (you may use \noindent). If A is one of
 %% left, right, center, then no hyphenation and no indent.
+%%   Option [font=italic] prints entire block in Italics.
 \newif\ifnvt@inblock %% True within block environment.
 \newif\ifnvt@smallblock %% True when block uses small text.
 \DeclareDocumentEnvironment{block}{O{}}{%%
   \par\strut\par\vspace{-\nvt@bls}%% Ensure fresh line.
   \ifnvt@infootnote\nvt@fatal{Cannot place block environment in a footnote, page \thepage.}\fi%%
   \ifnvt@inheader\nvt@fatal{Cannot place block environment in page headers.}\fi%%
-  \def\tmpblockalign{0}%%
   \ifnvt@inblock%%
     \nvt@err{Cannot nest a block environment within another block.^^J%%
     \spii How to fix: Use separate blocks, each with its own options.}%%
     \strut\char"FFFD \smcp{bad nested block environment} \char"FFFD\par%%
   \else%%
-    \begingroup\def\tmpblockleft{2}\def\tmpblockright{0}\def\tmpkeyleft{0}\def\tmpkeyright{0}%%
+    \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
+    \def\indent{\strut\hspace{\nvt@parindent}}%% Substitute.
+    \def\tmpblockalign{0}\def\tmpblockleft{2}\def\tmpblockright{0}%%
+    \def\tmpkeyleft{0}\def\tmpkeyright{0}\def\tmpital{0}\def\tmphalfkeydiff{}%%
     \ifnvt@indisplay%%
       \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
     \else%%
@@ -143,7 +144,7 @@
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad option for block. Unknown settings or bad side margins.^^J%%
         \spii Note: If block content begins with [ character, use \string\[ there.^^J%%]]
-        \spii Option format: [L/R,align=A,size=S]^^J%%
+        \spii Option format: [L/R,align=A,size=S,font=F]^^J%%
         \spiv L and/or R -> left/right block side offsets, relative to margins.^^J%%
         \spix Numerical values may be decimal, but integers strongly preferred.^^J%%
         \spxi Value is multiple of normal paragraph indent.^^J%%
@@ -157,30 +158,50 @@
         \spix If justify (or not set), normal hyphenation and paragraph indent.^^J%%
         \spix If not justify, hyphenation disabled and no paragraph indent.^^J%%
         \spiv S -> normal small. Default normal. Text size and baselineskip.^^J%%
-        \spix Only display zone allows size=small.}%%
+        \spix Only display zone allows size=small.^^J%%
+        \spiv F -> normal italic. Default normal. Applies to entire block.}%%
       \strut\char"FFFD \smcp{bad option for block environment} \char"FFFD\par%%
     \else%%
       \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
-      \ifnum\tmpkeyleft=1\relax%% key at left
-        \edef\tmpblockoffsetleft{\nvt@halfkeydiff}%%
-        \ifx\nvt@goodkey\else%%
-          \nvt@err{Width of \string\key{text} is greater than textwidth,^^J%%
-            \spii or less than 4 normal paragraph indents,^^J%%
-            \spii or key text was not set before using key in block option.}%%
+      \ifnum\tmpital=1\relax\itshape\fi%%
+%%%%%
+      \ifnum\tmpkeyleft=1\relax\def\tmptestkey{1}\else\def\tmptestkey{0}\fi%%
+      \ifnum\tmpkeyright=1\relax\def\tmptestkey{1}\fi%%
+      \ifnum\tmptestkey=1\relax%%
+        \ifnvt@goodkey%%
+          \sbox0{\nvt@keytext}\setlength\nvt@keywidth{\wd0}%%
+          \edef\tmpbad{\fpeval{(\wd0 < 4*\nvt@parindent) + (\wd0 > \textwidth)}}%%
+          \ifnum\tmpbad=1\relax%%
+            \nvt@warn{\string\key\space text is too short or too wide. Ignored.}%%
+          \else%%
+            \edef\tmphalfkeydiff{\fpeval{(\textwidth-\wd0)/2}pt}%%
+          \fi%%
+        \else%%
+          \nvt@warn{Did not set good \string\key\space before block option [k,R].}%%
         \fi%%
-      \else%% numerical value at left
+      \fi%%
+%%%%%
+      \ifnum\tmpkeyleft=1\relax%% [k/N] or [k/k]
+        \ifx\tmphalfkeydiff\@empty%%
+          \edef\tmpblockoffsetleft{\fpeval{2*\nvt@parindent}pt}%%
+        \else%%
+          \edef\tmpblockoffsetleft{\tmphalfkeydiff}%%
+        \fi%%
+      \else%%
         \edef\tmpblockoffsetleft{\fpeval{\tmpblockleft*\nvt@parindent}pt}%%
       \fi%%
-      \ifnum\tmpkeyright=1\relax%% key at right
-        \edef\tmpblockoffsetright{\nvt@halfkeydiff}%%
-        \ifx\nvt@goodkey\else%%
-          \nvt@err{Width of \string\key{text} is greater than textwidth,^^J%%
-            \spii or less than 4 normal paragraph indents,^^J%%
-            \spii or key text was not set before using key in block option.}%%
+%%%%%
+      \ifnum\tmpkeyright=1\relax%% [N/k] or [k/k]
+        \ifx\tmphalfkeydiff\@empty%%
+          \def\tmpblockoffsetright{0pt}%%
+        \else%%
+          \edef\tmpblockoffsetright{\tmphalfkeydiff}%%
         \fi%%
-      \else%% numerical value at right
+      \else%%
         \edef\tmpblockoffsetright{\fpeval{\tmpblockright*\nvt@parindent}pt}%%
       \fi%%
+%%%%%
+%%%%%
       \nvt@inblocktrue%%
       \setlength{\leftmargin}{\tmpblockoffsetleft}%%
       \setlength{\rightmargin}{\tmpblockoffsetright}%%
@@ -204,6 +225,43 @@
     \endgroup%%
     \vspace*{-\nvt@bls}\strut\par%% Ensure enough space beneath small block.
   \fi%%
+}%%
+%%
+
+
+%% ATTRIBUTION:
+%%   This may be used within a block, after its last paragraph ends. The text of the attribution
+%% must fit within the block width, one line only. If more, break it into several \attrib.
+%%   The text will be preceded by em dash, and right-aligned to either block right offset,
+%% or right side of key text (if used). It will be normal size or small, according to
+%% block option. It will not be Italics, regardless of block option, but you may use \textit
+%% in the usual fashion.
+\DeclareDocumentCommand\attrib{m}{%%
+  \par\begingroup\upshape%%
+  \ifnvt@inblock%%
+    \edef\tmphaskeywidth{\fpeval{\nvt@keywidth > 0pt}}%%
+    \sbox1{---#1}%%
+    \ifnum\tmphaskeywidth=1\relax%%
+      \edef\tmpbadwidth{\fpeval{\wd1 > \nvt@keywidth}}%%
+      \ifnum\tmpbadwidth=1\relax%%
+        \nvt@warn{\string\attrib{text} is too wide to fit in block.}%%
+        {---#1}%%
+      \else%%
+        \makebox[\nvt@keywidth][r]{---#1}%%
+      \fi%%
+    \else%%
+      \edef\tmpbadwidth{\fpeval{\wd1 > \linewidth}}%%
+      \ifnum\tmpbadwidth=1\relax%%
+        {---#1}%%
+      \else%%
+        \hfill{---#1}%%
+      \fi%%
+    \fi%%
+  \else%%
+    \nvt@warn{\string\attrib\space can only be used within block environment.}%%
+    {---#1}%%
+  \fi%%
+  \par\endgroup%%
 }%%
 %%
 
@@ -280,7 +338,7 @@
 \def\style{\@ifnextchar\bgroup\nvt@badstyle\nvt@stylecmd}
 \newif\ifnvt@instyle %% True within \styleN and \scene commands.
 \DeclareDocumentCommand\nvt@stylecmd{mO{}+m}{%% +m will be re-parsed as m.
-  \begingroup%%
+  \begingroup\nvt@instyletrue%%
   \directlua{nvt.parsestyle('\luaescapestring{#1}','\luaescapestring{#2}')}%%
   \ifnum\tmpreturn=-99\relax%%
     \nvt@fatal{Cannot use \string\styleN\space in preamble.^^J%%

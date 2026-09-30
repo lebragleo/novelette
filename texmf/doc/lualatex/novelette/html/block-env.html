@@ -33,12 +33,12 @@ block environment may be used; the LaTeX standards will fail.</p>
 
 
 <h4>Block Environment</h4>
-<p>The <i>block</i> environment does many things. Its complicated options are described below.</p>
-<p>Use it for block quotes, epigraphs, poetry (verse), and other places where
-a block of text needs special treatment. If you need centered text, put it in a <i>block</i>,
-because Novelette disables the <i>center</i> environment and <code>\centering</code> command.</p>
+<p>The <i>block</i> environment does many things. Use it for block quotes, epigraphs, poetry
+(verse), and other places where a block of text needs special treatment. For centered text,
+put it in a <i>block</i>, because Novelette disables the <i>center</i> environment
+and <code>\centering</code> command.</p>
 <p class="code"><code>\begin{block}[<i>option</i>]</code></p>
-<p class="code"><i>contents</i></p>
+<p class="code"><i>content</i></p>
 <p class="code"><code>\end{block}</code></p>
 <ul>
 <li><p>You may <i>not</i> use <i>block</i> inside other styling commands. The parent element of
@@ -50,7 +50,7 @@ because Novelette disables the <i>center</i> environment and <code>\centering</c
 </ul>
 <p>Use the <code>[<i>option</i>]</code> to change the block side offsets (relative to margin),
 the alignment of text within the block, and whether the text size is normal or small.</p>
-<p>Format: <code>[<i>L</i>/<i>R</i>,align=<i>A</i>,size=<i>S</i>]</code></p> 
+<p>Format: <code>[<i>L</i>/<i>R</i>,align=<i>A</i>,size=<i>S</i>,font=<i>F</i>]</code></p> 
 <ul>
 <li><p>Alternative: <i>L</i> and <i>R</i> are both numbers (prefer integers).</p>
   <ul>
@@ -69,58 +69,151 @@ the alignment of text within the block, and whether the text size is normal or s
   <li><p>This is most useful for an epigraph, particularly when the key is the same as
          the first line of block text.</p></li>
   </ul></li>
-<li><p>Alternative: <code>k/number</code> or <code>number/k</code>.</p>
+<li><p>Alternative: <code>k/R</code> or <code>L/k</code>, where L and R are numbers.</p>
   <ul>
   <li><p>This requires prior <code>\key{<i>text</i>}</code> setting.</p></li>
   <li><p>The width of the formatted key text is measured. The difference between full
          linewidth and key width is halved, and applied only to one of left or right block
          offset. The opposite offset is determined by the number of paragraph indents.</p></li>
   <li><p>Using <code>k/0</code> is most useful for a poem (verse), when the key is the same as
-         an average line of the poem. Best when <code>align=left</code>.</p></li>
+         an average line of the poem. Best with <code>[align=left]</code>.</p></li>
   </ul></li>
-<li><p><code><i>A</i></code> sets how text is justified within the block.
-       Choices: left right center justify toc. Default justify.</p>
+<li><p><code><i>A</i></code> sets how text is justified <i>within the block</i>.
+       Choices: left right center justify. Default justify.</p>
     <p>If <i>A</i> is justify (default), then hyphenation and paragraph indent are applied
        as usual. For any other choice, hyphenation is disabled within the block,
-       and there is no paragraph indent.</p>
-       <p>The special <code>[align=toc]</code> may be used for creating
-       a <a href="table-of-contents.html">table of contents</a>.</p></li>
+       and there is no paragraph indent.</p></li>
 <li><p><code><i>S</i></code> choices are normal, small. Default normal.</p>
     <p>Only display zones allow small. If small, font size and baselineskip are reduced
        to the size of footnotes.</p></li>
+<li><p><code><i>F</i></code> is either normal or italic. Default normal.</p>
+    <ul>
+    <li><p><code>[font=italic]</code> prints all content in Italics.</p></li>
+    <li><p>For only a few words in Italics, use <code>\textit{<i>text</i>}</code>
+        as usual. It cannot cross paragraphs.</p></li>
+    <li><p>Unlike the <code>\style<i>N</i></code> commands, you cannot choose
+        a font other than the main font.</p></li>
+    </ul></li>
 </ul>
-<p>The <code>\key{<i>text</i>}</code> command must be set prior to any <i>block</i> that needs it.
-The <i>block</i> does not need to follow immediately, because it remains in effect
+
+
+<h4>Key Text</h4>
+<p>The <code>\key{<i>text</i>}</code> command must be set prior to any <i>block</i> that
+uses <code>[k/k]</code> or <code>[k/<i>R</i>]</code> or <code>[<i>L</i>/k]</code> option.</p>
+<p>The <i>block</i> does not need to follow immediately, because the key remains in effect
 (whether or not it is used) until changed by another <code>\key</code>.</p>
 <ul>
-<li><p>The <i>text</i> may be styled with Italics, small caps, oldstyle.</p></li>
-<li><p>You cannot set <code>\key</code> within a <code>\styleN</code> or <code>\scene</code>
-command, or within a block.</p></li>
+<li><p>If the <i>text</i> will be used in a block with <code>[font=italic]</code>,
+    then you do not need to set Italics in the key. It is automatic.</p></li>
+<li><p>You cannot set <code>\key</code> within a within a block. It must be set
+    before the block begins.</p></li>
 <li><p>When it is needed by a subsequent <i>block</i>, the width of <i>text</i> is measured.
-It may be normal size, or small, depending on the <i>block</i> option.</p></li>
+    It may be normal size or small, normal text or Italics, depending on
+    the <i>block</i> option.</p></li>
 <li><p>Only the width is used for calculations. The <i>text</i> is not printed.
-It may or may not appear in any <i>block</i>.</p></li>
+    It may or may not appear in any <i>block</i>.</p></li>
 <li><p>The width may not exceed the textblock width. It may not wrap.</p></li>
 <li><p>The measurement is made without paragraph indent. If you need it measured with indent,
-write <code>\key{\indent <i>text</i>}</code>.</p></li>
+    write <code>\key{\indent <i>text</i>}</code>.</p></li>
 </ul>
 
 
-<h4>Epigraphs</h4>
+<h4>Attribution</h4>
+<p>If you need a short attribution at the bottom of a <i>block</i>, you may write this
+<i>within the block,</i> after ending its last paragraph:</p>
+<p><code>\attrib{<i>text of attribution</i>}</code></p>
+<ul>
+<li><p>The attribution must be a single line, no wider than the block width. If it is too wide,
+    then manually break it into several <code>\attrib</code>.</p></li>
+<li><p>The text will be right-justified, and preceded by an em dash.</p></li>
+<li><p>Whether or not the block uses <code>[font=italic]</code>, the attribution is not
+    in Italics, unless you use <code>\textit</code> for all or some of it.</p></li>
+<li><p>If the block uses <code>[size=small]</code> then the attribution will
+    also be small.</p></li>
+</ul>
+
+
+<h4>Prose Epigraphs</h4>
 <p>An Epigraph is a brief, real or imaginary quotation. It may be used in frontmatter,
 to set the tone of the book. It may be used in display zones, to set the tone of particular
-chapters. Good epigraphs are very effective.</p>
-<p>If you use a real quotation, beware: Commercial publishers, who have the rights to several
-works by several authors, will often trade quotations amng them. This is why material
-by <i>Jane FamousAuthor</i> can be used as an epigraph, in a work by <i>John AlsoFamous</i>.
-But you are not in that league. Don't do it. Also remember that the author of a work is
-not necessarily its current copyright holder, so permissions may be useless.</p>
-<p>You can safely use material from works that are certainly in the public domain everywhere.
-Again, beware: Recent translations and edits may be copyrighted, even when their original
-texts are not.</p>
+chapters.</p>
+<p>This section describes the prose epigraph, which is one or more paragraphs of text.
+For a poetic epigraph, with lines of varied lengths, see the next section.</p>
+<ul>
+<li><p>A good epigraph is an excelllent transition from frontmatter to mainmatter.</p></li>
+<li><p>Unless you are <i>certain</i> that quoted material is in the public domain, do not use
+    material from someone else. A better tactic is to create your own epigraph, related to
+    something in the story.</p></li>
+<li><p>Write the epigraph in a <i>block</i> environment.</p></li>
+<li><p>If the epigraph stands alone, use equal block side offsets,
+    with justified alignment.</p></li>
+<li><p>If the epigraph is at the beginning of a chapter, between the chapter title and its
+    main text, then there are two possibilities: You may use equal block offsets, with justified
+    alignment. Or, use block option <code>[0/N,align=right]</code> where N is usually 0.
+    In either case, <code>[size=small]</code> is useful.</p></li>
+<li><p>All paragraphs will be indented, unless you begin them
+    with <code>\noindent</code>.</p></li>
+<li><p>For attribution, add one or more lines beginning with <code>\hfill</code>.
+    That will push the line to the right side of the block.</p></li>
+<li><p>To vertically center the block (when alone on its page), use <code>\vfill</code>
+    above and below the block.</p>
+    <p>To move it slightly higher than vertical center, use one or more <code>\blankline</code>
+    aftr the block.</li>
+</ul>
+<p class="noindent"><b>Example Prose Epigraph:</b> The book is a brutal crime novel, set in
+1930s Chicago. This is an imaginary quotation from an imaginary newspaper article.
+When prospective readers see this, they <i>know</i> what to expect in the story:</p>
+<div class="code"><code><!-- Do not copy code from HTML. Copy it from browser. -->
+\begin{component}<br/>
+\vfill<br/>
+\begin{block}[4/4]<br/>
+\indent Even in a city that has seen the darkest side of humanity, recent events drag us to
+a new level of revulsion. Frightened citizens avoid the main thoroghfares in daylight,
+even as they avoid dark alleys at night. State and local authorities have no strategy
+for dealing with the situation. If federal force must be used, it will be.\par<br/>
+\attrib{\textit{Chicago Klaxon,} May 24, 1933.}<br/>
+\end{block}<br/>
+\blankline\blankline\vfill<br/>
+\end{component}
+</code></div>
+<p class="noindent"><b>Result:</b></p>
+<div style="margin-top:.5rem; width:100%; text-align:center;">
+<img src="images/epigraph-prose.png" style="width:80%" alt="result of epigraph"/>
+</div>
 
 
-<p>Poetry (Verse)</h4>
+    
+<h4>Poetry (Verse)</h4>
+<p>Use the <i>block</i> environment for poetry. Manually break lines using <code>\\</code>
+or <code>\par</code> where needed. Details of block options are described earier on this page.</p>
+<ul>
+<li><p>If you need a specific left offset for the block,
+    use block option <code>[<i>L</i>/0,align=left]</code>.</p></li>
+<li><p>If there is an average-length line, try this: Use <code>\key</code> with that line text,
+    and set the block option to <code>[k/0,align=left]</code>.</p></li>
+<li><p>For a different effect, sometimes used for a chapter epigraph: You may push the lines
+    to the right, using block option <code>[0/<i>R</i>,align=right]</code>.</p></li>
+</ul>
+<p class="noindent"><b>Example Poem:</b></p>
+<div class="code"><code>
+\begin{component}<br/><!-- Do not copy code from HTML. Copy from browser. -->
+\key{ange on two lines, and after all,}<br/>
+\style4{Rhymes With Orange}<br/>
+\blankline<br/>
+\begin{block}[k/0,font=italic]<br/>
+Angelic voices sound the call:\\<br/>
+Poetic fame arrives, with or-\\<br/>
+ange on two lines, and after all,\\<br/>
+That's surely what a hyphen's for.\par<br/>
+\attrib{Terry Lebragleo}<br/>
+\end{block}<br/>
+\end{component}
+</code></div>
+<p class="noindent"><b>Result:</b></p>
+<div style="margin-top:.5rem; width:100%; text-align:center;">
+<img src="images/rwo.png" style="width:80%" alt="result of poem code"/>
+</div>
+
 
 
 <h4 class="section">&nbsp;</h4>

@@ -113,7 +113,7 @@ for i = 0, 9 do
   nvt.styleright[i] = '\\hfill'
   nvt.styletrack[i] = '2'
   nvt.stylefn[i] = 'main'
-  nvt.stylefont[i] = '\\nvt@mainfont'
+  nvt.stylefont[i] = '\\nvt@main'
   nvt.stylecn[i] = 'none'
   nvt.styleraw[i] = 'RawFeature={+ss17}'
   nvt.stylespace[i] = 0.21
@@ -906,7 +906,7 @@ end
 
 -- Parse option of block environment:
 function nvt.parseblock (s,d)
-  local n, size, a, l, r, ln, rn
+  local n, size, font, a, l, r, ln, rn
   s = string.gsub(s, ' ', '') ; s = s .. ','
   size, n = string.gsub(s, '.*size=', '') ; size = string.gsub(size, ',.*', '')
   if n == 1 then
@@ -922,6 +922,12 @@ function nvt.parseblock (s,d)
     end
   else
     tex.sprint('\\def\\tmpblocksize{0}')
+  end
+  font, n = string.gsub(s, '.*font=', '') ; font = string.gsub(font, ',.*', '')
+  if n == 1 then
+    if string.find(font, 'tal') or font == 'normal' then -- Allows Ital, ital, italic, italics.
+      tex.sprint('\\def\\tmpital{1}') ; s = string.gsub(s, 'font=' .. font, '')
+    end
   end
   a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
   if n == 1 then
