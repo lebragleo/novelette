@@ -1667,9 +1667,9 @@ function nvt.calculatevertical ()
     nvt.evensidemargin = 0.5 * (nvt.trimwidth - nvt.textwidth - nvt.glue)
     nvt.oddsidemargin = 0.5 * (nvt.trimwidth - nvt.textwidth + nvt.glue)
   end
-  if (nvt.bls/nvt.em) > 1.5 then -- Adjust bls and topmargin.
-    local excess = 0.5 *(linetotal * (nvt.bls - 1.5*nvt.em))
-    nvt.bls = 1.5*nvt.em ; nvt.topmargin = nvt.minmargin + excess
+  if (nvt.bls/nvt.em) > 1.4 then -- Adjust bls and topmargin.
+    local excess = 0.5 *(linetotal * (nvt.bls - 1.4*nvt.em))
+    nvt.bls = 1.4*nvt.em ; nvt.topmargin = nvt.minmargin + excess
   else
     nvt.topmargin = nvt.minmargin
   end

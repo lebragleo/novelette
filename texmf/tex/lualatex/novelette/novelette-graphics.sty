@@ -212,8 +212,8 @@
 
 
 %% ICON: \icon{path/to/filename.png}
-%%   An icon occupies exactly 0.24in width, 0.18in height. Its upper two-thirds will print
-%% above the surrounding text baseline; lower one-third below baseline.
+%%   An icon occupies exactly 0.24in width, 0.18in height. Its upper 70% will print
+%% above the surrounding text baseline; lower 30% below baseline.
 %%   You must design the file so that it fits within that area. If smaller, it is automatically
 %% padded to the full area.
 %%   The \icon command may only be used in a display zone. It may be used within a \styleN,
@@ -221,15 +221,8 @@
 %% use small text.
 \DeclareDocumentCommand\icon{sm}{%%
   \begingroup%%
-  \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
-  \ifnvt@inheader\def\tmpok{0}\fi%%
-  \ifnvt@indisplay\else\def\tmpok{0}\fi%%
+  \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
   \ifnvt@smallblock\def\tmpok{0}\fi%%
-  \ifnum\tmpok=0\relax%%
-    \nvt@err{Cannot place \string\icon\space in footnote, page header, or \string\scene.^^J%%
-      Cannot place \string\icon\space in block environment with small text.}%%
-    {\char"FFFD}%%
-  \fi%%
   \ifnum\tmpok=1\relax%%
     \def\fps@figure{}\def\tmpvalidate{0}%%
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
@@ -265,8 +258,12 @@
     \else%%
       \sbox0{{\nvt@gray{8}\rule{.24in}{.18in}}}%%
     \fi%%
-    \edef\tmpdesc{\fpeval{.33333*\ht0}pt}%%
-    \strut\smash{\raisebox{-\tmpdesc}{\usebox0}}%%
+    \edef\tmpdesc{\fpeval{.296*\ht0}pt}%%
+    \strut\makebox[2em]{\hfill\smash{\raisebox{-\tmpdesc}{\usebox0}}\hfill}%%
+  \else%%
+    \nvt@err{Cannot place \string\icon\space outside display zone,^^J%%
+      or in block environment with option [size=small].}%%
+    \strut\makebox[2em]{\hfill\char"FFFD\hfill}%%
   \fi%%
   \endgroup%%
 }%%
