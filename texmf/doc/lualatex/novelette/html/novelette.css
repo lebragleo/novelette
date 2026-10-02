@@ -25,6 +25,13 @@ code {color:#660000}
 pre.code {color:#660000;}
 pre.code a {text-decoration:none}
 
+div.tree p {text-indent:0px; margin-top:.5rem;}
+div.tree p.one {margin-left:1rem;}
+div.tree p.two {margin-left:2rem; margin-top:0px;}
+div.tree p.three {margin-left:3rem; margin-top:0px;}
+div.tree p.four {margin-left:4rem;}
+div.tree p.five {margin-left:5rem;}
+
 ul {margin:0px; padding-left:2rem;}
 li p {padding-left:0px;}
 li p:first-child {text-indent:0px;}

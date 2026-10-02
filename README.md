@@ -29,3 +29,6 @@ UPDATE 24-SEP-2026 : Continued development. Moved some code from LaTeX to Lua.
 Font kerning not yet complete. Partial documentation. Eventually will add utilities
 and gallery.
 
+UPDATE 02-OCT-2026 : At the suggestion of a non-programmer tester, some of the
+command names and syntax have been changed, for better user experience.
+ 

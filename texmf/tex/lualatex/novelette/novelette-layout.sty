@@ -368,10 +368,10 @@
 %% A better idea is to have footnotes direct the reader to backmatter, but not any particular
 %% place there; then merge all notes into a general discussion, written as ordinary text.
 %%   Default footnote style prints label at left margin, then a big space to the footnote text,
-%% at normal indent. You may globally change this in Preamble: \footnotestyle{indent=both} indents
-%% prior to the label, then ordinary space to text. \footnotestyle{indent=none} does not indent
+%% at normal indent. You may globally change this in Preamble: \setfootnote{indent=both} indents
+%% prior to the label, then ordinary space to text. \setfootnote{indent=none} does not indent
 %% the first line of a footnote; the label is at left margin, then ordinary space, then text.
-%% \footnotestyle{indent=near} looks nice; text at indent, marker/space just before it.
+%% \setfootnote{indent=near} looks nice; text at indent, marker/space just before it.
 %%   In all cases, when a footnote has extra paragraphs, they are indented.
 \setcounter{footnote}{0}%% Resets to 0 at each \begin{component}.
 \newif\ifnvt@infootnote %% True within footnote.

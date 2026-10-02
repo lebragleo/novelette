@@ -128,9 +128,9 @@ nvt.diddocdate = false
 nvt.didmode = false
 nvt.didtrimsize = false
 nvt.didlayout = false
-nvt.didheadstyle = false
-nvt.didscenestyle = false
-nvt.didfootnotestyle = false
+nvt.didsethead = false
+nvt.didsetscene = false
+nvt.didsetfootnote = false
 nvt.didversohead = false
 nvt.didrectohead = false
 local GLYPH = node.id('glyph')
@@ -164,11 +164,6 @@ end
 nvt.parseimage = function (star,opt,file) -----
   local a, t, f, l, lx, n ; local img = 0 ; local sc = 0 ; local label = 'image' ; local ok = true
   opt = string.gsub(opt, ' ', '') ; opt = opt .. ',' ; opt = string.gsub(opt, 'lines=', 'line=')
-
-  if string.find(opt, 'scene,') then
-     sc = 1 ; opt = string.gsub(opt, 'scene,', '') ; label = 'scene image'
-  end
-  tex.sprint('\\def\\tmpscene{' .. sc .. '}')
   if file ~= '' then
     label = string.gsub(file, '.*/', '')
     local e = utf8.len(label)
@@ -248,8 +243,8 @@ end
 --
 
 
--- Parse \icon:
-nvt.parseicon = function (star,file) -----
+-- Parse \logo:
+nvt.parselogo = function (star,file) -----
   local a, t, f, l, lx, n ; local img = 0 ; local ok = true
   file = string.gsub(file, ' ', '') -----
   if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
@@ -450,8 +445,8 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 --
 
 
--- Parse \headstyle:
-nvt.parseheadstyle = function (s)
+-- Parse \sethead:
+nvt.parsesethead = function (s)  ---- need to add check for multiple use
   s = s .. ',' ; s = string.gsub(s, ' ', '')
   local n, t, a, f, c, x, xx, min, max
   tex.sprint('\\begingroup\\makeatletter')
@@ -645,7 +640,7 @@ end
 nvt.parsestyle = function (N, s) -- style number, option
   s = string.gsub(s, ' ', '')
   local h, d
-  if s == 'info' then
+  if string.find(s, 'info') then
     tex.sprint('\\def\\tmpinfo{1}') ; s = string.gsub(s, 'info', '')
   else
     tex.sprint('\\def\\tmpinfo{0}')
@@ -655,8 +650,14 @@ nvt.parsestyle = function (N, s) -- style number, option
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   else
     tex.sprint('\\def\\tmpscale{' .. nvt.stylescale[N] .. '}')
-    h = nvt.stylescale[N] * nvt.bls
-    d = 0.3 * nvt.stylescale[N] * nvt.bls
+    if string.find(s, 'logo') then
+      tex.sprint('\\def\\tmplogo{1}') ; s = string.gsub(s, 'logo', '')
+      h = math.max(nvt.stylescale[N],3) * nvt.bls
+      d = 0.3 * math.max(nvt.stylescale[N],3) * nvt.bls
+    else
+      h = nvt.stylescale[N] * nvt.bls
+      d = 0.3 * nvt.stylescale[N] * nvt.bls
+    end
     tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
     tex.sprint('\\def\\tmpleft{' .. nvt.styleleft[N] .. '}')
     tex.sprint('\\def\\tmpright{' .. nvt.styleright[N] .. '}')
@@ -665,6 +666,7 @@ nvt.parsestyle = function (N, s) -- style number, option
     tex.sprint('\\begingroup\\makeatletter\\gdef\\tmpfont{' .. nvt.stylefont[N] .. '}\\endgroup')
     tex.sprint('\\def\\tmpspace{' .. nvt.space[nvt.stylefn[N]] .. '}')
     tex.sprint('\\def\\tmpraw{' .. nvt.styleraw[N] .. '}')
+    s = string.gsub(s, ',', '')
     if s == '' then
       tex.sprint('\\def\\tmpreturn{1}')
     else
@@ -732,10 +734,10 @@ end
 --
 
 
--- Parse \scene option:
+-- Parse \scene option and \sceneimage option:
 nvt.parsescene = function (s)
   s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',', '')
-  local n, a
+  local n, a, g
   if string.find(s, 'align=') then
     a, n = string.gsub(s, '.*align=', '')
     if n == 1 then
@@ -761,12 +763,12 @@ end
 --
 
 
--- Parse \scenestyle:
-nvt.parsescenestyle = function (s)
+-- Parse \setscene:
+nvt.parsesetscene = function (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',', '')
   local n, t, a, f, c, x, xx, ok ; local miss = ''
   local min = 1 ; local max = 1.5
-  if nvt.didscenestyle == true then ok = false else nvt.didscenestyle = true ; ok = true end
+  if nvt.didsetscene == true then ok = false else nvt.didsetscene = true ; ok = true end
   if nvt.preamble == false then ok = false end
   tex.sprint('\\begingroup\\makeatletter')
   if ok == true and string.find(s, 'align=') then
@@ -794,10 +796,10 @@ end
 --
 
 
--- Parse \footnotestyle:
-nvt.parsefnstyle = function (s)
+-- Parse \setfootnote:
+nvt.parsesetfootnote = function (s)
   local ok = false
-  if nvt.didfootnotestyle == true then
+  if nvt.didsetfootnote == true then
     tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
   else
     tex.sprint('\\begingroup\\makeatletter')
@@ -806,7 +808,7 @@ nvt.parsefnstyle = function (s)
     if s == 'away' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{1}') end
     if s == 'both' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{2}') end
     if s == 'near' or s == '' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{3}') end
-    nvt.didfootnotestyle = true
+    nvt.didsetfootnote = true
     tex.sprint('\\endgroup')
     if ok == true then
       tex.sprint('\\def\\tmpreturn{1}')

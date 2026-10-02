@@ -331,14 +331,14 @@
 }%%
 \setstyle0{font=main,scale=1,track=0,align=center,case=none} %% developer test.
 %%
-\DeclareDocumentCommand\headstyle{m}{%%
-  \directlua{nvt.parseheadstyle('\luaescapestring{#1}')}
+\DeclareDocumentCommand\sethead{m}{%%
+  \directlua{nvt.parsesethead('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\headstyle. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\sethead. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\headstyle.^^J%%
-      \spii Format: \headstyle{font=F,scale=S,track=T,deco=D,case=C}^^J%%
+    \nvt@err{Bad setting for \string\sethead.^^J%%
+      \spii Format: \sethead{font=F,scale=S,track=T,deco=D,case=C}^^J%%
       \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
       \spix Default main.^^J%%
       \spiv S -> Decimal number 0.83-1. Default 0.93.^^J%%
@@ -354,31 +354,31 @@
       \spix none -> No changes.}%%
   \fi
 }%%
-\headstyle{font=main,scale=0.93,track=2,deco=bar,case=dflt}
-\directlua{nvt.didheadstyle=0}
+\sethead{font=main,scale=0.93,track=2,deco=bar,case=dflt}
+\directlua{nvt.didsethead=0}
 %%
-\DeclareDocumentCommand\defaultscene{m}{%%
-  \directlua{nvt.parsescenestyle('\luaescapestring{#1}')}
+\DeclareDocumentCommand\setscene{m}{%%
+  \directlua{nvt.parsesetscene('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\defaultscene. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\setscene. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\defaultscene.^^J%%
-      \spii Format: \string\defaultscene{align=A}^^J%%
+    \nvt@err{Bad setting for \string\setscene.^^J%%
+      \spii Format: \string\setscene{align=A}^^J%%
       \spiv A -> left right center. Default center.}%%
   \fi
 }%%
-\defaultscene{align=center} %% Default
-\directlua{nvt.didscenestyle=0}
+\setscene{align=center} %% Default
+\directlua{nvt.didsetscene=0}
 %%
-\DeclareDocumentCommand\footnotestyle{m}{%%
-  \directlua{nvt.parsefnstyle('\luaescapestring{#1}')}
+\DeclareDocumentCommand\setfootnote{m}{%%
+  \directlua{nvt.parsesetfootnote('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\footnotestyle. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\setfootnote. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\footnotestyle.^^J%%
-      \spii Format: \string\footnotestyle{indent=I}^^J%%
+    \nvt@err{Bad setting for \string\setfootnote.^^J%%
+      \spii Format: \string\setfootnote{indent=I}^^J%%
       \spiv I -> near away both none. Default near.^^J%%
       \spix near -> Text at indent, label and space just before it.^^J%%
       \spix away -> Label at margin, big space, text at indent.^^J%%
@@ -386,13 +386,13 @@
       \spix none -> Label at margin, space, text.}%%
   \fi
 }%%
-\footnotestyle{indent=near} %% Default.
-\directlua{nvt.didfootnotestyle=0}
+\setfootnote{indent=near} %% Default.
+\directlua{nvt.didsetfootnote=0}
 %%
-\@onlypreamble\headstyle
+\@onlypreamble\sethead
 \@onlypreamble\setstyle
-\@onlypreamble\defaultscene
-\@onlypreamble\footnotestyle
+\@onlypreamble\setscene
+\@onlypreamble\setfootnote
 %%
 
 
@@ -588,7 +588,7 @@
 \long\def\center{\nvt@warn{%%
   \spii The center environment, and \string\centering, cannot be used in Novelette.^^J%%
   \spii The block environment has [align=center] option, which serves that purpose.^^J%%
-  \spii \string\setstyleN (N = 1 2 3 4), and \string\defaultscene, allow {align=center}.^^J%%
+  \spii \string\setstyleN (N = 1 2 3 4), and \string\setscene, allow {align=center}.^^J%%
   \spii \string\styleN, \string\scene, and \string\image\space allow [align=center].}%%
 }%%
 \let\endcenter\par

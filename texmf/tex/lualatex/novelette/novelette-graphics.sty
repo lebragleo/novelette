@@ -8,7 +8,7 @@
 %% GRAPHICS:
 %%   Novelette does not use standard LaTeX graphics commands, such as \includegraphics. You cannot
 %% create vector (TiKz) drawings, or include eps/pdf files.
-%%   There are two graphics commands: \image and \icon. In all cases, the graphics file must be
+%%   There are two graphics commands: \image and \logo. In all cases, the graphics file must be
 %% png raster format, monochrome or true grayscale. It must state its resolution (density).
 %%   In preview and final modes, the file must also pass conformance tests. Novelette provides
 %% shell scripts, using ImageMagick, that process files to ensure conformance. These scripts
@@ -16,7 +16,7 @@
 %%   Files must be located in the same folder as the main document, or (better) in a subfolder
 %% relative to the main document. File paths are always relative to the main document, even if
 %% the file is called by a sub-document.
-%%   You may never place graphics in footnotes or page headers. Only \icon may be used inline
+%%   You may never place graphics in footnotes or page headers. Only \logo may be used inline
 %% with text; \image and \sceneimage create their own paragraphs.
 %%   All three graphics commands have starred and unstarred versions. In preview and final modes,
 %% there is no difference: each file is carefully inspected.
@@ -35,6 +35,7 @@
 %% but if you use it, the image appears alone on its page.
 \def\ftype@figure{1} %% Standard.
 \def\nvt@imgrulewd{0pt} %% Nonzero in dev mode. Applies to strut that enforces lines=L.
+\newif\ifnvt@inimage %% True within the \image mandatory argument.
 \DeclareDocumentCommand\image{sO{}m}{%%
   \begingroup%%
   \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
@@ -42,11 +43,16 @@
   \ifnvt@instyle\def\tmpok{0}\fi%%
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnum\tmpok=0\relax%%
-    \nvt@err{Cannot place \string\image\space in footnote or page header.^^J%%
-      Cannot place \string\image\space in \string\styleN (N=0-9) %%
-      or \string\scene, or block environment.}%%
+    \nvt@err{Cannot place graphics in footnote or page header,^^J%%
+      \spii or in \string\styleN\space (N=0-9), \string\scene, or block environment.}%%
     {\char"FFFD}%%
   \fi%%
+  \ifnvt@inimage%%
+    \nvt@err{Do not write \string\image\space within \string\sceneimage.^^J%%
+      \spii The \string\sceneimage\space command already knows that its argument is an image.}%%
+    {\char"FFFD}\def\tmpok{0}%%
+  \fi%%
+  \nvt@inimagetrue%%
   \ifnum\tmpok=1\relax%%
     \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
     \def\tmpalign{0}\def\tmptweak{0}\def\tmplines{0}\def\tmpvalidate{0}%%
@@ -60,7 +66,7 @@
       {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad \string\image\space option.^^J%%
-        \spii Format: [lines=L,align=A,float=F,tweak=T] or [scene,align=A]^^J%%
+        \spii Format: [lines=L,align=A,float=F,tweak=T]^^J%%
         \spiv L -> Integer 1<=L<=(lines per page). Must be set.^^J%%
         \spiv A -> left right center. Default center.^^J%%
         \spiv F -> none here top bottom. Choose only one.^^J%%
@@ -70,36 +76,29 @@
         \spiv T -> down up mid. Default mid.^^J%%
         \spix down ->  Bottom of image at baseline of lowest displaced line.^^J%%
         \spix up -> Top at accented uppercase height of highest displaced line.^^J%%
-        \spix mid -> Splits padding above/below image.^^J%%
-        \spii If [scene] option:^^J%%
-        \spiv You may also use align=A, but no other options.^^J%%
-        \spiv Default alignment is set by \string\defaultscene, or center if unset.^^J%%
-        \spiv No float. Special values are used for lines and tweak.}%%
+        \spix mid -> Splits padding above/below image.}%%
     \fi%%
-    \ifnum\tmpscene=1\relax\blankline\fi%%
     \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
     \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
     \ifnum\tmpalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
     \ifnum\tmpalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
-    \ifnum\tmpscene=0\relax%%
-      \ifnum\tmplines=0\relax%%
-        \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=(lines per page).}%%
-        \def\tmplines{3}%% Placeholder default. Almost always an incorrect value.
-      \fi%%
+    \ifnum\tmplines=0\relax%%
+      \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=(lines per page).}%%
+      \def\tmplines{3}%% Placeholder backup. Almost always an incorrect value.
     \fi%%
     \ifnum\tmpisfile=0\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
       \IfFileExists{#3}{%%
         \def\imgfake{0}%%
       }{%%
-        \nvt@err{Missing image file #3.^^J%%
+        \nvt@err{Missing \string\image\space file #3.^^J%%
           \spii The path and filename have correct format, but the file is not there.^^J%%
           \spii Either you mis-spelled the path or filename, or no such file.}%%
         \def\imgfake{1}%%
       }%%
     \fi%%
     \ifnum\tmpisfile=2\relax%%
-      \nvt@err{Bad image argument: {#3}.^^J%%
+      \nvt@err{Bad \string\image\space argument: {#3}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. Image filename does not have .png file extension.^^J%%
         \spiv 2. Path to image file is not relative to main document.^^J%%
@@ -111,47 +110,127 @@
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\imgfake{1}%%
     \fi%%
-    \ifnum\tmpscene=1\relax%%
+    \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
+    \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
+    \ifnum\tmpfloat=2\relax\def\fps@figure{!t}\fi%%
+    \ifnum\tmpfloat=3\relax\def\fps@figure{!b}\fi%%
+    \ifnvt@indisplay%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
       \def\fps@figure{}%%
-    \else%%
-      \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
-      \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
-      \ifnum\tmpfloat=2\relax\def\fps@figure{!t}\fi%%
-      \ifnum\tmpfloat=3\relax\def\fps@figure{!b}\fi%%
-      \ifnvt@indisplay%%
-        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
-        \def\fps@figure{}%%
-      \fi%%
-      \ifnvt@infrontmatter%%
-        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
-        \def\fps@figure{}%%
-      \fi%%
-      \ifnvt@inbackmatter%%
-        \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
-        \def\fps@figure{}%%
-      \fi%%
+    \fi%%
+    \ifnvt@infrontmatter%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+      \def\fps@figure{}%%
+    \fi%%
+    \ifnvt@inbackmatter%%
+      \ifnum\tmpfloat>0\relax\nvt@warn{Ignored request for float in no-float location.}\fi%%
+      \def\fps@figure{}%%
     \fi%%
     \ifnum\imgfake=0\relax\nvt@realimage{#3}\else\nvt@fakeimage\fi%%
     \nvt@printimage%%
     \par\vspace*{-\nvt@bls}\null%%
   \fi%%
-  \ifnum\tmpscene=1\relax\gdef\tmpaddblank{1}\else\gdef\tmpaddblank{0}\fi%%
   \endgroup%%
-  \ifnum\tmpaddblank=1\relax\blankline\fi\gdef\tmpaddblank{0}%%
+}%%
+%%
+
+
+%% SCENEIMAGE: \sceneimage[align=A]{PathTo/filename.png}  also starred version.
+%%   This is a hybid of \scene and \image. Like \scene, it creates a 3-line gap between
+%% paragraphs, with the following paragraph unindented. Also, it defaults to \setscene.
+%% But unlike \scene, this command does not print text.
+%%   Like \image, the mandatory argument is a png raster image file. \sceneimage and \sceneimage*
+%% have the same bahavior as \image and \image*, and may print a placeholder. But unlike
+%% \image, the \sceneimage file can never float or tweak. It has a fixed maximum size, and does
+%% not use lines=L to reserve the space.
+%%   The lower half of the image sits below the middle baseline.
+\newif\ifnvt@insceneimage %% True within \sceneimage.
+\DeclareDocumentCommand\sceneimage{sO{}m}{%%
+  \begingroup%%
+  \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnvt@instyle\def\tmpok{0}\fi%%
+  \ifnvt@inblock\def\tmpok{0}\fi%%
+  \ifnvt@inscene\def\tmpok{0}\fi%%
+  \ifnum\tmpok=0\relax%%
+    \nvt@err{Cannot place graphics in footnote or page header,^^J%%
+      \spii or in \string\styleN\space (N=0-9), or \string\scene, or block environment.}%%
+    {\char"FFFD}%%
+  \fi%%
+  \ifnvt@insceneimage%%
+    \nvt@err{Do not write \string\image\space within \string\sceneimage.^^J%%
+      \spii The \string\sceneimage\space command already knows that its argument is an image.}%%
+    {\char"FFFD}\def\tmpok{0}%%
+  \fi%%
+  \nvt@insceneimagetrue%%
+  \ifnum\tmpok=1\relax%%
+    \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
+    \def\tmpalign{0}\def\tmpvalidate{0}%%
+    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
+    \catcode`\~=12\relax\def\tmpopt{lines=2,#2}%% Else ~ in file path would be undetected here.
+    \IfBooleanTF{#1}%%
+      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
+    \ifnum\tmpreturn=0\relax%%
+      \nvt@err{Bad \string\sceneimage\space option.^^J%%
+        \spii Format: [align=A]^^J%%
+        \spiv A -> left right center. Default from \string\setscene, or center.^^J%%
+        \spiv \string\sceneimage\space does not have [lines=L] or other options.}%%
+    \fi%%
+    \vspace{\nvt@bls}%%
+    \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
+    \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
+    \ifnum\tmpalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
+    \ifnum\tmpisfile=0\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
+    \ifnum\tmpisfile=1\relax%%
+      \IfFileExists{#3}{%%
+        \def\imgfake{0}%%
+      }{%%
+        \nvt@err{Missing \string\sceneimage\space file #3.^^J%%
+          \spii The path and filename have correct format, but the file is not there.^^J%%
+          \spii Either you mis-spelled the path or filename, or no such file.}%%
+        \def\imgfake{1}%%
+      }%%
+    \fi%%
+    \ifnum\tmpisfile=2\relax%%
+      \nvt@err{Bad \string\sceneimage\space argument: {#3}.^^J%%
+        \spii There are several possibilities:^^J%%
+        \spiv 1. Image filename does not have .png file extension.^^J%%
+        \spiv 2. Path to image file is not relative to main document.^^J%%
+        \spix Do not use path relative to sub-documents.^^J%%
+        \spix Do not use absolute path, or symlink (softlink).^^J%%
+        \spiv 3. Image file is not in same folder as main document,^^J%%
+        \spix or in subfolder from main document (max 5 levels).^^J%%
+        \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
+        \spix You may use hyphen or underscore, but not space or tilde.}%%
+      \def\imgfake{1}%%
+    \fi%%
+    \def\fps@figure{}%%
+    \ifnum\imgfake=0\relax\nvt@realimage{#3}\else\nvt@fakeimage\fi%%
+    \nvt@printimage%%
+    \par\vspace*{-\nvt@bls}\null%%
+  \fi%%
+  \endgroup%%
+  \blankline%%
 }%%
 %%
 
 
 %% Fake image, placeholder rectangle:
 \def\nvt@fakeimage{%%
-  \ifnum\tmpscene=1\relax%%
-    \def\imgwd{3.5in}\def\imght{.24in}%%
+  \ifnvt@insceneimage%%
+    \def\imgwd{3.4in}\def\imght{.32in}%%
   \else%%
     \edef\imgwd{\fpeval{0.6*\textwidth}pt}%%
     \edef\imght{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls}pt}%%
   \fi%%
   \sbox0{{\nvt@gray{8}\rule{\imgwd}{\imght}}}%%
-  \def\imglabel{{\nvt@gray{4}\nvt@aff{RawFeature={+titl},Scale=.75}\tmplabel}}%%
+  \ifnvt@insceneimage%%
+    \def\imglabel{{\nvt@gray{4}\nvt@aff{RawFeature={+titl},Scale=.75}scene\tmplabel}}%%
+  \else%%
+    \def\imglabel{{\nvt@gray{4}\nvt@aff{RawFeature={+titl},Scale=.75}\tmplabel}}%%
+  \fi%%
 }%%
 %%
 
@@ -177,12 +256,21 @@
       \sbox0{\csname #1 image:I\endcsname}%%
     }%%
   \fi%%
-  \edef\tmpht{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls + .004}pt}%%
-  \edef\tmpfit{\fpeval{(\ht0 > \tmpht) + (\wd0 > \textwidth)}}%%
-  \ifnum\tmpfit>0\relax%%
-    \nvt@warn{Image #1 is too large.^^J%%
-      \spii Reduce image width and/or height, or increase [lines=L] option.}%% %%%% \tmpscene ?
-    \def\tmplabel{oversize image}\nvt@fakeimage%%
+  \ifnvt@insceneimage%%
+    \edef\tmpfit{\fpeval{(\ht0 > .324in) + (\wd0 > 3.44in)}}%% .004in fuzz h,w.
+    \ifnum\tmpfit>0\relax%%
+      \nvt@warn{\string\sceneimage\space #1 is too large.^^J%%
+        \spii Maximum width 3.4in, maximum height 0.32in.}%%
+      \def\tmplabel{oversize image}\nvt@fakeimage%%
+    \fi%%
+  \else%%
+    \edef\tmpht{\fpeval{0.84*\nvt@em + (\tmplines-1)*\nvt@bls + .004in}pt}%% .004in fuzz
+    \edef\tmpfit{\fpeval{(\ht0 > \tmpht) + (\wd0 > \textwidth)}}%% no width fuzz
+    \ifnum\tmpfit>0\relax%%
+      \nvt@warn{\string\image\space #1 is too large.^^J%%
+        \spii Reduce image width and/or height, or increase [lines=L] option.}%%
+      \def\tmplabel{oversize image}\nvt@fakeimage%%
+    \fi%%
   \fi%%
 }%%
 %%
@@ -190,9 +278,9 @@
 
 %% Print the real or fake image:
 \def\nvt@printimage{%%
-  \ifnum\tmpscene=1\relax%% %%%%%
+  \ifnvt@insceneimage%%
     \edef\imgruleht{\fpeval{\nvt@bls}pt}%%
-    \edef\tmppad{\fpeval{.117in - \ht0}pt}%% %%%%%
+    \edef\tmppad{\fpeval{-.5*\ht0}pt}%% %%%%%
   \else%%
     \edef\imgruleht{\fpeval{\tmplines*\nvt@bls}pt}%%
     \ifnum\tmptweak=0\relax\edef\tmppad{%%
@@ -204,78 +292,81 @@
   \ifx\fps@figure\@empty\else\@float{figure}\fi%%
   \nvt@zrule\imgleft\rule{\nvt@imgrulewd}{\imgruleht}%%
   \smash{\raisebox{\tmppad}{\usebox0}}%%
-  \ifx\imglabel\@empty\else\llap{\smash{\raisebox{\tmppad}{\imglabel}}}\fi%%
+  \ifx\imglabel\@empty\else%%
+    \llap{\smash{\raisebox{\tmppad}{\imglabel}}}%%
+  \fi%%
   \imgright\nvt@zrule\par%%
   \ifx\fps@figure\@empty\else\end@float\fi%%
 }%%
 %%
 
 
-%% ICON: \icon{path/to/filename.png}
-%%   An icon occupies exactly 0.24in width, 0.18in height. Its upper 70% will print
-%% above the surrounding text baseline; lower 30% below baseline.
-%%   You must design the file so that it fits within that area. If smaller, it is automatically
-%% padded to the full area.
-%%   The \icon command may only be used in a display zone. It may be used within a \styleN,
-%% but will not be scaled. It may be used in a block environment, but only if the block does not
-%% use small text.
-\DeclareDocumentCommand\icon{sm}{%%
+%% LOGO: \logo{path/to/filename.png}  also starred version.
+%%   A logo is a small image that sits inline with surrounding text. Its purpose is publisher's
+%% logo on the title or copyright page, but Novelette does not know or care why you use it.
+%%   You may only use \logo within a \styleN, with option [logo]. The logo width and height
+%% may not exceed 0.32in. It will be vertically positioned so that its lower 1/4 is below
+%% textbaseline, and its upper 3/4 is above baseline. It will be horizontally padded to occupy
+%% 3em (unscaled). Regardless of its scale, the \styleN will occupy 3 at least 3 normal lines.
+%%   The starred \logo* and unstarred \logo behave the same as the related \image* and \image.
+\DeclareDocumentCommand\logo{sm}{%%
   \begingroup%%
-  \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
-  \ifnvt@smallblock\def\tmpok{0}\fi%%
+  \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
+  \ifnvt@instyle\def\tmpok{1}\else\def\tmpok{0}\fi%%
   \ifnum\tmpok=1\relax%%
     \def\fps@figure{}\def\tmpvalidate{0}%%
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
-      {\directlua{nvt.parseicon('star','\luaescapestring{#2}')}}%%
-      {\directlua{nvt.parseicon('','\luaescapestring{#2}')}}%%
-    \ifnum\tmpisfile=0\relax\def\iconfake{1}\else\def\iconfake{0}\fi%%
+      {\directlua{nvt.parselogo('star','\luaescapestring{#2}')}}%%
+      {\directlua{nvt.parselogo('','\luaescapestring{#2}')}}%%
+  \fi%%
+  \ifnum\tmplogo=1\relax%% \tmplogo is provided by \styleN.
+    \ifnum\tmpisfile=0\relax\def\logofake{1}\else\def\logofake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
       \IfFileExists{#2}{%%
-        \def\iconfake{0}%%
+        \def\logofake{0}%%
       }{%%
-        \nvt@err{Missing icon file #2.^^J%%
+        \nvt@err{Missing logo file #2.^^J%%
           \spii The path and filename have correct format, but the file is not there.^^J%%
           \spii Either you mis-spelled the path or filename, or no such file.}%%
-        \def\iconfake{1}%%
+        \def\logofake{1}%%
       }%%
     \fi%%
     \ifnum\tmpisfile=2\relax%%
-      \nvt@err{Bad icon argument: {#2}.^^J%%
+      \nvt@err{Bad logo argument: {#2}.^^J%%
         \spii There are several possibilities:^^J%%
-        \spiv 1. Icon filename does not have .png file extension.^^J%%
-        \spiv 2. Path to icon file is not relative to main document.^^J%%
+        \spiv 1. The filename does not have .png file extension.^^J%%
+        \spiv 2. Path to logo file is not relative to main document.^^J%%
         \spix Do not use path relative to sub-documents.^^J%%
         \spix Do not use absolute path, or symlink (softlink).^^J%%
-        \spiv 3. Icon file is not in same folder as main document,^^J%%
+        \spiv 3. File is not in same folder as main document,^^J%%
         \spix or in subfolder from main document (max 5 levels).^^J%%
         \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
-      \def\iconfake{1}%%
+      \def\logofake{1}%%
     \fi%%
-    \ifnum\iconfake=0\relax%%
-      \nvt@realicon{#2}%%
+    \ifnum\logofake=0\relax%%
+      \nvt@reallogo{#2}%%
     \else%%
-      \sbox0{{\nvt@gray{8}\rule{.24in}{.18in}}}%%
+      \sbox0{{\nvt@gray{8}\rule{.32in}{.32in}}}%%
     \fi%%
-    \edef\tmpdesc{\fpeval{.296*\ht0}pt}%%
-    \strut\makebox[2em]{\hfill\smash{\raisebox{-\tmpdesc}{\usebox0}}\hfill}%%
+    \edef\tmplogodrop{\fpeval{.25*\ht0}pt}%%
+    \strut\makebox[3\nvt@em]{\hfill\smash{\raisebox{-\tmplogodrop}{\usebox0}}\hfill}%%
   \else%%
-    \nvt@err{Cannot place \string\icon\space outside display zone,^^J%%
-      or in block environment with option [size=small].}%%
-    \strut\makebox[2em]{\hfill\char"FFFD\hfill}%%
+    \nvt@err{\string\logow\space may only be placed within \string\styleN, with [logo] option.}%%
+    \strut\makebox[3\nvt@em]{\hfill\char"FFFD\hfill}%%
   \fi%%
   \endgroup%%
 }%%
 %%
 
 
-%% Real icon (if bad, defaults to fake):
-\def\nvt@realicon#1{%%
+%% Real logo (if bad, defaults to fake):
+\def\nvt@reallogo#1{%%
   \def\tmpvalid{1}%%
   \ifnum\tmpvalidate=1\relax\nvt@validateimage{#1}\fi%%
   \ifnum\tmpvalid=0\relax%%
-    \nvt@warn{Icon file #1 failed validation.^^J%%
+    \nvt@warn{File #1 failed validation.^^J%%
       See Novelette docs for how to fix this problem.^^J%%
       Cannot produce preview or final mode, if not valid.}%%
     \sbox0{{\nvt@gray{8}\rule[-.06in]{.24in}{.18in}}}%%
@@ -290,16 +381,16 @@
       \sbox0{\csname #1 image:I\endcsname}%%
     }%%
   \fi%%
-  \edef\tmpfit{\fpeval{(\ht0 > .184in) + (\wd0 > .244in)}}%%
+  \edef\tmpfit{\fpeval{(\ht0 > .324in) + (\wd0 > .324in)}}%% .004in fuzz h,w
   \ifnum\tmpfit>0\relax%%
-    \nvt@warn{Icon #1 is too large.^^J%%
-      \spii Max width 0.24in, height 0.18in.}%%
+    \nvt@warn{File #1 is too large for \string\logo.^^J%%
+      \spii Max width 0.32in, height 0.32in.}%%
   \fi%%
 }%%
 %%
 
 
-%% Image or Icon file validation:
+%% Image or Logo file validation:
 \def\nvt@validateimage#1{%%
   \directlua{nvt.validateimage('\luaescapestring{#1}')}%%
 }%%

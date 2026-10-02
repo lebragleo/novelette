@@ -323,12 +323,13 @@
 %% same display zone. Although these commands are intended for such purposes as chapter titles,
 %% Novelette does not care why you use them.
 %%   Each \styleN has its font, scale, track, align, and case set by \setstyleN commands
-%% in preamble, or the built-in defaults (if unset by user). These are fixed. The local
-%% \styleN[option] only affects whether info is written to Terminal (console).
+%% in preamble, or the built-in defaults (if unset by user). These are fixed.
+%%   The local \styleN[option] cannot change those settings. Local option [info] writes the
+%% typeset width of the text to Terminal (console). Option [logo] allows \logo in the text.
 %%   There is no automatic chapter numbering (see \next command, for placeholder).
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
-    \spii inside \string\styleN (N=0-9), or \string\scene.}%%
+    \spii inside \string\styleN (N=0-9), or \string\scene, or \string\sceneimage.}%%
 }%%
 \def\nvt@badstyle#1{%%
   \nvt@err{Do not write \string\style{N}[option]{text}.^^J%%
@@ -338,7 +339,7 @@
 \def\style{\@ifnextchar\bgroup\nvt@badstyle\nvt@stylecmd}
 \newif\ifnvt@instyle %% True within \styleN and \scene commands.
 \DeclareDocumentCommand\nvt@stylecmd{mO{}+m}{%% +m will be re-parsed as m.
-  \begingroup\nvt@instyletrue%%
+  \begingroup\nvt@instyletrue\def\tmplogo{0}%%
   \directlua{nvt.parsestyle('\luaescapestring{#1}','\luaescapestring{#2}')}%%
   \ifnum\tmpreturn=-99\relax%%
     \nvt@fatal{Cannot use \string\styleN\space in preamble.^^J%%
@@ -354,9 +355,10 @@
       \spii N must be integer 0-9. Not the letter N or n.^^J%%
       \spii Choices for font, scale, track, align, and case^^J%%
       \spiv are globally fixed by \string\setstyle[N]{choices} in preamble.^^J%%
-      \spii Option [info] is the only local possibility:^^J%%
-      \spiv It writes the typeset text width to Terminal (console).^^J%%
-      \spiv That might be useful for your own design purposes.}%%
+      \spii Option may be one or both: info logo (comma-separated).
+      \spiv [info] -> Writes the typeset text width to Terminal (console).^^J%%
+      \spix That might be useful for your own design purposes.^^J%%
+      \spiv [logo] -> Allows use of \string\logo\space within the text.}%%
       \strut\char"FFFD\par%%
   \fi%%
   \ifnum\tmpreturn=1\relax%%
@@ -366,11 +368,15 @@
     \edef\tmpsp{\fpeval{(\tmpscale*\tmpspace + .02*\tmptrack)*\nvt@em}pt}%% %%%%%
     \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%% %%%%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
+    \begingroup\DeclareDocumentCommand\logo{sm}{}%%
+      \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% %%%%%
+      \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
+      \ifnum\tmpboxdp=1\relax%%
+        \nvt@warn{\string\styleN\space content has disallowed characters.}%%
+      \fi%%
+    \endgroup%%
     \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% %%%%%
-    \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
-    \ifnum\tmpboxdp=1\relax%%
-      \nvt@warn{\string\styleN\space content has disallowed characters.}%%
-    \fi%%
+%%%%% ensure above/below padding for logo, when scale not enough. %%%%%
     \edef\tmpwdz{\the\wd0}%%
     \edef\tmpwide{\fpeval{\wd0 > \textwidth}}%%
     \ifnum\tmpwide=1\relax%%
@@ -392,42 +398,33 @@
 %%
 
 
-%% SCENE: \scene[option]{text}  see also \image[scene,option]{filename} in graphics.
+%% SCENE: \scene[option]{text}  also see \sceneimage (graphics).
 %%   The simplest scene breaks are one or more \blankline, possible with \dinkus where needed.
-%% You may also use ordinary text, perhaps aligned via the block environment. Or you may use
-%% an image.
-%%   But if a chapter of your story has distinct sub-chapters, each with its own name, then the
-%% \scene command may be useful. This creates a three-line gap between paragraphs. The first
-%% line is always blank, and is omitted if the \scene happens to fall at the top of a page.
-%% If you prefer a larger gap, use \blankline before or after \scene.
-%%   The \scene text must fit on one line, maximum width 3.5in regardless of layout. The text
-%% sits slightly below the middle of the other two lines. Its is styled to be slightly different
-%% than normal text. The first paragraph following \scene is not indented.
-%%   The default \scene alignment is set in preamble by \defaultscene, or center if unset.
+%% But if a chapter of your story has distinct sub-chapters, each with its own name, then the
+%% \scene command may be useful. This creates a three-line gap between paragraphs. You may
+%% increase the gap by using \blankline above and/or below. After the scene break, the first
+%% paragraph is not indented.
+%%   The default \scene alignment is set in preamble by \setscene, or center if unset.
 %% Option [align=A] is for local over-ride (A = left right center).
 %%   Scenes have no automatic numbering. Do it yourself. See the \next command.
+\newif\ifnvt@inscene %% True inside \scene.
 \DeclareDocumentCommand\scene{O{}+m}{%% +m will be re-parsed as m.
   \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
   \ifnvt@inblock\def\tmpok{0}\fi%%
-  \ifnvt@instyle\def\tmpok{0}\fi%%
-  \begingroup\nvt@instyletrue%%
+  \ifnvt@inscene\def\tmpok{0}\fi%%
+  \begingroup\nvt@inscenetrue%%
+  \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
   \def\tmpsceneleft{\nvt@sceneleft}\def\tmpsceneright{\nvt@sceneright}%%
   \directlua{nvt.parsescene('\luaescapestring{#1}')}%%
   \ifnum\tmpreturn=-99\relax%%
     \nvt@fatal{Cannot use \string\scene\space in preamble.^^J%%
-      Did you mean \string\defaultscene\space instead?}%%
+      Did you mean \string\setscene\space ?}%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
-    \nvt@err{Did not understand \string\scene\space option.^^J%%
+    \nvt@warn{Did not understand \string\scene\space option.^^J%%
       \spii Only option is [align=A] for A -> left right center.}%%
   \fi%%
   \ifnum\tmpok=1\relax%%
-    \par\edef\tmppgtot{\fpeval{\pagetotal = 0pt}}%%
-    \ifnum\tmppgtot>0\relax\strut\par\vspace*{-2\nvt@bls}\fi%%
-    \vspace{\nvt@bls}\vspace*{-\nvt@bls}\blankline\nopagebreak%%
-    \setlength\parindent{0pt}%%
-    \def\textit##1{##1}\def\it##1{##1}%%
-    \def\smcp##1{##1}\def\SMCP##1{##1}\def\Smcp##1{##1}\def\onum##1{##1}%%
     \sbox0{\nvt@aff{RawFeature={+titl,+case},Scale=1.08,FakeStretch=.96,LetterSpace=4}%%
       \char"200D{#2}\char"200D}%%
     \edef\tmpwide{\fpeval{\wd0 > 3.5in}}%%
@@ -659,8 +656,8 @@
 %%   Novelette does not use many standard LaTeX commands, but instead uses other methods.
 \def\nvt@nocmd#1{%%
   \nvt@warn{Novelette has no command #1.^^J%%
-    \spii See these commands: \string\styleN for N=0-9,^^J%%
-    \spii\string\headstyle, and options for block environment.}
+    \spii See these commands: \string\setstyleN and \string\styleN for N=0-9,^^J%%
+    \spii\string\sethead, and options for block environment.}
 }%%
 \def\footnotesize{\nvt@nocmd{\string\footnotesize}}
 \def\tiny{\nvt@nocmd{\string\tiny}}
