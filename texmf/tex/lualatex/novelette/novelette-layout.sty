@@ -33,7 +33,7 @@
     \def\nvt@pagestyle{empty}\let\thispagestyle\nvt@thispagestyle
     \def\tmpmm{.75in}\def\tmpglue{0pt}
     \setlength\nvt@trimwidth{8.5in}\setlength\nvt@trimheight{11in}
-    \setlength\nvt@em{12pt}\setlength\nvt@bls{14.4pt}\def\nvt@lines{44}
+    \setlength\nvt@em{12pt}\setlength\nvt@bls{14.4pt}\def\nvt@lines{48}
     \setlength\topmargin{.75in}\setlength\textwidth{7in}
     \setlength\oddsidemargin{.75in}\setlength\evensidemargin{.75in}
     \setlength\nvt@glue{0pt}
@@ -46,6 +46,7 @@
     \setlength\oddsidemargin{\tmposm}\setlength\evensidemargin{\tmpesm}
     \setlength\textwidth{\tmptextwd}
     \setlength\topmargin{\tmptopm}
+    \setlength\nvt@linegap{\tmplinegap}
   \fi
   \def\tmptest{split}\ifx\nvt@pagestyle\tmptest
     \nvt@hasheadertrue\nvt@hasfootertrue\let\ps@normal\ps@split
@@ -71,7 +72,6 @@
     \ifx\tmpdeco\tmpd\gdef\nvt@pndeco{/}\fi
   \fi
   \edef\nvt@scenescale{\fpeval{round(12.6/\nvt@em,3)}}
-  \setlength\nvt@linegap{\tmplinegap}
   \setlength\topskip{\nvt@bls}
   \edef\tmptextht{\fpeval{(\nvt@lines-1)*\nvt@bls+\topskip+.00004}pt}
   \setlength\textheight{\tmptextht}

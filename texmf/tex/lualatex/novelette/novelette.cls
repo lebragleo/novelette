@@ -329,8 +329,8 @@
   \let\\\nvt@brk\relax
   \ifnvt@noblankend\else
     \ifodd\c@page\nvt@thispagestyle{empty}\null\clearpage\fi
+    \nvt@blankverso
   \fi
-  \nvt@blankverso
   \let\input\nvt@input\relax
   \nvt@didprinttrue
   \ifnum\currentgrouplevel>\z@\relax\directlua{nvt.good = false}\fi

@@ -384,7 +384,7 @@ nvt.parsemode = function (s)
       s = string.gsub(s, 'usl', '')
       if s == '' then
         tex.sprint('\\gdef\\nvt@titleprefix{}')
-        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@usltrue')
+        tex.sprint('\\global\\nvt@draftfalse\\global\\nvt@usltrue')
         nvt.mode = 'usl' ; nvt.startmode = 'usl'
       end
     end
