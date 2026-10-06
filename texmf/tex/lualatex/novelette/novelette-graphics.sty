@@ -31,8 +31,8 @@
 %% that the image will displace. The default (3 lines) is a placeholder, and is an error.
 %%   Note that Novelette handles floats using its own syntax. You may provide at most one
 %% of the float choices. Some areas disallow floats. There are no "float pages" that accumulate
-%% several floats. A full-page float is discouraged (better to use a single-page component),
-%% but if you use it, the image appears alone on its page.
+%% several floats. A full-page float is unavailable: Use a single-page component, which cannot
+%% be mid-chapter.
 \def\ftype@figure{1} %% Standard.
 \def\nvt@imgrulewd{0pt} %% Nonzero in dev mode. Applies to strut that enforces lines=L.
 \newif\ifnvt@inimage %% True within the \image mandatory argument.
@@ -62,8 +62,8 @@
     \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
-      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
-      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}',0)}}%%
+      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}',0)}}%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad \string\image\space option.^^J%%
         \spii Format: [lines=L,align=A,float=F,tweak=T]^^J%%
@@ -73,6 +73,7 @@
         \spix If here, then top is automatic backup.^^J%%
         \spix In frontmatter, backmatter, displays: default none. No other allowed.^^J%%
         \spix Elsewhere: default here.^^J%%
+        \spix No page floats. Instead use single page component. Not mid-chapter.^^J%%
         \spiv T -> down up mid. Default mid.^^J%%
         \spix down ->  Bottom of image at baseline of lowest displaced line.^^J%%
         \spix up -> Top at accented uppercase height of highest displaced line.^^J%%
@@ -169,8 +170,8 @@
     \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
     \catcode`\~=12\relax\def\tmpopt{lines=2,#2}%% Else ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
-      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
-      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}')}}%%
+      {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}',1)}}%%
+      {\directlua{nvt.parseimage('','\luaescapestring{\tmpopt}','\luaescapestring{#3}',1)}}%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad \string\sceneimage\space option.^^J%%
         \spii Format: [align=A]^^J%%
@@ -384,6 +385,7 @@
       Cannot produce preview or final mode, if not valid.}%%
     \sbox0{{\nvt@gray{8}\rule[-.06in]{.24in}{.18in}}}%%
   \else%%
+\edef\tmpnumone{#1}%%
     \@ifundefined{#1 image:I}{%%
       \saveimageresource attr{/Interpolate true}{#1}%%
       \sbox0{\useimageresource\lastsavedimageresourceindex}%%

@@ -23,9 +23,10 @@
 <a href="#top">Overview</a> &nbsp;
 <a href="#image">Images</a> &nbsp;
 <a href="#footnote">Footnotes</a> &nbsp;
+<a href="#block">Blocks</a> &nbsp;
 <a href="#vspace">Vertical Spacing</a> &nbsp;
 <a href="#style">\style<i>N</i></a> &nbsp;
-<a href="#block">Blocks</a> &nbsp;
+<a href="#line">Horizontal Lines</a> &nbsp;
 <a href="#title">Example: Title Page</a> &nbsp;
 <a href="#chapter">Example: New Chapter</a>
 </div>
@@ -49,65 +50,33 @@ to <i>what you need</i>.</p>
 <p><a id="image"></a>&nbsp;</p>
 <h4>Images in Display Zones</h4>
 <p>You may place <a href="graphics.html">images</a> in a display zone.</p>
-<ul>
-<li><p>An image may not float. If you attempt to float, then a warning is issued,
-and the float is not obeyed.</p></li>
-<li><p>An image may occupy a full page. This is useful for such things as maps,
-where the image is an entire single-page component.</p></li>
-</ul>
+<ul><li>
+  <p>An image may not float. If you attempt to float, then a warning is issued,
+     and the float is not obeyed.</p>
+</li><li>
+  <p>An image may occupy a full page. This is useful for such things as maps,
+     where the image is an entire single-page component.</p>
+</li></ul>
 
 
 <p><a id="footnote"></a>&nbsp;</p>
 <h4>Footnotes in Display Zones</h4>
 <p>You may write <a href="footnotes.html">footnotes</a> in most display zones.</p>
-<ul>
-<li><p>You may not write footnotes anywhere in <a href="frontmatter.html">front matter</a>
-or in <a href="backmatter.html">back matter</a>, whether or not within a display zone.</p></li>
-<li><p>The text of the footnote will appear at the bottom of the page (not the bottom of the
-display zone).</p></li>
-<li><p>No marker prints, and the marker count is not incremented. No label prints at the
-footnote text. This is standard book design.</p></li>
-<li><p>Display zone footnotes are rare. Generally, they are only used when the note applies
-to an entire chapter, rather than to a particular sentence or paragraph. For example:</p>
-<p>\style3{12}</p>
-<p>\style4{Myron and Bertha}</p>
-<p>\footnote{This chapter is based on \textit{Romeo and Juliet}.}</p></li>
-</ul>
-
-
-<p><a id="vspace"></a>&nbsp;</p>
-<h4>Vertical Spacing</h4>
-<p>Display zones usually consist of styled text, vertically separated with a large amount of
-white space. Use <code>\blankline</code> and <code>\vspace</code> commands for that purpose.</p>
-<ul>
-<li><p>Important: Measure vertical space with units of <code>\baselineskip</code> rather than
-units of <code>pt</code> or anything else.</p></li>
-<li><p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p></li>
-</ul>
-
-
-<p><a id="style"></a>&nbsp;</p>
-<h4>\style<i>N</i>[<i>option</i>]{<i>text</i>} where N = integer 0-9.</h4>
-<p>These commands are used for printing the book title, subtitle, and author; chapter titles
-and chapter subtitles; and similar purposes.</p>
-<p>Each <code>\style<i>N</i></code> (for <i>N</i> = 0 to 9) applies the font, scale, track, align,
-and case that were set by the corresponding <code>\setstyle<i>N</i></code>
-in <a href="preamble.html">preamble</a>.</p>
-<ul>
-<li><p><code>\style<i>N</i></code> requires <i>N</i> to be an integer 0-9.</p></li>
-<li><p>These commands may only be used within a display zone, but not within
-a <a href="block-env.html">block environment</a>.</p></li>
-<li><p>You may not nest styles within styles.</p></li>
-<li><p>There is no particular meaning or hierarchy. <code>\style1</code> may be more prominent,
-or less prominent, than <code>\style2</code>.</p></li>
-<li><p>The styled text must fit on one line, without wrap.</p></li>
-<li><p>You may repeat the various <code>\style<i>N</i></code> in any order,
-in any display zone.</p></li>
-<li><p>The only option is <code>[info]</code>. This measures the width of the typeset text, and
-writes the width to Terminal (console). It is measured in normal, unscaled <i>em</i>. Example:</p>
-<p><i>Info: PDFpage 56 \style4 width 12.84em.</i></p></li>
-<li><p>If the style setting is <code>font=main,case=none</code> then the text may use Italics.
-Write the <code>\textit{text}</code> command inside the <code>\style<i>N</i></code>.</p></li>
+<ul><li>
+  <p>You may not write footnotes anywhere in <a href="frontmatter.html">front matter</a>
+     or in <a href="backmatter.html">back matter</a>, whether or not within a display zone.</p>
+</li><li>
+  <p>The text of the footnote will appear at the bottom of the page (not the bottom of the
+     display zone).</p>
+</li><li>
+  <p>No marker prints, and the marker count is not incremented. No label prints at the
+     footnote text. This is standard book design.</p>
+</li><li>
+  <p>Display zone footnotes are rare. Generally, they are only used when the note applies
+     to an entire chapter, rather than to a particular sentence or paragraph. For example:</p>
+  <p>\style3{12} % Chapter number</p>
+  <p>\style4{Myron and Bertha} % Chapter title</p>
+  <p>\footnote{This chapter is based on \textit{Romeo and Juliet}.}</p></li>
 </ul>
 
 
@@ -117,8 +86,94 @@ Write the <code>\textit{text}</code> command inside the <code>\style<i>N</i></co
 its option to choose normal or small text. Small text is especially useful for epigraphs.</p>
 
 
+<p><a id="vspace"></a>&nbsp;</p>
+<h4>Vertical Spacing</h4>
+<p>Display zones usually consist of styled text, vertically separated with a large amount of
+white space. Use <code>\blankline</code> and <code>\vspace</code> commands for that purpose.</p>
+<ul><li>
+  <p>Important: Measure vertical space with units of <code>\baselineskip</code> rather than
+     units of <code>pt</code> or anything else.</p>
+</li><li>
+  <p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p>
+</li></ul>
+
+
+<p><a id="style"></a>&nbsp;</p>
+<h4>\style<i>N</i>[<i>option</i>]{<i>text</i>} where N = integer 0-9.</h4>
+<p>These commands are used for printing the book title, subtitle, and author; chapter titles
+and chapter subtitles; and similar purposes.</p>
+<p>Each <code>\style<i>N</i></code> (for <i>N</i> = 0 to 9) applies the font, scale, track, align,
+and case that were set by the corresponding <code>\setstyle<i>N</i></code>
+in <a href="preamble.html">preamble</a>.</p>
+<ul><li>
+  <p><code>\style<i>N</i></code> requires <i>N</i> to be an integer 0-9.</p>
+</li><li>
+  <p>These commands may only be used within a display zone, but not within
+     a <a href="block-env.html">block environment</a>.</p>
+</li><li>
+  <p>You may not nest styles within styles.</p>
+</li><li>
+  <p>There is no particular meaning or hierarchy. <code>\style1</code> may be more prominent,
+     or less prominent, than <code>\style2</code>.</p>
+</li><li>
+  <p>The styled text must fit on one line, without wrap.</p>
+</li><li>
+  <p>You may repeat the various <code>\style<i>N</i></code> in any order,
+     in any display zone.</p>
+</li><li>
+  <p>The only option is <code>[info]</code>. This measures the width of the typeset text, and
+     writes the width to Terminal (console). It is measured in normal, unscaled <i>em</i>.
+     Example:</p>
+  <p><i>Info: PDFpage 56 \style4 width 12.84em.</i></p>
+</li><li>
+  <p>If the <code>\setstyle<i>N</i></code> is <code>font=main,case=none</code> then the style
+     text may use Italics. Write the <code>\textit{text}</code> command inside the
+     <code>\style<i>N</i></code>.</p>
+</li></ul>
+
+
+<a id="line"></a>
+<h4>Horizontal Lines</h4>
+<p>For decoration, you may print horizontal lines within display zones. This <i>may</i> be useful
+in special places such as the book title page. But it can be distracting, when used within
+the flow of your story.</p>
+<p>Although standard LaTeX has a <code>\line</code> command, its purpose is irrelevant
+in Novelette. So the command is re&#8209;written with custom syntax:</p>
+<p><code>\line{align=<i>A</i>,width=<i>W</i>,thick=<i>T</i>}</code></p>
+<ul><li>
+  <p><i>A</i> -> left right center. Default center.</p>
+</li><li>
+  <p><i>W</i> -> must be measured in units of <code>em</code>. Not <code>pt</code>.</p>
+  <ul><li>
+    <p>Recommended: W >= 4em.</p>
+  </li><li>
+    <p>If W is larger than the textwidth, it will be silently truncated to the
+       textwidth. Thus W=100em is a quick way to produce a full&#8209;width line.</p>
+  </li><li>
+    <p>To produce a line width that is related to the width of some
+       <code>\style<i>N</i></code> line of text, do this: Compile using <code>[info]</code>
+       for that style. Then request a suitable line width
+       (may be more, less, or the same value).</p>
+  </li></ul>
+</li><li>
+  <p><i>T</i> -> number without units 0-9. May be decimal.</p>
+  <ul><li>
+    <p>T=1 is the thinnest available line, 0.75pt. Print services prefer this minimum,
+       for best appearance.</p>
+  </li><li>
+    <p>T=9 is 6.75pt.</p>
+  </li><li>
+    <p>T=0 reserves the space, but does not print a line.</p>
+  </li><li>
+    <p>0&lt;T&lt;1 is silently promoted to T=1.</p>
+  </li><li>
+    <p>T&gt;9 is silently demoted to T=9.</p>
+  </li></ul>
+</li></ul>
+
+
 <p><a id="titlepage"></a>&nbsp;</p>
-<h4>Example: Title Page</h4>
+<h4>Example: Book Title Page</h4>
 <p>\begin{component}[single,recto]<br>
 \vspace{4\baselineskip}<br>
 \style1{The Conspiracy}<br>
@@ -128,7 +183,6 @@ its option to choose normal or small text. Small text is especially useful for e
 \vfill<br>
 \style6{Potboiler Press • London Paris}<br>
 \end{component}</p>
-
 
 
 <p><a id="chapter"></a>&nbsp;</p>

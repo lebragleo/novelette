@@ -174,8 +174,8 @@ end
 
 
 -- Parse \image:
-nvt.parseimage = function (star,opt,file) -----
-  local a, t, f, l, lx, n ; local img = 0 ; local sc = 0 ; local label = 'image' ; local ok = true
+nvt.parseimage = function (star,opt,file,sc) -- sc=0->image, sc=1->sceneimage
+  local a, t, f, l, lx, n ; local img = 0 ; local label = 'image' ; local ok = true
   opt = string.gsub(opt, ' ', '') ; opt = opt .. ',' ; opt = string.gsub(opt, 'lines=', 'line=')
   if file ~= '' then
     label = string.gsub(file, '.*/', '')
@@ -183,9 +183,9 @@ nvt.parseimage = function (star,opt,file) -----
     if e > 32 then local b = utf8.offset(label, e - 32) ; label = string.sub(label, b, e) end
   end
   tex.sprint('\\def\\tmplabel{' .. label .. '}')
-  file = string.gsub(file, ' ', '')
+  file = string.gsub(file, '^%s', '') ; file = string.gsub(file, '%s$', '')
   if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
-    img = 1 ; if file == '' then img = -1 end
+    img = 1
     local sp = string.gsub(file, '%s', '') ; if sp == '' then img = -1 end
     if string.find(file, '~') then img = -1 end
     if string.find(file, '%.%.') then img = -1 end
@@ -196,7 +196,6 @@ nvt.parseimage = function (star,opt,file) -----
     if 'link' == lfs.symlinkattributes(file, 'mode') then img = -1 end
     file = string.gsub(file, '^%./', '') -- remove initial ./ if present
     _, n = string.gsub(file, '/', '') ; if n > 5 then img = -1 end -- max 5 folder levels
-    if img ~= 1 then ok = false end
   end
   tex.sprint('\\def\\tmpisfile{' .. img .. '}')
   if (nvt.mode == 'preview' or nvt.mode == 'final') and img == 1 then
@@ -233,22 +232,19 @@ nvt.parseimage = function (star,opt,file) -----
     elseif f == 'bottom' then
       tex.sprint('\\def\\tmpfloat{3}') ; opt = string.gsub(opt, 'float=bottom', '')
     end
-    if f == 'page' then -----
-      tex.sprint('\\def\\tmplines{' .. (nvt.lines - 6) .. '}') ------
+    l, n = string.gsub(opt, '.*line=', '') ; l = string.gsub(l, ',.*', '')
+    if n > 1 then ok = false end
+    lx = l ; l = tonumber(l) -- tonumber may change format; preserve original as lx.
+    if l and l == math.floor(l) and l > 1 and l <= nvt.lines then
+      tex.sprint('\\def\\tmplines{' .. lx .. '}') ; opt = string.gsub(opt, 'line=' .. lx, '')
     else
-      l, n = string.gsub(opt, '.*line=', '') ; l = string.gsub(l, ',.*', '')
-      if n > 1 then ok = false end
-      lx = l ; l = tonumber(l) -- tonumber may change format; preserve original as lx.
-      if l and l == math.floor(l) and l > 1 and l <= nvt.lines then
-        tex.sprint('\\def\\tmplines{' .. lx .. '}') ; opt = string.gsub(opt, 'line=' .. lx, '')
-      else
-        ok = false
-      end
+      ok = false
     end
     opt = string.gsub(opt, ',', '')
-    if ok == true and opt == '' then tex.sprint('\\def\\tmpreturn{1}')
-    elseif img == -1 then tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
-    else tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    if ok == true and opt == '' then
+      tex.sprint('\\def\\tmpreturn{1}')
+    else
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
     end
   end
 end
@@ -256,11 +252,11 @@ end
 
 
 -- Parse \logo:
-nvt.parselogo = function (star,file) -----
+nvt.parselogo = function (star,file)
   local a, t, f, l, lx, n ; local img = 0
-  file = string.gsub(file, ' ', '') -----
+  file = string.gsub(file, '^%s', '') ; file = string.gsub(file, '%s$', '')
   if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
-    img = 1 ; if file == '' then img = -1 end
+    img = 1
     local sp = string.gsub(file, '%s', '') ; if sp == '' then img = -1 end
     if string.find(file, '~') then img = -1 end
     if string.find(file, '%.%.') then img = -1 end
@@ -276,11 +272,7 @@ nvt.parselogo = function (star,file) -----
   if (nvt.mode == 'preview' or nvt.mode == 'final') and img == 1 then
     tex.sprint('\\def\\tmpvalidate{1}')
   end
-  if img == -1 then
-    tex.sprint('\\def\\tmpisfile{-1}') ; nvt.good = false
-  else
-    tex.sprint('\\def\\tmpisfile{1}')
-  end
+  if img == -1 then nvt.good = false end
 end
 --
 
@@ -458,7 +450,7 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 
 -- Parse \headstyle:
 nvt.parseheadstyle = function (s)  ---- need to add check for multiple use
-  s = s .. ',' ; s = string.gsub(s, ' ', '')
+  s = s .. ',' ; s = string.gsub(s, ' ', '') ; s = string.gsub(s, '"', '')
   local n, a, t, f, c, x, xx, min, max, sk
   tex.sprint('\\begingroup\\makeatletter')
   if string.find(s, 'deco=') then -- only head chooses deco
@@ -469,13 +461,13 @@ nvt.parseheadstyle = function (s)  ---- need to add check for multiple use
       elseif d == 'bar' then
         s = string.gsub(s, 'deco=bar', '') ; tex.sprint('\\gdef\\nvt@pndeco{|}')
       elseif d == 'bullet' then
-        s = string.gsub(s, 'deco=bullet', '') ; tex.sprint('\\gdef\\nvt@pndeco{}')
+        s = string.gsub(s, 'deco=bullet', '') ; tex.sprint('\\gdef\\nvt@pndeco{{\\char"2022}')
       elseif d == 'square' then
-        s = string.gsub(s, 'deco=square', '') ; tex.sprint('\\gdef\nvt@pndeco{}')
+        s = string.gsub(s, 'deco=square', '') ; tex.sprint('\\gdef\nvt@pndeco{{\\char"25AA}}')
       elseif d == 'lozenge' then
-        s = string.gsub(s, 'deco=lozenge', '') ; tex.sprint('\\gdef\\nvt@pndeco{}')
+        s = string.gsub(s, 'deco=lozenge', '') ; tex.sprint('\\gdef\\nvt@pndeco{{\\char"25CA}}')
       elseif d == 'dash' then
-        s = string.gsub(s, 'deco=dash', '') ; tex.sprint('\\gdef\\nvt@pndeco')
+        s = string.gsub(s, 'deco=dash', '') ; tex.sprint('\\gdef\\nvt@pndeco{{\\char"2013}}')
       end
     end
   end
@@ -1445,6 +1437,7 @@ function nvt.parselayout (s)
   else
     nvt.didlayout = true
     s = s .. ',' ; s = string.gsub(s, ' ' ,'') ; s = string.gsub(s, 'lines=', 'line=')
+    s = string.gsub(s, '"', '')
     local p, l, n, g, c ; local ok = true
     tex.sprint('\\begingroup\\makeatletter')
     if string.find(s, 'pagestyle=') then

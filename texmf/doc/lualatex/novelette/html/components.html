@@ -26,7 +26,7 @@
 <a href="#guide">Guide Mark</a> &nbsp;
 <a href="#option">Component [option]</a> &nbsp;
 <a href="#legal">[class=legal]</a> &nbsp;
-
+<a href="#vrhead">Changing Page Headers</a>
 </div>
 
 
@@ -68,7 +68,9 @@ Use placeholder <code>\next</code> until you know the numbers.</p></li>
 
 
 <p><a id="displayzone"></a>&nbsp;</p>
-<h4>Display Zone</h4>
+<h4 class="section">Display Zone</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Each component begins with a <i>display zone</i>. It may be empty, but that is unusual.
 It may occupy the entire component, which is typical for the title page and other special
 pages.</p>
@@ -80,7 +82,9 @@ Full description is <a href="display-zone.html">provided here</a>.</p>
 
 
 <p><a id="maintext"></a>&nbsp;</p>
-<h4>Main Text</h4>
+<h4 class="section">Main Text</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <code>\maintext</code> command ends the display zone. If the display occupies
 the entire component, do not write <code>\maintext</code>.</p>
 <p>At <code>\maintext</code>, one or two blank lines are added automatically. It will be two,
@@ -101,7 +105,9 @@ not small.</p></li>
 
 
 <p><a id="guide"></a>&nbsp;</p>
-<h4>Guide Mark</h4>
+<h4 class="section">Guide Mark</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The content and spacing of the display zone, determines where the first line after
 <code>\maintext</code> will print. Standard practice (not mandatory) is to tweak the
 display zones, so that each <code>\maintext</code> prints at the same vertical position.</p>
@@ -117,7 +123,9 @@ no guide.</p>
 
 
 <p><a id="option"></a>&nbsp;</p>
-<h4>Component Option</h4>
+<h4 class="section">Component Option</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Most components do not need an option.</p>
 <p><code>\begin{component}[class=<i>C</i>,style=<i>S</i>,guide=<i>G</i>]</code></p>
 <ul>
@@ -154,7 +162,9 @@ no guide.</p>
 
 
 <p><a id="legal"></a>&nbsp;</p>
-<h4>Component [class=legal]</h4>
+<h4 class="section">Option [class=legal]</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>This is a special case. The content of the component is neither display nor main text,
 but has its own set of rules, optimized for showing basic legal information.</p>
 <p>Using <code>[class=legal]</code> is recommended, but not mandatory, for the copyright page.
@@ -185,60 +195,32 @@ than the full textwidth. Do not allow lines to wrap!</p></li>
 </ul>
 
 
-<h4>\style<i>N</i>[<i>option</i>]{<i>one line of text</i>} where <i>N</i>=0-9</h4>
-<p>There are ten commands of the form <code>\style0</code> through <code>\style9</code>.
-Each of them can style <i>one line of text</i> according to the corresponding
-<code>\scenestyle<i>N</i></code> setting in preamble.</p>
-<ul>
-<li><p>The <i>one line of text</i> is just that: no line breaks or wrap. Do not write
-<code>\par</code> within the <code>\style<i>N</i></code> command.</p></li>
-<li><p>These commands may only be used in display zones, but not within block
-environments.</p></li>
-<li><p>There is no hierarchy. You decide whether <code>\style1</code> is more or less important,
-and more or less prominent, than <code>\style2</code>.</p></li>
-<li><p>You may use any of these commands more than once in a display zone, in any order.</p></li>
-<li><p>You may not nest one style within another.</p></li>
-<li><p>The only option is <code>[info]</code>. With this option, Novelette will write the measured
-width of the typeset text, in Terminal (console). Format:</p>
-<p><code>Info: PDFpage ..., \style<i>N</i> width is ...em.</code></p>
-<p>That info might be useful if you will use the <code>\line</code> command to print line(s)
-with their width(s) related to that line of styled text.</p></li>
-</ul>
+<p><a id="vrtext"></a>&nbsp;</p>
+<h4 class="section">Changing Page Headers</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>Print-on-demand usually insists that the title and author of your book be the same,
+wherever they appear. That includes page headers. They headers will not print on some pages,
+but wherever they print, they will not change from place to place.</p>
+<p>On the other hand, traditional book design, using production-run commercial printing,
+does change page headers. This is especitally true in frontmatter and backmatter. If you need
+this capability, and you know what you are doing, and your print service allows you to
+change page headers, it is possible:</p>
+<ul><li>
+  <p>The preamble must use the option <code>[local]</code> for its <code>\vrheadtext</code>
+     setting.</p>
+</li><li>
+  <p>Just after <code>\begin{component}</code>, write:</p>
+  <p class="code"><code>\vrheadtext[local]{<i>new verso</i>}{<i>new recto</i>}</code></p>
+  <p>The change is effective only for that component. It reverts to the preamble setting
+     at the next component. Note that default in frontmatter and backmatter is empty header,
+     regardless of the preamble setting.</p>
+</li><li>
+  <p>This does not affect whether or not the first page of a component prints the header.</p>
+</li></ul>
 
 
-<h4>\line{values}</h4>
-<p>Although standard LaTeX has a <code>\line</code> command, its purpose is irrelevant
-in Novelette. So the command is re&#8209;written with custom syntax:</p>
-<p><code>\line{align=<i>A</i>,width=<i>W</i>,thick=<i>T</i>}</code></p>
-<ul>
-<li><p><i>A</i> -> left right center. Default center.</p></li>
-<li><p><i>W</i> -> must be measured in units of <code>em</code>. Not <code>pt</code>.</p>
-    <ul>
-    <li><p>Recommended: W >= 4em.</p></li>
-    <li><p>If W is larger than the textwidth, it will be silently truncated to the
-       textwidth. Thus W=100em is a quick way to produce a full&#8209;width line.</p></li>
-    <li><p>To produce a line width that is related to the width of some
-        <code>\style<i>N</i></code> line of text, do this: Compile using <code>[info]</code>
-        for that style. Then request a suitable line width
-        (may be more, less, or the same value).</p></li>
-    </ul></li>
-<li><p><i>T</i> -> number without units 0-9. May be decimal.</p>
-    <ul>
-    <li><p>T=1 is the thinnest available line, 0.75pt. Print services prefer this minimum,
-    for best appearance.</p></li>
-    <li><p>T=9 is 6.75pt.</p></li>
-    <li><p>T=0 reserves the space, but does not print a line.</p></li>
-    <li><p>0&lt;T&lt;1 is silently promoted to T=1.</p></li>
-    <li><p>T&gt;9 is silently demoted to T=9.</p></li>
-    </ul>
-</ul>
-<p class="noindent">When identical <code>\line</code> are used above and below
-a <code>\style<i>N</i></code>, they will be vertically symmetrical around the styled font
-uppercase Xheight.</p>
-<p>Use <code>\vspace</code> to tweak the vertical spacing. Be sure that the space is measured
-in units of <code>\baselineskip</code>.</p>
 
- 
 <h4 class="section">&nbsp;</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>

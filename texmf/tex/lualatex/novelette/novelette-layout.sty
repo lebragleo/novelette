@@ -69,8 +69,14 @@
   \def\ps@normal{\csname ps@\nvt@pagestyle\endcsname}
   \def\ps@fancy{\csname ps@\nvt@pagestyle\endcsname}
   \def\tmpl{center}\ifx\nvt@pagestyle\tmpl\def\tmpd{}
-    \ifx\tmpdeco\tmpd\gdef\nvt@pndeco{/}\fi
+    \ifx\nvt@pndeco\tmpd\gdef\nvt@pndeco{/}\fi
   \fi
+  \def\tmpl{plain}\ifx\nvt@pagestyle\tmpl\def\tmpd{|}%%
+    \ifx\nvt@pndeco\tmpd\gdef\nvt@pndeco{}\fi%%
+  \fi%%
+  \def\tmpl{split}\ifx\nvt@pagestyle\tmpl\def\tmpd{|}%%
+    \ifx\nvt@pndeco\tmpd\gdef\nvt@pndeco{}\fi%%
+  \fi%%
   \edef\nvt@scenescale{\fpeval{round(12.6/\nvt@em,3)}}
   \setlength\topskip{\nvt@bls}
   \edef\tmptextht{\fpeval{(\nvt@lines-1)*\nvt@bls+\topskip+.00004}pt}
@@ -85,7 +91,7 @@
   \ifnvt@hasfooter
     \setlength\footskip{2\nvt@bls}
   \else
-\setlength\footskip{0pt}
+\setlength\footskip{0pt} %%%%%
   \fi
   \edef\tmpa{\fpeval{1.3\nvt@bls}pt plus \fpeval{.2*\nvt@bls}pt minus \fpeval{.8*\nvt@bls}pt}
   \skip\footins=\tmpa\relax%% This is for footnotes, not footer.

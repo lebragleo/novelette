@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" href="novelette.css">
-<title>Novelette Documentation - Display Zone</title>
+<title>Novelette Documentation - Main Text</title>
 </head>
 <body>
 <div id="master">
@@ -33,7 +33,9 @@ component's first page.</p>
 
 
 <p><a id="maintext"></a>&nbsp;</p>
-<h4>\maintext</h4>
+<h4 class="section">Command: \maintext</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <code>\maintext</code> command ends the display zone. Then:</p>
 <ul>
 <li><p>One or two blank lines are automatically inserted above <code>\maintext</code>.</p></li>
@@ -49,7 +51,9 @@ are available.</p></li>
 
 
 <p><a id="guide"></a>&nbsp;</p>
-<h4>Guide Marker</h4>
+<h4 class="section">Guide Marker</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>If you use a <a href="preamble.html#guide">guide marker</a>, the first line of main text
 is not forced to align with the guide. Whether or not it aligns, is your decision; Novelette
 does not care.</p>
@@ -60,7 +64,9 @@ of <code>\baselineskip</code>, not <code>pt</code>, like this:</p>
 
 
 <p><a id="init"></a>&nbsp;</p>
-<h4>Initial Letter of Main Text</h4>
+<h4 class="section">Initial Letter</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>When main text is the start of a chapter, most book designs apply a special style to its
 first letter. Novelette has <code>\init{<i>letter</i>}</code> for that purpose. It styles its
 <i>letter</i> with the main font, but at double the normal size. The baseline is the same
@@ -85,7 +91,9 @@ it is already printed as the initial letter.</p></li>
 
 
 <p><a id="dcap"></a>&nbsp;</p>
-<h4>Drop Cap</h4>
+<h4 class="section">Drop Cap</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Instead of <code>\init</code>, you may use a <i>drop cap</i> for the first letter of main text.
 This is an enlarged letter occupying the first two lines, with other text wrapped around it.</p>
 <p>Popular fiction almost never uses drop caps. They only look good when the opening paragraphs
@@ -117,7 +125,9 @@ Use <code>\fakepar</code> instead.</p></li>
 
 
 <p><a id="scene"></a>&nbsp;</p>
-<h4>Scenes</h4>
+<h4 class="section">Scenes</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>In general, use <code>\blankline</code> one or more times, to separate scenes. Do not use
 <code>\null</code>.</p>
 <p>If the blank line happens to fall at the last or first line of a page, use

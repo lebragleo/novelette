@@ -11,8 +11,8 @@
 
 <h4 class="pagepath">Novelette Documentation<br/>
 <img src="images/home.svg" width="16" height="16" alt="home"/><!--
---><a href="home.html">Home</a><span class="downtree">&nbsp;</span><!--
---><h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
+--><a href="home.html">Home</a><span class="downtree">&nbsp;</span></h4>
+<h4 class="index"><img src="images/index.svg" height="16" width="16" alt=""/><!--
 --><a href="index.html">Index</a></h4>
 <h2 class="pagename">Developer Notes</h2>
 
@@ -26,6 +26,7 @@
 <a href="#pdfx">About PDF/X</a> &nbsp;
 <a href="#lua">So Much Lua</a> &nbsp;
 <a href="#chapters">No Auto TOC</a>
+<a href="#graphics">Only png Images</a>
 </div>
 
 
@@ -35,9 +36,9 @@ These notes are for future maintainers and developers, who know what they are do
 
 
 <p><a id="noexpl3"></a>&nbsp;</p>
-<h4 class="section">What, No Expl3 Syntax?</h4>
+<h4 class="section">No Expl3 Syntax ?</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette only uses Expl3 syntax in code that is copied/modified from standard LaTex.
 All original Novelette code uses ordinary LaTeX and Lua.</p>
 <p>Expl3 is great for resolving most catcode and expansion issues. But because Novelette is
@@ -52,9 +53,9 @@ is plain to read.</p>
 
 
 <p><a id="nopkg"></a>&nbsp;</p>
-<h4 class="section">What, No Added Packages?</h4>
+<h4 class="section">No Added Packages ?</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette does what is necessary. There is no need for writers to waste time and effort
 trying to do more advanced things. They should be writing!</p>
 <p>The original developer has looked through a large number of books in the fiction shelves of
@@ -65,9 +66,9 @@ to compensate for bad writing.</p>
 
 
 <p><a id="nolang"></a>&nbsp;</p>
-<h4 class="section">What, No Global Language Support?</h4>
+<h4 class="section">No Global Language Support ?</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette lives within the limits of its developer's grasp. If you wish to write murder
 mysteries in Greek, or Science Fiction in Sanskrit, do it yourself. And if you wish to abuse
 Novelette by transforming it into another academic class, please go away. Quickly.</p>
@@ -78,13 +79,13 @@ But he did not write murder mysteries. He did read them, so if I were you, I'd s
 <p><a id="fonts"></a>&nbsp;</p>
 <h4 class="section">About the Fonts</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>All fonts were edited using FontForge. They are OpenType format with PostScript (cubic)
 outlines at 1000 grid units per em. If you need to edit the fonts, any good font editor
 should be able to do it.</p>
 <p>The maximum height of any glyph cannot exceeed 840 grid units above baseline. The maximum
 glyph depth cannot be beneath 230 units below baseline. Exception: If it is a decorative glyph
-that would never be used in metadata, it can extend 26o grid units below baseline.</p>
+that would never be used in metadata, it can extend 260 grid units below baseline.</p>
 <p>Observe that the weight of glyphs is slightly heavier than commonly seen in other fonts.
 This is especially noticeable where the shapes are thin. Modern digital printing, especially
 with print-on-demand, tends to produce lighter text than users expect from offset presses.
@@ -99,7 +100,7 @@ that original fonts are not confused with modified substitutes.</p>
 <p><a id="pdfx"></a>&nbsp;</p>
 <h4 class="section">About PDF Version 1.3, and PDF/X</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>PDF/X-1a:2001 is the format preferred by many print-on-demand services. It is the closest to
 "digital paper" that PDF provides. It is based on PDF version 1.3.</p>
 <p>Modern digital Ebooks use PDF 1.7 or later. But that adds nothing useful to paper print,
@@ -121,9 +122,9 @@ using color inks, when only black is used.</p>
 
 
 <p><a id="lua"></a>&nbsp;</p>
-<h4 class="section">Why So Much Lua Code?</h4>
+<h4 class="section">Why So Much Lua Code ?</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Lua is not hard to understand. It is particularly effective with if-then-else constructions,
 which may use logical and/or/not, and parentheses for grouping. Also, TeX catcodes do not
 matter (Lua has its own special characters).</p>
@@ -148,49 +149,10 @@ relevant Novelette variables.</p></li>
 </ul>
 
 
-<hr/>
-Overall structure of the Lua code:
-
-1. Novelette's LaTeX namespace is 'nvt@', and its Lua namespace is 'nvt'. All global variables
-(text, numerical, boolean) follow this pattern, whether or not the variables can be changed.
-Temporary LaTeX variables, which exist only within a macro, begin with '\tmp'. Temporary
-Lua variables use the standard 'local' within a function.
-
-2. Where Lua calculations need a length, 'nvt.in' and 'nvt.mm' convert to the equivalent
-TeX pt.
-
-3. A preamble setting reads its macro value, then passes it to Lua. It may also pass additional
-information such as where the macro was written (frontmatter? display zone? inside block?).
-
-4. If the macro was written in the wrong location (such as block within footnote), or if the macro
-can only be used once but was repeated, then Lua returns a negative value of '\tmpreturn'.
-No values are changed. This will trigger an error or warning.
-
-5. Otherwise, if the contents of the macro cannot be fully parsed (bad keys or bad values),
-then Lua returns '\tmpreturn' equal to 1. Readable values may be set, unreadable values
-unchanged.
-
-6. If the macro value can be parsed without error, the corresponding 'nvt' Lua values are
-changed. Lua uses 'tex.sprint' to send information back to LaTeX. It defines '\tmpreturn'
-equal to 1 (means good). And, it defines the corresponding LaTeX variables. In order for
-the @ symbol to be understood as a macro-name letter, Lua wraps the definitions in a
-LaTeX group with '\makeatletter'. So, the variable are returned as global values. In special
-cases, good values may be accompanied by '\tmpreturn' greater than 1, which tells LaTeX
-to do something on its own.
-
-7. If the macro was used in the wrong location (such as a block within a footnote), then
-Lua sends '\tmpreturn' -1. If the macro value could not be fully parsed, then '\tmpreturn' is 0.
-Whether or not any variables are set, depends on circumstances. Also, Lua sets 'good=false',
-which cannot be changed back to true; at the end of document, that signals a bad compile.
-
-<hr/>
-
-
-
 <p><a id="chapters"></a>&nbsp;</p>
-<h4 class="section">Why Not Automatic TOC?</h4>
+<h4 class="section">Why Not Automatic TOC ?</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Normally, LaTeX requires two compiler passes for automatic numbering. The first pass gathers
 the information, and saves it an auxiliary file. The second pass reads that information,
 and writes it into the document.</p>
@@ -200,11 +162,45 @@ a double-compile while the other does not. It gets worse if (as usual) the edito
 not using TeX.</p>
 <p>So, do the numbering yourself. Did Plato have automatic numbering? No! Did Cervantes have
 automatic numbering? No!</p>
+<p>Novelette's <code>{\next}</code> command prints placeholder <code>##</code> there, and sets
+an internal flag. Later, you will replace each of them with actual information (page number).
+Until the flag is cleared by removal of all <code>{\next}</code>, you cannot proceed to preview
+or final mode.</p>
+
+
+<p><a id="graphics"></a>&nbsp;</p>
+<h4 class="section">Why Only png Raster Images ?</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Looking through various online user forums, both among technical and non-technical users,
+you can see many issues related to graphics.</p>
+<p>If something in a PDF can be interpreted in more than one way, any home or office printer will
+intelligently guess what you mean. The guess is almost always right; but if it is wrong,
+you can fix the problem immedately, because you and the printer are there together.</p>
+<p>But you and the printer are not there together, with commercial printing. This is especially
+true for print-on-demand, where single copies are printed in multiple, distant locations by
+different machines. Thus, commercial printers insist that the PDF only contain material that
+does not require guesswork.</p>
+<p>A grayscale or monochrome <i>png</i> image does not require guesswork. It may or may not
+look as beautiful as you hoped to see, but it will never confuse the printer.</p>
+<p>On the other hand, vector graphics frequently confuse the printer. It is quite possible
+to draw vector graphics that have correct syntax, but ambiguous meaning. For that reaon,
+many commercial printrs discourage (or prohibit) vector graphics. Also, print-on-demand
+expects that your PDF will print rapidly; there is a short time limit, which can be exceeded
+by the calculations needed for converting vector to raster.</p>
+<p>Font glyphs are vector graphics. But in this case, font editors can inform you when there
+are problems, because glyph outlines (for ordinary fonts, not <i>svg</i> fonts) are simple.</p>
+<p>Novelette could have allowed grayscale <i>jpg</i> raster images. But the <i>png</i> format
+can be more easily parsed by Lua, to ensure specifications. Adding <i>jpg</i> capability
+would involve a lot more code and processing time (although it would be necessary if
+Novelette did color).</p>
+
+
 
 
 <h4 class="section">&nbsp;</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/>TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>&nbsp;</p>
 
 

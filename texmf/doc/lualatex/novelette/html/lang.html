@@ -8,15 +8,6 @@
 <body>
 <div id="master">
 
-<div id="navbara"><p class="noindent">
-<a href="home.html"><img src="images/home.svg" width="16px" height="16px" alt=""/> HOME</a> &nbsp;
-<a href="installation.html">Installation</a> &nbsp;
-<a href="index.html">INDEX</a>
-</p></div>
-
-<h2>Novelette Documentation - Language</h2>
-
-
 
 <h4 class="pagepath">Novelette Documentation<br/>
 <img src="images/home.svg" width="16" height="16" alt="home"/><!--
@@ -28,11 +19,10 @@
 <h2 class="pagename">Language Support</h2>
 
 
-
 <div id="navbar">
 <a href="#top">Overview</a> &nbsp;
 <a href="#list">List of Codes</a> &nbsp;
-<a href="notes">Language-Specific Notes</a>
+<a href="#notes">Language-Specific Notes</a>
 </div>
 
 
@@ -48,8 +38,8 @@ language&#8209;related features, then you should use something other than Novele
 <p><a id="lang"></a>&nbsp;</p>
 <h4 class="section">Setting: \lang{<i>code</i>}</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
-<p>In preamble, <code>\lang{<i>code</li>}</code> sets the language used for hyphenation.
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>In preamble, <code>\lang{<i>code</i>}</code> sets the language used for hyphenation.
 It must be one of the codes listed below.</p>
 <p>Novelette is monolingual. You may write words and phrases in any language that the
 fonts support. But hyphenation will use the language chosen by <code>\lang</code>. If you
@@ -62,7 +52,7 @@ of date/time, or anything else. Do it yourself.</p>
 <p><a id="list"></a>&nbsp;</p>
 <h4 class="section">List of Language Codes</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>These codes are case-insensitive: <code>en-US</code> and <code>en-us</code> are the same.</p>
 <ul>
 <li><p><code>en-US</code> -> American English. Red is a "color".</p></li>
@@ -90,11 +80,13 @@ of date/time, or anything else. Do it yourself.</p>
 </ul>
 
 
-<p><a id="list"></a>&nbsp;</p>
+<p><a id="notes"></a>&nbsp;</p>
 <h4 class="section">Language-Specific Notes</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <ul>
+<li><p>Any: Although Eastern European languages are not supported, the fonts contain a few
+characters that allow you to print <i>some</i> text outside Latin&#8209;1.</p></li>
 <li><p>English: If no <code>\lang</code> is specified, or if <code>\lang{en}</code> unmodified by
 US or UK, then a generic American English pattern is used. Better to specify <code>en-US</code>
 or <code>en-UK</code>.</p></li>
@@ -118,15 +110,17 @@ characters. This is the only method available in Novelette. If you try
 <li><p>Finnish: Be sure that the characters you need are in the fonts.</p></li>
 <li><p>Irish: The Tironian et (agus) is available. Use <code>{\agus}</code> for that.
 Only modern Irish is supported.</p></li>
+<li><p>Welsh: Characters W and Y, with diacriticals, are in the fonts and can be printed.</p></li>
 <li><p>Latin: Only modern Latin is supported.</p></li>
 <li><p>Hawai'ian: Hyphenation for this language is unavailable, but the necessary characters
 are in the fonts (vowels with macron, okina). Use <code>{\okina}</code> for that.</p></li>
 </ul>
 
 
+
 <h4 class="section">&nbsp;</h4>
 <h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16px" height="16px" alt=""/> TOP</a></h4>
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>&nbsp;</p>
 
 

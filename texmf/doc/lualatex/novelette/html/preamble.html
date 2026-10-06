@@ -48,34 +48,33 @@ If not English, then you must set the language, or hyphenation will be wrong.</p
 <p>Even a large Preamble will not contain many lines. Click on a command to see its syntax and
 possible settings:</p>
 
-<pre class="code" style="margin-left:2rem">
-<a href="#documentclass">\documentclass{novelette}</a>
-<a href="#mode">\mode{<i>choice</i>}</a>
-<a href="#metadatatsa">\title{<i>Book Title</i>}</a>
-<a href="#metadatatsa">\subtitle{<i>Optional Subtitle</i>}</a>
-<a href="#metadatatsa">\author{<i>Author Name</i>}</a>
-<a href="#metadatavc">\docdate{<i>yyyy/mm/dd</i>}</a>
-<a href="#metadatavc">\version{<i>Version String</i>}</a>
-<a href="#language">\lang{<i>language code</i>}</a>
-<a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a>
-<a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a>
+<p class="noindent code" style="margin-left:2rem">
+<a href="#documentclass">\documentclass{novelette}</a><br/>
+<a href="#mode">\mode{<i>choice</i>}</a><br/>
+<a href="#metadatatsa">\title{<i>Book Title</i>}</a><br/>
+<a href="#metadatatsa">\subtitle{<i>Optional Subtitle</i>}</a><br/>
+<a href="#metadatatsa">\author{<i>Author Name</i>}</a><br/>
+<a href="#metadatavc">\docdate{<i>yyyy/mm/dd</i>}</a><br/>
+<a href="#metadatavc">\version{<i>Version String</i>}</a><br/>
+<a href="#language">\lang{<i>language code</i>}</a><br/>
+<a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a><br/>
+<a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a></br>
 <a href="#styles">\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->deco=<i>D</i>,case=<i>C</i>}</a>
-% For N = 0 to 9 :
-<a href="#vrhead">\versohead{<i>text</i>}</a>
-<a href="#vrhead">\rectohead{<i>text</i>}</a>
+-->deco=<i>D</i>,case=<i>C</i>}</a><br/>
+<a href="#vrhead">\vrheadtext[<i>option</i>]{<i>verso</i>}{<i>recto</i>}</a><br/>
+% For <i>N</i> = 0 to 9 :<br/>
 <a href="#styles">\setstyle<i>N</i>{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->align=<i>A</i>,case=<i>C</i>}</a>
-<a href="#styles">\scenestyle{align=<i>A</i>}</a>
-<a href="#styles">\footnotestyle{indent=<i>I</i>}</a>
-<a href="#pdfx">\pdfx{<i>choice</i>}</a>
-<a href="#enable">\enable{<i>comma,separated,choices</i>}</a>
-<a href="#disable">\disable{<i>comma,separated,choices</i>}</a>
-<a href="#examine">\examine{<i>0|1</i>}</a>
-% <a href="#margins">No settings for margins and font size!</a>
-% <a href="#packages">No added packages!</a>
+-->align=<i>A</i>,case=<i>C</i>}</a><br/>
+<a href="#styles">\scenestyle{align=<i>A</i>}</a><br/>
+<a href="#styles">\footnotestyle{indent=<i>I</i>}</a><br/>
+<a href="#pdfx">\pdfx{<i>choice</i>}</a><br/>
+<a href="#enable">\enable{<i>comma,separated,choices</i>}</a><br/>
+<a href="#disable">\disable{<i>comma,separated,choices</i>}</a><br/>
+<a href="#examine">\examine{<i>0|1</i>}</a><br/>
+% <a href="#margins">No settings for margins and font size!</a><br/>
+% <a href="#packages">No added packages!</a><br/>
 <a href="#begindocument">\begin{document}</a>
-</pre>
+</p>
 
 <hr/>
 
@@ -345,28 +344,32 @@ font=main, and <i>do not</i> choose case=dflt or case=titl.</p>
 <h4 class="section">Page Header Texts</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
-<p>If your layout uses page headers, these commands set the text that appears in them:</p>
-<p><code>\versohead{<i>Text at Verso (Left) Page Head</i>}</code></p>
-<p><code>\rectohead{<i>Text at Recto (Right) Page Head</i>}</code></p>
+<p>If your layout uses page headers, this command sets the text that appears in the
+verso and recto page headers:</p>
+<p><code>\vrheadtext[<i>option</i>]{<i>verso</i>}{<i>recto</i>}</code></p>
 <ul><li>
   <p>The texts do not include page numbers; those are placed automatically.</p>
 </li><li>
-  <p>Defaults are <i>Untitled Document</i> and <i>Anonymous Author</i>. If your layout
-     uses page headers, and you do not set these texts to something else, then you cannot
-     proceed to preview or final mode.</p>
+  <p>Default <code>\vrheadtext{Untitled Document}{Anonymous Author}</code>.</p>
+     <p>If your layout uses page headers, and you do not set these texts to something else,
+     then you cannot proceed to preview or final mode.</p>
 </li><li>
   <p>The texts are limited to the same characters set used by metadata. If you use any
      of @ # &amp; they must be escaped by backslash.</p>
 </li><li>
   <p>If you wish to print either page header in Italics, Use <code>\textit</code> as usual,
-     within <code>\versohead</code> or <code>\rectohead</code>. However, Italics are ignored
-     unless the header font is main, and the header case <i>is not</i> dflt or titl.</p>
+     within <code>\vrheadtext</code>. However, Italics are ignored
+     unless the header font is main, and the header case <i>is not</i> <code>dflt</code>
+     or <code>titl</code>.</p>
 </li><li>
-  <p>Print-on-demand normally requires that the book title and author by the same wherever
-     they appear. That includes page headers (except on pages where no header prints).
-     Novelette allows you to reset the header texts, following any <code>\begin{component}</code>.
-     But you should not do that, unless you are certain that your print service allows it.</p>
-</li></ul>
+</ul>
+<p class="noindent">Print-on-demand normally requires that the book title and author be the same
+wherever they appear. That includes page headers (except on pages where no header prints).</p>
+<p>Without option, the <code>\vrheadtext</code> is global, and cannot be changed. This is best
+for most users.</p>
+<p>With option <code>[local]</code>, the verso and/or recto text can be locally changed.
+See the <a href="components.html">components page</a> for details. That may be useful,
+but many print-on-demand services will not allow it.</p>
 
 
 <p><a id="styles"></a>&nbsp;</p>
