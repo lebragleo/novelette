@@ -368,7 +368,8 @@
     \edef\tmpsp{\fpeval{(\tmpscale*\tmpspace + .02*\tmptrack)*\nvt@em}pt}%% %%%%%
     \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%% %%%%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
-    \begingroup\DeclareDocumentCommand\logo{sm}{}%% Measure without logo.
+    \begingroup%%
+      \DeclareDocumentCommand\logo{sm}{}%% Measure without logo.
       \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%%
       \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
       \ifnum\tmpboxdp=1\relax%%
@@ -390,8 +391,7 @@
       \edef\tmpwdz{\fpeval{round(\wd0/\nvt@em,2)}em}%%
       \typeout{Info: PDFpage \thepage, \string\style#1\space width \tmpwdz.}%%
     \fi%%
-    \tmpstrut\tmpleft\smash{\usebox0}\tmpright\tmpstrut\nvt@par%%
-    \vspace{-\nvt@bls}\strut\nvt@par%%
+    \tmpstrut\tmpleft{\usebox0}\tmpright\tmpstrut\nvt@par%%
   \fi%%
   \endgroup%%
 }%%
@@ -562,7 +562,7 @@
 
 %% RE-DEFINE \line:
 %%   The standard LaTeX \line is not needed, so it is re-defined. Novelette \line is an \hrule
-%% with minimum and maximum dimensions, vertically padded to always occupy half-baselineskip.
+%% with minimum and maximum dimensions, vertically padded to always occupy baselineskip.
 %%   To track possible layout changes, the width must be measured in normal em. The thickness
 %% is a number without units (requesting units would likely cause user confusion).
 \def\line#1{%%
@@ -576,12 +576,13 @@
     \par\vspace*{-\nvt@bls}\strut\par%%
     \directlua{nvt.parseline('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=1\relax%%
+      \begingroup\setlength\parindent{0pt}%%
       \ifnum\tmpshow=1\relax%%
-        \vspace*{-.25\nvt@bls}%%
+        \vspace{-\tmpdrop}%%
         \strut\tmpleft\smash{\rule[-\tmpdrop]{\tmpwidth}{\tmpthick}}\tmpright\strut\par%%
-        \vspace{-.25\nvt@bls}%%
+        \vspace{\tmpdrop}%%
       \else%%
-        \vspace*{-.25\nvt@bls}\strut\par\vspace*{-.25\nvt@bls}%%
+        \strut\par%%
       \fi%%
     \else%%
       \nvt@err{Bad \string\line{align=A,width=W,thick=T}.^^J%%
@@ -596,13 +597,9 @@
         \spix Larger T means thicker line. T=1 is 0.75pt.^^J%%
         \spix 0<T<1 promoted to T=1. T>9 demoted to T=9.^^J%%
         \spix T=0 reserves space, but does not print line.}%%
-      \def\tmpbadline{%%
-        {\nvt@aff{Scale=.6}\char"2327 bad \textbackslash line \char"2327}%%
-      }%%
-      \vspace*{-.25\nvt@bls}%%
-      \strut\tmpleft\smash{\tmpbadline}\tmpright\strut\par%%
-      \vspace{-.25\nvt@bls}%%
+      \strut\tmpleft\char"FFFD Bad \textbackslash\line.\tmpright\strut\par%%
     \fi%%
+    \endgroup%%
   \else%%
     \nvt@err{Cannot use \string\line\space outside display zone, or within block}%%
   \fi%%

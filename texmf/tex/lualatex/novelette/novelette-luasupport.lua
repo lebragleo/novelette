@@ -578,7 +578,7 @@ nvt.parsesetstyle = function (N, s) -- style number, setting
     m, n = string.gsub(s, '.*scale=', '') ; m = string.gsub(m, ',.*', '') ; mm = m
     if n == 1 and m ~= '' then
       m = tonumber(m)
-      if m and m >= 1 and m <= 4 then
+      if m and m >= 1 and m <= 6 then
         s = string.gsub(s, 'scale=' .. mm, '') ; nvt.stylescale[N] = mm
       end
     end
@@ -672,8 +672,11 @@ nvt.parsestyle = function (N, s) -- style number, option
       h = math.max(nvt.stylescale[N],3) * nvt.bls
       d = 0.3 * math.max(nvt.stylescale[N],3) * nvt.bls
     else
-      h = nvt.stylescale[N] * nvt.bls
-      d = 0.3 * nvt.stylescale[N] * nvt.bls
+--      h = nvt.stylescale[N] * nvt.bls
+--      d = 0.3 * nvt.stylescale[N] * nvt.bls
+-----      h = 1.17 * nvt.stylescale[N] * nvt.bls
+      d = 0.26 * nvt.stylescale[N] * nvt.em
+      h = (0.65 * nvt.stylescale[N] * nvt.em) + (2 * d)
     end
     local ssp = nvt.space[nvt.stylefont[N]] + 0.02 * nvt.styletrack[N]
     tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
@@ -700,7 +703,7 @@ end
 -- Parse \line argument:
 nvt.parseline = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ',' ; s = string.gsub(s, 'thickness', 'thick')
-  local n, a, w, t, tt, d
+  local n, a, w, t, d ; local tt = 0.76
   if string.find(s, 'align=') then
     a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
     if n == 1 and a == 'left' then
@@ -737,11 +740,11 @@ nvt.parseline = function (s)
         if tt < 1 then tt = 1 end
         if tt > 9 then tt = 9 end
         tt = 0.76 + 0.655 * (tt - 1)
-        tex.sprint('\\def\\tmpthick{' .. tt .. 'pt }')
       end
     end
   end
-  d = -0.2 * nvt.bls + 0.5 * tt -----
+  tex.sprint('\\def\\tmpthick{' .. tt .. 'pt }')
+  d = -0.5 * tt
   tex.sprint('\\def\\tmpdrop{' .. d .. 'pt}')
   s = string.gsub(s, ',', '')
   if s == '' then
