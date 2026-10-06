@@ -75,6 +75,7 @@ nvt.textwidth = 3.875*nvt.inch
 nvt.pdfx = true
 nvt.oi = 'fogra'
 nvt.examine = false
+nvt.examinemsg = 0
 nvt.nopageflip = false
 nvt.countnext = 0 -- Increments when \next used.
 nvt.qq = 0 -- Counts bad use of " (double quotes).
@@ -94,14 +95,18 @@ nvt.usefont['black'] = false ; nvt.usefont['wide'] = false ; nvt.usefont['thick'
 nvt.usefont['thin'] = false ; nvt.usefont['srir'] = false ; nvt.usefont['gero'] = false
 nvt.usefont['plas'] = false ; nvt.usefont['crge'] = false
 nvt.space = {} -- em width of space character in font
-nvt.space['main'] = 0.21 ; nvt.space['dark'] = 0.21 ; nvt.space['heavy'] = 0.21
-nvt.space['black'] = 0.21 ; nvt.space['wide'] = 0.21 ; nvt.space['thick'] = 0.21
-nvt.space['thin'] = 0.21 ; nvt.space['srir'] = 0.21 ; nvt.space['gero'] = 0.21
-nvt.space['plas'] = 0.21 ; nvt.space['crge'] = 0.21
+nvt.space['main'] = 0.21 ; nvt.space['dark'] = 0.21 ; nvt.space['heavy'] = 0.24
+nvt.space['black'] = 0.3 ; nvt.space['wide'] = 0.336 ; nvt.space['thick'] = 0.24
+nvt.space['thin'] = 0.24 ; nvt.space['srir'] = 0.240 ; nvt.space['gero'] = 0.238
+nvt.space['plas'] = 0.426 ; nvt.space['crge'] = 0.264
+nvt.headfont = 'main'
+nvt.headscale = 0.93
+nvt.headfeat = ''
+nvt.headtrack = 2
+nvt.headital = true
 nvt.didstyle = {} -- true when its default style is set
 nvt.styleleft = {} ; nvt.styleright = {} -- left and right fill
 nvt.styletrack = {} -- tracking 0 - 9
-nvt.stylefn = {} -- short font name
 nvt.stylefont = {} -- nvt@ font name
 nvt.stylecn = {} -- short case name
 nvt.stylespace = {} -- em width of space character, depends on font
@@ -112,8 +117,7 @@ for i = 0, 9 do
   nvt.styleleft[i] = '\\hfill'
   nvt.styleright[i] = '\\hfill'
   nvt.styletrack[i] = '2'
-  nvt.stylefn[i] = 'main'
-  nvt.stylefont[i] = '\\nvt@main'
+  nvt.stylefont[i] = 'main'
   nvt.stylecn[i] = 'none'
   nvt.styleraw[i] = 'RawFeature={+ss17}'
   nvt.stylespace[i] = 0.21
@@ -128,11 +132,9 @@ nvt.diddocdate = false
 nvt.didmode = false
 nvt.didtrimsize = false
 nvt.didlayout = false
-nvt.didsethead = false
-nvt.didsetscene = false
-nvt.didsetfootnote = false
-nvt.didversohead = false
-nvt.didrectohead = false
+nvt.didheadstyle = false
+nvt.didscenestyle = false
+nvt.didfootnotestyle = false
 local GLYPH = node.id('glyph')
 local GLUE = node.id('glue')
 local HLIST = node.id('hlist')
@@ -160,6 +162,17 @@ end
 --
 
 
+-- Parse \vrheadtext option (does not parse the text):
+nvt.parsevrheadtext = function (s)
+  s = string.gsub(s, ' ', '')
+  if s == 'local' then tex.sprint('\\def\\tmpreturn{2}') ; string.gsub(s, 'local', '')
+  elseif s == '' then tex.sprint('\\def\\tmpreturn{1}')
+  else tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
+end
+--
+
+
 -- Parse \image:
 nvt.parseimage = function (star,opt,file) -----
   local a, t, f, l, lx, n ; local img = 0 ; local sc = 0 ; local label = 'image' ; local ok = true
@@ -172,17 +185,17 @@ nvt.parseimage = function (star,opt,file) -----
   tex.sprint('\\def\\tmplabel{' .. label .. '}')
   file = string.gsub(file, ' ', '')
   if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
-    img = 1 ; if file == '' then img = 2 end
-    local sp = string.gsub(file, '%s', '') ; if sp == '' then img = 2 end
-    if string.find(file, '~') then img = 2 end
-    if string.find(file, '%.%.') then img = 2 end
-    if string.find(file, '\\') then img = 2 end
-    if string.find(file, '//') then img = 2 end
-    if string.find(file, ':') then img = 2 end
-    if not string.find(file, '%.png$') then img = 2 end
-    if 'link' == lfs.symlinkattributes(file, 'mode') then img = 2 end
+    img = 1 ; if file == '' then img = -1 end
+    local sp = string.gsub(file, '%s', '') ; if sp == '' then img = -1 end
+    if string.find(file, '~') then img = -1 end
+    if string.find(file, '%.%.') then img = -1 end
+    if string.find(file, '\\') then img = -1 end
+    if string.find(file, '//') then img = -1 end
+    if string.find(file, ':') then img = -1 end
+    if not string.find(file, '%.png$') then img = -1 end
+    if 'link' == lfs.symlinkattributes(file, 'mode') then img = -1 end
     file = string.gsub(file, '^%./', '') -- remove initial ./ if present
-    _, n = string.gsub(file, '/', '') ; if n > 5 then img = 2 end -- max 5 folder levels
+    _, n = string.gsub(file, '/', '') ; if n > 5 then img = -1 end -- max 5 folder levels
     if img ~= 1 then ok = false end
   end
   tex.sprint('\\def\\tmpisfile{' .. img .. '}')
@@ -233,10 +246,9 @@ nvt.parseimage = function (star,opt,file) -----
       end
     end
     opt = string.gsub(opt, ',', '')
-    if ok == true and opt == '' then
-      tex.sprint('\\def\\tmpreturn{1}')
-    else
-      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    if ok == true and opt == '' then tex.sprint('\\def\\tmpreturn{1}')
+    elseif img == -1 then tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
+    else tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
     end
   end
 end
@@ -245,30 +257,29 @@ end
 
 -- Parse \logo:
 nvt.parselogo = function (star,file) -----
-  local a, t, f, l, lx, n ; local img = 0 ; local ok = true
+  local a, t, f, l, lx, n ; local img = 0
   file = string.gsub(file, ' ', '') -----
   if star == 'star' or nvt.mode == 'preview' or nvt.mode == 'final' then
-    img = 1 ; if file == '' then img = 2 end
-    local sp = string.gsub(file, '%s', '') ; if sp == '' then img = 2 end
-    if string.find(file, '~') then img = 2 end
-    if string.find(file, '%.%.') then img = 2 end
-    if string.find(file, '\\') then img = 2 end
-    if string.find(file, '//') then img = 2 end
-    if string.find(file, ':') then img = 2 end
-    if not string.find(file, '%.png$') then img = 2 end
-    if 'link' == lfs.symlinkattributes(file, 'mode') then img = 2 end
+    img = 1 ; if file == '' then img = -1 end
+    local sp = string.gsub(file, '%s', '') ; if sp == '' then img = -1 end
+    if string.find(file, '~') then img = -1 end
+    if string.find(file, '%.%.') then img = -1 end
+    if string.find(file, '\\') then img = -1 end
+    if string.find(file, '//') then img = -1 end
+    if string.find(file, ':') then img = -1 end
+    if not string.find(file, '%.png$') then img = -1 end
+    if 'link' == lfs.symlinkattributes(file, 'mode') then img = -1 end
     file = string.gsub(file, '^%./', '') -- remove initial ./ if present
-    _, n = string.gsub(file, '/', '') ; if n > 5 then img = 2 end -- max 5 folder levels
-    if img ~= 1 then ok = false end
+    _, n = string.gsub(file, '/', '') ; if n > 5 then img = -1 end -- max 5 folder levels
   end
   tex.sprint('\\def\\tmpisfile{' .. img .. '}')
   if (nvt.mode == 'preview' or nvt.mode == 'final') and img == 1 then
     tex.sprint('\\def\\tmpvalidate{1}')
   end
-  if ok == true then
-    tex.sprint('\\def\\tmpreturn{1}')
+  if img == -1 then
+    tex.sprint('\\def\\tmpisfile{-1}') ; nvt.good = false
   else
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    tex.sprint('\\def\\tmpisfile{1}')
   end
 end
 --
@@ -360,7 +371,7 @@ nvt.parsemode = function (s)
       s = string.gsub(s, 'preview', '')
       if s == '' then
         tex.sprint('\\gdef\\nvt@titleprefix{PREVIEW: }')
-        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@previewtrue')
+        tex.sprint('\\global\\nvt@draftfalse\\global\\nvt@previewtrue')
         nvt.mode = 'preview' ; nvt.startmode = 'preview'
       end
     end
@@ -368,7 +379,7 @@ nvt.parsemode = function (s)
       s = string.gsub(s, 'final', '')
       if s == '' then
         tex.sprint('\\gdef\\nvt@titleprefix{}')
-        tex.sprint('\\global\\\nvt@draftfalse\\global\\nvt@finaltrue')
+        tex.sprint('\\global\\nvt@draftfalse\\global\\nvt@finaltrue')
         nvt.mode = 'final' ; nvt.startmode = 'final'
       end
     end
@@ -445,10 +456,10 @@ luatexbase.add_to_callback('pre_linebreak_filter',
 --
 
 
--- Parse \sethead:
-nvt.parsesethead = function (s)  ---- need to add check for multiple use
+-- Parse \headstyle:
+nvt.parseheadstyle = function (s)  ---- need to add check for multiple use
   s = s .. ',' ; s = string.gsub(s, ' ', '')
-  local n, t, a, f, c, x, xx, min, max
+  local n, a, t, f, c, x, xx, min, max, sk
   tex.sprint('\\begingroup\\makeatletter')
   if string.find(s, 'deco=') then -- only head chooses deco
     d, n = string.gsub(s, '.*deco=', '') ; d = string.gsub(d, ',.*', '')
@@ -473,7 +484,7 @@ nvt.parsesethead = function (s)  ---- need to add check for multiple use
     if n == 1 and t ~= '' then
       t = tonumber(t)
       if t and t >= 0 and t <= 9 then
-        s = string.gsub(s, 'track=' .. t, '') ; tex.sprint('\\def\\tmptrack{' .. t .. '}')
+        s = string.gsub(s, 'track=' .. t, '') ; nvt.headtrack = t
       end
     end
   end
@@ -481,58 +492,77 @@ nvt.parsesethead = function (s)  ---- need to add check for multiple use
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
     f = string.gsub(f, ',', '')
     if n == 1 then
-      if string.find(nvt.allfonts, f) then ----- don't forget the space value
+      if string.find(nvt.allfonts, f) then
         s = string.gsub(s, 'font=' .. f, '')
-        tex.sprint('\\gdef\\nvt@headfont{\\nvt@' .. f .. '}' )
-        tex.sprint('\\gdef\\nvt@headfn{' .. f .. '}\\global\\nvt@use' .. f .. 'true')
+        tex.sprint('\\gdef\\nvt@headfont{\\nvt@' .. f .. '}' ) ; nvt.headfont = f
+        tex.sprint('\\global\\nvt@use' .. f .. 'true')
+        if f == 'main' then nvt.headital = true else nvt.headital = false end 
       end
     end
   end
-  if string.find(s, 'scale=') then ----- needs default. apply scale to case
+  sk = nvt.space[nvt.headfont] + 0.02 * nvt.headtrack
+  tex.sprint('\\gdef\\nvt@headspaceskip{' .. sk .. 'em}')
+  if string.find(s, 'scale=') then
     x, n = string.gsub(s, '.*scale=', '') ; x = string.gsub(x, ',.*', '')
     if n == 1 and x ~= '' then
       xx = '' .. x -- because tonumber may add preceding 0.
       x = tonumber(x)
       if x and x >= 0.83 and x <= 1 then
-        tex.sprint('\\gdef\\nvt@headscale{' .. x .. '}') -- not needed. apply to case feat
-        s = string.gsub(s, 'scale=' .. xx, '')
+        s = string.gsub(s, 'scale=' .. xx, '') ; nvt.headscale = x
       end
     end
   end
   if string.find(s, 'case=') then
     c, n = string.gsub(s, '.*case=', '') ; c = string.gsub(c, ',.*', '')
     s = string.gsub(s, 'title', 'titl')
-    if n == 1 then ----- becomes nvt@headfeat
+    if n == 1 then
       if c == 'none' then
-        s = string.gsub(s, 'case=none', '') ; tex.sprint('\\gdef\\nvt@headfeat{}')
-        tex.sprint('\\gdef\\nvt@pnfeat{}')
+        s = string.gsub(s, 'case=none', '')
+        tex.sprint('\\gdef\\nvt@headfeat{'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale=' .. nvt.headscale .. '}\\gdef\\nvt@headcn{none}')
       end
       if c == 'smcp' then
         s = string.gsub(s, 'case=smcp', '')
-        tex.sprint('\\gdef\\nvt@headfeat{}') -----
-        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
+        tex.sprint('\\gdef\\nvt@headfeat{RawFeature={+smcp},'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale='
+          .. nvt.headscale .. ',RawFeature={+smcp}}\\gdef\\nvt@headcn{smcp}')
       end
       if c == 'onum' then
         s = string.gsub(s, 'case=onum', '')
-        tex.sprint('\\gdef\\nvt@headfeat{}') -----
-        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
+        tex.sprint('\\gdef\\nvt@headfeat{RawFeature={+onum},'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale='
+          .. nvt.headscale .. ',RawFeature={+onum}}\\gdef\\nvt@headcn{onum}')
       end
       if c == 'smon' then
         s = string.gsub(s, 'case=smon', '')
-        tex.sprint('\\gdef\\nvt@headfeat{}') -----
-        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
+        tex.sprint('\\gdef\\nvt@headfeat{RawFeature={+smcp,+onum},'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale='
+          .. nvt.headscale .. ',RawFeature={+smcp,+onum}}\\gdef\\nvt@headcn{smon}')
       end
       if c == 'titl' then
-        s = string.gsub(s, 'case=titl', '')
-        tex.sprint('\\gdef\\nvt@headfeat{}') -----
-        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
+        s = string.gsub(s, 'case=titl', '') ; nvt.headital = false
+        tex.sprint('\\gdef\\nvt@headfeat{RawFeature={+titl},'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale='
+          .. nvt.headscale .. ',RawFeature={+titl}}\\gdef\\nvt@headcn{titl}')
       end
       if c == 'dflt' then
-        s = string.gsub(s, 'case=dflt', '')
-        tex.sprint('\\gdef\\nvt@headfeat{}') -----
-        tex.sprint('\\gdef\\nvt@pnfeat{}') -----
+        s = string.gsub(s, 'case=dflt', '') ; nvt.headital = false
+        tex.sprint('\\gdef\\nvt@headfeat{RawFeature={+titl},'
+          .. 'Scale=' .. nvt.headscale .. ',LetterSpace=' .. nvt.headtrack .. '}')
+        tex.sprint('\\gdef\\nvt@pnfeat{Scale='
+          .. nvt.headscale .. ',RawFeature={+titl}}\\gdef\\nvt@headcn{dflt}')
       end
     end
+  end
+  if nvt.headital == false then
+    tex.sprint('\\gdef\\nvt@headital{\\def\\textit##1{##1}}')
+  else
+    tex.sprint('\\gdef\\nvt@headital{}')
   end
   s = string.gsub(s, ',', '')
   tex.sprint('\\endgroup')
@@ -593,14 +623,9 @@ nvt.parsesetstyle = function (N, s) -- style number, setting
     f = string.gsub(f, ',', '')
     if n == 1 then
       if string.find(nvt.allfonts, f) then
-        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@use' .. f .. 'true\\endgroup')
         s = string.gsub(s, 'font=' .. f, '')
-        if f == 'main' then
-          nvt.stylefn[N] = 'main' ; nvt.stylefont[N] = '\\normalfont'
-        else
-          nvt.stylefn[N] = f ; nvt.stylefont[N] = '\\nvt@' .. f
-        end
-        local ff = "'" .. f .. "'" ; nvt.stylespace[N] = nvt.space[ff] ; nvt.usefont[ff] = true
+        tex.sprint('\\begingroup\\makeatletter\\global\\nvt@use' .. f .. 'true\\endgroup')
+        nvt.stylefont[N] = f ; nvt.usefont[f] = true ; nvt.stylespace[N] = nvt.space[f]
       end
     end
   end
@@ -658,13 +683,15 @@ nvt.parsestyle = function (N, s) -- style number, option
       h = nvt.stylescale[N] * nvt.bls
       d = 0.3 * nvt.stylescale[N] * nvt.bls
     end
+    local ssp = nvt.space[nvt.stylefont[N]] + 0.02 * nvt.styletrack[N]
     tex.sprint('\\def\\tmph{' .. h .. 'pt}\\def\\tmpd{' .. d .. 'pt}')
     tex.sprint('\\def\\tmpleft{' .. nvt.styleleft[N] .. '}')
     tex.sprint('\\def\\tmpright{' .. nvt.styleright[N] .. '}')
     tex.sprint('\\def\\tmptrack{' .. nvt.styletrack[N] .. '}')
-    tex.sprint('\\def\\tmpfn{' .. nvt.stylefn[N] .. '}')
-    tex.sprint('\\begingroup\\makeatletter\\gdef\\tmpfont{' .. nvt.stylefont[N] .. '}\\endgroup')
-    tex.sprint('\\def\\tmpspace{' .. nvt.space[nvt.stylefn[N]] .. '}')
+    tex.sprint('\\def\\tmpfn{' .. nvt.stylefont[N] .. '}')
+    tex.sprint('\\begingroup\\makeatletter\\gdef\\tmpfont{\\nvt@'
+      .. nvt.stylefont[N] .. '}\\endgroup')
+    tex.sprint('\\def\\tmpspace{' .. ssp .. '}')
     tex.sprint('\\def\\tmpraw{' .. nvt.styleraw[N] .. '}')
     s = string.gsub(s, ',', '')
     if s == '' then
@@ -763,12 +790,12 @@ end
 --
 
 
--- Parse \setscene:
-nvt.parsesetscene = function (s)
+-- Parse \scenestyle:
+nvt.parsescenestyle = function (s)
   s = s .. ',' ; s = string.gsub(s, ' ', '') ; s = string.gsub(s, ',', '')
   local n, t, a, f, c, x, xx, ok ; local miss = ''
   local min = 1 ; local max = 1.5
-  if nvt.didsetscene == true then ok = false else nvt.didsetscene = true ; ok = true end
+  if nvt.didscenestyle == true then ok = false else nvt.didscenestyle = true ; ok = true end
   if nvt.preamble == false then ok = false end
   tex.sprint('\\begingroup\\makeatletter')
   if ok == true and string.find(s, 'align=') then
@@ -796,10 +823,10 @@ end
 --
 
 
--- Parse \setfootnote:
-nvt.parsesetfootnote = function (s)
+-- Parse \footnotestyle:
+nvt.parsefootnotestyle = function (s)
   local ok = false
-  if nvt.didsetfootnote == true then
+  if nvt.didfootnotestyle == true then
     tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
   else
     tex.sprint('\\begingroup\\makeatletter')
@@ -808,7 +835,7 @@ nvt.parsesetfootnote = function (s)
     if s == 'away' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{1}') end
     if s == 'both' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{2}') end
     if s == 'near' or s == '' then ok = true ; tex.sprint('\\gdef\\nvt@fnindent{3}') end
-    nvt.didsetfootnote = true
+    nvt.didfootnotestyle = true
     tex.sprint('\\endgroup')
     if ok == true then
       tex.sprint('\\def\\tmpreturn{1}')
@@ -1009,7 +1036,6 @@ function nvt.parsecomponent (s1,s2)
   if s1 == '' then
     tex.sprint('\\def\\tmpreturn{1}')
   else
-texio.write_nl('SSSSSSSSSSSSSSS=' .. s1 .. '<\n')
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
 end
@@ -1469,7 +1495,7 @@ end
 --
 
 
--- Parse pdfx setting:
+-- Parse \pdfx setting:
 function nvt.parsepdfx (s)
   if nvt.didpdfx == true then
     tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
@@ -1616,12 +1642,11 @@ end
 
 -- Parse \examine setting: ---- nvt.didexamine ?
 nvt.parseexamine = function (s)
-  s = string.gsub(s, ' ', '') ; local n = 0
-  if string.find(s, '1,') then
-     tex.sprint('\\def\\tmpex{1}') ; s = string.gsub(s, '1', '') ; n = n + 1
+  s = string.gsub(s, ' ', '')
+  if s == '1' then tex.sprint('\\def\\tmpex{1}')
+  elseif s == '0' then tex.sprint('\\def\\tmpex{0}')
+  else tex.sprint('\\def\\tmpreturn{0}')
   end
-  if string.find(s, '0,') then s = string.gsub(s, '0', '') ; n = n + 1 end
-  if s ~= '' or n > 1 then tex.sprint('\\def\\tmpreturn{0}') end
 end
 --
 
@@ -1714,16 +1739,17 @@ nvt.finalize = function ()
       if nvt.docdate ~= '' then texio.write_nl('Docdate: ' .. nvt.docdate) end
       if nvt.version ~= '' then texio.write_nl('Version: ' .. nvt.version) end
       if nvt.countnext ~= 0 and nvt.mode ~= 'bad' then nvt.mode = 'draft' end
-      local ng
+      local ng = '.'
       if nvt.mode == nvt.startmode then
-        texio.write_nl('Mode: ' .. nvt.mode)
+        texio.write_nl('Mode: ' .. nvt.mode .. '.')
       else
-        if nvt.countnext ~= 0 then
-          ng = ', but denied due to ' .. nvt.countnext .. ' instances of \\next.'
-        else
-          ng = ', but denied due to error/warning/overfull.'
+        if nvt.countnext ~= 0 and nvt.mode ~= 'draft' and nvt.mode ~= 'dev' then
+          ng = '. Requested' .. nvt.startmode .. ','
+            .. 'but denied due to ' .. nvt.countnext .. ' instances of \\next.'
+        elseif nvt.mode ~= 'draft' and nvt.mode ~= 'dev' then
+          ng = '. Requested' .. nvt.startmode .. ', but denied due to error/warning/overfull.'
         end
-        texio.write_nl('Mode: draft. Requested ' .. nvt.startmode .. ng)
+        texio.write_nl('Mode: draft' .. ng)
       end
       texio.write_nl('Trim Size: ' .. nvt.trimtext)
       local twin, emin, blin
@@ -1802,6 +1828,9 @@ nvt.finalize = function ()
       end
       if nvt.thisdoc ~= '' then
         texio.write_nl('Note: When compiling only subdocs, mode is never preview or final.')
+      end
+      if nvt.examinemsg == 1 then
+        texio.write_nl('Alert: Typo examine not performed unless requested mode=draft.')
       end
       if nvt.good == false then texio.write_nl('Note: Forced draft mode, due to problems.') end
       texio.write_nl('******************************** '

@@ -36,7 +36,9 @@ Most popular fiction does not need back matter, or has a simple "About the Autho
 
 
 <p><a id="backmatter"></a>&nbsp;</p>
-<h4>Command: \backmatter (also starred version)</h4>
+<h4 class="section">Command: \backmatter (also starred version)</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>This command is used between the final component of mainmatter, and the first component
 of backmatter. Only use it if you actually have backmatter.</p>
 <p>At <code>\backmatter</code> there are some changes:</p>
@@ -66,7 +68,9 @@ of backmatter. Only use it if you actually have backmatter.</p>
 
 
 <p><a id="whatwhere"></a>&nbsp;</p>
-<h4>What Goes Where</h4>
+<h4 class="section">What Goes Where</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Backmatter is never fictional, although a few books add fictional notes that <i>look like</i>
 backmatter, even though they are actually mainmatter.</p>
 <p>Here is a quick guide:</p>
@@ -99,32 +103,56 @@ how you wrote the book while recovering from a bad tattoo, then it goes in backm
 
 
 <p><a id="endnote"></a>&nbsp;</p>
-<h4>Command: \endnote</h4>
+<h4 class="section">Command: \endnote</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Novelette's limited capability for footnotes is intended for brief author comments,
 not citations or discussions. If you need more, use end notes.</p>
 <p>You may style end notes as you wish. For your convenience, Novelette provides the
 <code>\endnote</code> command, which styles it for you:</p>
 <p><code>\endnote{<i>page</i>}{<i>excerpt</i>}{<i>note</i>}</code></p>
-<ul>
-<li><p>The command may only be used in backmatter.</p></li>
-<li><p>It does not print a marker anywhere. The reader will not know that some text has
-    an endnote, without looking in backmatter.</p>
-    <p>This is not the standard for academic writing. But it has been used in well-known,
-       popular nonfiction. Ordinary readers will not see the flow of text interrupted by numerous
-       markers. Professional readers, who expect that certain passages will be noted,
-       can find what they need in the endnotes.</p></li>
-<li><p>The <i>page</i> is the book page number, where the text will be noted.</p></li>
-<li><p>Its <i>excerpt</i> is a few words (does not need to be a whole sentence) sufficient
-    to locate where the note applies.</p></li>
-<li><p>The <i>note</i> is the endnote. May be more than one paragraph.</p></li>
-</ul>
-<p class="noindent">Example: Main text, page 83,says: "In 1936, Jack D. Ripper testified before
-the Senate subcommittee on baloney sandwiches, emphatically denying that he uses pickles."</p>
+<ul><li>
+  <p>The command may only be used in backmatter.</p>
+</li><li>
+  <p>It does not print a marker anywhere. The reader will not know that some text has
+     an endnote, without looking in backmatter.</p>
+  <p>This is not the standard for academic writing. But it has been used in well-known,
+     popular nonfiction. Ordinary readers will not see the flow of text interrupted by numerous
+     markers. Professional readers, who expect that certain passages will be noted,
+     can find what they need in the endnotes.</p>
+  <p>If an endnote is especially important, you may write a bried footnote (shows marker)
+     directing the reader's attention to detailed information in the endnotes.</p>
+</li><li>
+  <p>The <i>page</i> is the book page number, where the text will be noted.</p>
+</li><li>
+  <p>The <i>excerpt</i> is a few words (does not need to be a whole sentence) sufficient
+     to locate where the note applies, on that <i>page</i>.</p>
+</li><li>
+  <p>The <i>note</i> is the endnote. May be more than one paragraph.</p>
+</li><li>
+  <p>The endnote prints in small text, with its page number at left margin, then excerpt and
+     note are block indented. The excerpt is surrounded by angle brackets, followed by colon.</p>
+</li></ul>
+<!-- Do not copy code from HTML. Copy it from browser. -->
+<p class="noindent"><b>Example:</b> Main text, page 83, says: "In 1936, Jack D. Ripper
+testified before the Senate subcommittee on baloney sandwiches, emphatically denying that
+he uses pickles."</p>
 <p><code>\endnote{83}{Ripper testified}{Proceedings of the Charcuterie Senate,
-March 23, 1936, Vol. XXIV, pages 1342&#8209;1683. This was brought to the author's attention by
+March 23, 1936, Vol. XXIV, pages 1342&ndash;1683. This was brought to the author's attention by
 a custodian who found it in a dustbin.}</code></p>
-<p>The endnote prints in small text, with its page number at left margin, then excerpt and
-note are block indented. The excerpt is surrounded by angle brackets, followed by colon.</p>
+<p><b>Result:</b></p>
+<div style="margin-top:.5rem; width:80%; margin-left:auto; margin-right:auto; text-align:center;">
+<img src="images/endnote.png" style="width:100%" alt="result of endnote"/>
+</div>
+
+
+<p>&nbsp;</p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="uptree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="uptree">&nbsp;</span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
 
 
 </div><!-- end master -->

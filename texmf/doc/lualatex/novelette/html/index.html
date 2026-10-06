@@ -50,6 +50,7 @@ So be sure to read the Novelette documentation, starting at the
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p><a href="">component</a></p>
 <p><a href="">block</a></p>
+<p><a href="">toc (Table of Contents)</a></p>
 
 
 <p><a id="special"></a>&nbsp;</p>
@@ -63,7 +64,7 @@ So be sure to read the Novelette documentation, starting at the
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 
-<p>\. \, \; \: \~ \` \% \# \@ \& \= \' \" \^ \c \{ \} \[ \] $ @ # % ^ & 
+<p>\. \, \; \: \~ \` \% \# \@ \&amp; \= \' \" \^ \c \{ \} \[ \] $ @ # % ^ &amp; 
 
 \agus
 \author
@@ -71,29 +72,38 @@ So be sure to read the Novelette documentation, starting at the
 \blankline
 \blankpage
 \case
+center
+chapters
 \char
 \clearpage
-\setstyleN (N=1,2,3,4)
 \disable
-\docdate
-\down, \dn
 \dcap
+\docdate
+\documentclass
+\down, \dn
 \enable
+\endnote
+\entry
+\entrygap
 \footnote
 \footnotestyle
-\forceindent
 \frontmatter
 \headstyle
+<a href="lang.html">hyphenation</a>
 \ijacute, \IJacute
 \image
 \init
 \include
 \input
 <a href="lang.html">\lang</a>
+<a href="lang.html">language</a>
 \layout
+ligatures
+\line
 \linebreak
 \lgem, \Lgem
 \lnum
+\logo
 \mainmatter
 \maintext
 \mode
@@ -106,16 +116,19 @@ So be sure to read the Novelette documentation, starting at the
 \rectohead
 \sampletext
 \scene
+\sceneimage
 \scenestyle
+scripts (shell)
+\setstyle<i>N</i>
+shell scripts
 \smcp, \SMCP
 \styleN (N=0-9)
 \subdoc
-\subdocstyle
+sub-documents
 \subtitle
 \textit
 \title
 \trimsize
-\unindent
 \up
 \par
 \version
@@ -128,10 +141,12 @@ chapters and scenes
 Dutch
 document body
 drop cap
+endnotes
 English, US/UK
 escape characters
 folio
 fonts
+footnotes
 French punctuation
 German
 glue strip

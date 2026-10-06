@@ -78,7 +78,7 @@ LaTeX tutorials. Pay attention here:</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Commands <code>\image</code>, <code>\logo</code>, and <code>\sceneimage</code> have
-starred versions <code>\image*</code>, <code>\logo*</code>, and <code>\sceneimage*</code>.<p>
+starred versions <code>\image*</code>, <code>\logo*</code>, and <code>\sceneimage*</code>.</p>
 <ul><li>
   <p>In preview and final modes, the starred and unstarred commands behave the same:
   The file must exist, be in an allowable path, fit its allowed width and height, and
@@ -91,9 +91,11 @@ starred versions <code>\image*</code>, <code>\logo*</code>, and <code>\sceneimag
     <p>The unstarred commands do not look for the image file. It does not need to exist,
     and will be ignored if it does exist. The text in <code>{PathTo/filename.png}</code>
     may be anything, and may be empty (but you must write the braces).</p>
-    <p>Instead, a gray rectangle is printed where the image will print, displacing the same
-    area that the image will displace. This compiles much faster than the starred commands,
-    and allows you to "write your story now, design its images later."</p>
+    <p>Instead, a gray placeholder rectangle is printed where the image will print, It displaces
+    the same area that the image will displace, and (if float) floats to the same place.
+    This compiles much faster than the starred commands, yet preserves the line breaks and
+    page breaks. It allows you to "write your story now, design its images later."</p>
+  </li></ul>
 </li></ul>
 
 
@@ -261,17 +263,18 @@ to <code>\logo</code> or to <code>\sceneimage</code> commands.</p>
   <p><b>Equation</b> for calculating the maximum height of an image: <i>P</i> is its maximum
   height in pixels, <i>L</i> is the declared number of lines, <i>em</i> and <i>baselineskip</i>
   are measured in <i>pt</i>, and <i>R</i> is the image resolution in <i>pixels/inch</i>:</p>
-  <p style="text-indent:2em"> P = R*[0.84*em&nbsp;+&nbsp;(L-1)*baselineskip]&nbsp;/&nbsp;72.27</p>
-  <p>For example, if R=300px/in, L=5, em=11.7pt, and baselineskip=14.8pt:</p>
-  <p style="text-indent:2em">Max height = 300*[0.84*11.7+(5-1)*14.8]/72.27 = 286 pixels.</p>
-  <p>The actual calculation is a little more than 286, but the value must be truncated down
-  to an integer value. Never rounded up.</p>
-</li><li>
-  <p>Or, if you already know the pixel height, you may calculate the minimum number of lines
-  required:</p>
-  <p style="text-indent:2em">
-  L = 1&nbsp;+&nbsp;[(72.27*P/R)&nbsp;-&nbsp;.84*em]&nbsp;/&nbsp;baselineskip</p>
-  <p>Round L up (never down) to nearest integer.</p>
+  <ul><li>
+    <p>P = R*[0.84*em&nbsp;+&nbsp;(L-1)*baselineskip]&nbsp;/&nbsp;72.27</p>
+    <p>For example, if R=300px/in, L=5, em=11.7pt, and baselineskip=14.8pt:</p>
+    <p>P = 300*[0.84*11.7+(5-1)*14.8]/72.27 = 286 pixels.</p>
+    <p>The actual calculation is a little more than 286, but the value must be truncated down
+       to an integer value. Never rounded up.</p>
+  </li><li>
+    <p>Or, if you already know the pixel height, you may calculate the minimum number of lines
+       required:</p>
+    <p>L = 1&nbsp;+&nbsp;[(72.27*P/R)&nbsp;-&nbsp;.84*em]&nbsp;/&nbsp;baselineskip</p>
+    <p>Round L up (never down) to nearest integer.</p>
+  </li></ul>
 </li><li>
   <p>Unsure of the book trim size, or other Preamble settings? If you design images so that they
   do not exceed 3.4in width and 3.4in height, then they will fit all sizes provided by Novelette,
@@ -285,17 +288,20 @@ to <code>\logo</code> or to <code>\sceneimage</code> commands.</p>
 </li></ul>
 
 
-<h4>Command: \logo (also starred version)</h4>
+<p><a id="logo"></a>&nbsp;</p>
+<h4 class="section">Command: \logo (Also \logo*)</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>A Novelette "logo" is a special kind of image. It may be used inline with text.
-The purpose of a logo is to print something such as a publisher's logo,
-in places such as the title and copyright pages.</p>
+Its purpose is to print something such as a publisher's logo, in places such as the title
+and copyright pages; but Novelette does not know or care why you use it.</p>
 <p><code>\logo{PathTo/filename.png}</code></p>
 <ul><li>
   <p>A logo may only be used within a <code>\style<i>N</i></code> command that has
-     option [logo].</p>
+     option <code>[logo]</code>.</p>
 </li><li>
-  <p>If necessary, the line containing the loco will be padded above and below, to occupy
-     three lines. That avoids smashing it into adjacent lines.</p>
+  <p>If necessary, the line containing the logo will be padded above and below,
+     to occupy three lines. That avoids smashing it into adjacent lines.</p>
 </li><li>
   <p>Its width and height may not exceed 0.32in (144px @ 600px/in).</p>
   <p>That is: 96px @300px/in, or 192px @ 600px/in, etc.</p>
@@ -309,43 +315,85 @@ in places such as the title and copyright pages.</p>
 </li><li>
   <p>The unstarred <code>\logo</code> and the starred <code>\logo*</code> behave the same as
      the other unstarred and starred graphics commands.</p>
+</li><li>
+  <p>Example:
+  <code>\style5[logo]{Pathetic Press \logo{images/pp-logo.png} Brisbane Paris}</code></p>
+  <p class="center" style="margin-top:.5rem">Pathetic Press
+  <img src="images/pp-logo.png" style="height:1.5rem;vertical-align:top;" alt="PP logo"/>
+  Brisbane Paris</p>
 </li></ul>
 
 
-<p><a id ="scene"></a>&nbsp;</p>
-<h4>Using an Image as Scene Break</h4>
-<p>Usage: <code>\sceneimage[<i>option</i>]{<i>PathTo/filename.png</i>}</code>.</p>
-<p>The <code>\sceneimage</code> command is one of several methods for creating a scene break
-within a chapter. It is a hybrid of <code>\scene</code> and <code>\image</code>.</p>
+<p><a id="sceneimage"></a>&nbsp;</p>
+<h4 class="section">Command: \sceneimage (Also \sceneimage*)</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>Usually, <a href="">scene breaks</a> do not use images. You may use an ordinary
+<code>\image</code> as scene break, but the <code>\sceneimage</code> command is specially
+designed for this purpose.</p>
 <p>Typically, the image will be rasterized text in a prominent font. Intead of black, it will be
 some shade of gray, so that it is not too prominent. The font does not need to be one of the
-Novelette fonts, as long as its license permits commercial usage.</p>
+Novelette fonts, as long as its license permits commercial usage in rasterized form.</p>
+<p>Usage: <code>\sceneimage[<i>option</i>]{<i>PathTo/filename.png</i>}</code>.</p>
 <ul><li>
   <p>The image does not float.</p>
 </li><li>
   <p>The starred <code>\sceneimage*</code> and unstarred <code>\sceneimage</code> behave
-  the same as the corresponding <code>\image*</code> and <code>image</code> commands.</p>
+     the same as the corresponding <code>\image*</code> and <code>image</code> commands.</p>
 </li><li>
-  <p>Horizontal alignment is the <code>\scenestyle</code> setting, or default center.</p>
+  <p>Horizontal alignment is the <code>\setscene</code> setting, or default center.</p>
+  <p>The only option <code>[align=<i>A</i>]</code>, where <i>A</i> is one of left right center,
+     allows local over-ride.</p>
 </li><li>
-  <p>Maximum image width is 3.4in, which is more than any good-looking scene break needs.
-  Maximum image height is 0.32in. These apply regardless of trim size or layout.</p>
-</li><li><p>The image is automatically padded to occupy a total of 3 lines. If you wish,
-  use <code>\blankline</code> above and/or below.</p>
+  <p>Maximum image width is 3.4in. Maximum image height is 0.32in. These apply regardless
+     of trim size or layout.</p>
+</li><li>
+  <p>The image is automatically padded to occupy a total of 3 lines. If you wish,
+     use <code>\blankline</code> above and/or below.</p>
 </li><li>
   <p>The following paragraph is not indented.</p>
+</li><li>
+  <p>Example, with sceneimage "FOURTEEN" in a decorative font:</p>
+  <p style="margin-left:1rem" class="noindent"><code>and then they went away\par<br/>
+     \sceneimage{images/sc14.png}<br/>
+     The next day, they returned.</code></p>
+  <p class="noindent">Result:</p>
+  <p style="margin:.5rem 0px 1rem 2rem" class="noindent">and then they went away.</p>
+  <p style="margin-left:2rem" class="noindent"><img src="images/sc14.png" alt="scene image"/></p>
+  <p style="margin:1rem 0px 0px 2rem" class="noindent">The next day, they returned.</p>
 </li></ul>
 
 
-
-<a id="scripts"></a>
-<h3>Shell Scripts</h3>
+<p><a id="scripts"></a>&nbsp;</p>
+<h4 class="section">Shell Scripts</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>In its documentation <i>utilities</i> folder, Novelette provides several shell scripts.
 These are coded for Linux or Linux-compatible shells (including Mac OS/X and Android/Termux).
 If you are on Windows, use the Linux subsystem.</p>
-<p>These scripts will take off-spec image files, and convert them to on-spec. You will probably
-need to do this for preview and final modes. Instructions are in <i>utilities</i>.</p>
+<p>These scripts will take off&#8209;spec image files, and convert them to on&#8209;spec.
+You will probably need to do this for preview and final modes. Instructions are
+in <i>utilities</i>.</p>
 <p>The scripts require ImageMagick, which can be installed via your Linux distribution.</p>
+<p>What they do: Most printers do not care about image specs; anything that can be printed
+on your home or office printer, is acceptable to them. But the strictest standards, still used
+by many print-on-demand services, require that the images do not contain any color profile
+or internal metadata that is not minimally necessary. Above all, grayscale images must be
+single-channel gray without transparency, rather then the RGB grays that most graphics programs
+create. The scripts fix these problems.</p>
+<p>Since you cannot control whether your print jobs will be sent to slack or strict printers,
+Novelette requires strict.</p>
+<p>Also, the paper and process used for your book cannot produce photo-quality grayscale images.
+Print services advise that grays near black should become black, and grays near white
+should become white. The scripts do this, so that your processed images, when viewed on monitor,
+will more closely resemble how they will print.</p>
+
+
+<p>&nbsp;</p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree">&nbsp;</span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
 
 
 </div><!-- end master -->

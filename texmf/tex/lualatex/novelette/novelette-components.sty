@@ -35,7 +35,6 @@
 %% Chapters, and similar components, will use \maintext to separate the decorative opening from
 %% ordinary, flowing text.
 %%   If an image exceeds 20 lines height, it must be in a component with [single] option.
-\newif\ifnvt@indisplay %% Locally true at \begin{component}, until \maintext or \end{component}.
 \newif\ifnvt@compsingle %% If locally true, warns when component exceeds one page.
 \newif\ifnvt@hasfakefooter %% True when first page of component has fake footer for drop folio.
 \newif\ifnvt@didcomponent %% Becomes true upon first use of component environment.
@@ -55,6 +54,7 @@
   \global\nvt@didcomponenttrue%%
   \suppressfloats[t]%%
   \begingroup%%
+  \ifnvt@allowvrchange\nvt@didvrheadtextfalse\fi%%
   \nvt@indisplaytrue\nvt@didmaintextfalse\setcounter{footnote}{0}%%
   \ifnvt@inmainmatter%%
     \ifnvt@hasfooter\def\tmptps{plain}\else\def\tmptps{empty}\fi%%
@@ -153,6 +153,7 @@
 \def\nvt@initscale{1} %% \init is ineffective, except when following \maintext.
 \def\maintext{%%
   \par%%
+  \global\nvt@didvrheadtexttrue%%
   \ifnvt@didmaintext%%
     \nvt@warn{Duplicate \string\maintext\space in same component. Ignored.}%%
   \else%%

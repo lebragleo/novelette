@@ -354,7 +354,7 @@
     \nvt@err{Bad \string\styleN[option]{text}.^^J%%
       \spii N must be integer 0-9. Not the letter N or n.^^J%%
       \spii Choices for font, scale, track, align, and case^^J%%
-      \spiv are globally fixed by \string\setstyle[N]{choices} in preamble.^^J%%
+      \spiv are globally fixed by \string\setstyleN{choices} in preamble.^^J%%
       \spii Option may be one or both: info logo (comma-separated).
       \spiv [info] -> Writes the typeset text width to Terminal (console).^^J%%
       \spix That might be useful for your own design purposes.^^J%%
@@ -368,14 +368,14 @@
     \edef\tmpsp{\fpeval{(\tmpscale*\tmpspace + .02*\tmptrack)*\nvt@em}pt}%% %%%%%
     \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%% %%%%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
-    \begingroup\DeclareDocumentCommand\logo{sm}{}%%
-      \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% %%%%%
+    \begingroup\DeclareDocumentCommand\logo{sm}{}%% Measure without logo.
+      \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%%
       \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
       \ifnum\tmpboxdp=1\relax%%
         \nvt@warn{\string\styleN\space content has disallowed characters.}%%
       \fi%%
     \endgroup%%
-    \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% %%%%%
+    \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% Re-measure with logo.
 %%%%% ensure above/below padding for logo, when scale not enough. %%%%%
     \edef\tmpwdz{\the\wd0}%%
     \edef\tmpwide{\fpeval{\wd0 > \textwidth}}%%
@@ -404,7 +404,7 @@
 %% \scene command may be useful. This creates a three-line gap between paragraphs. You may
 %% increase the gap by using \blankline above and/or below. After the scene break, the first
 %% paragraph is not indented.
-%%   The default \scene alignment is set in preamble by \setscene, or center if unset.
+%%   The default \scene alignment is set in preamble by \scenestyle, or center if unset.
 %% Option [align=A] is for local over-ride (A = left right center).
 %%   Scenes have no automatic numbering. Do it yourself. See the \next command.
 \newif\ifnvt@inscene %% True inside \scene.
@@ -418,7 +418,7 @@
   \directlua{nvt.parsescene('\luaescapestring{#1}')}%%
   \ifnum\tmpreturn=-99\relax%%
     \nvt@fatal{Cannot use \string\scene\space in preamble.^^J%%
-      Did you mean \string\setscene\space ?}%%
+      Did you mean \string\scenestyle\space ?}%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@warn{Did not understand \string\scene\space option.^^J%%
@@ -641,7 +641,7 @@
 \DeclareDocumentCommand\endnote{mm+m}{%% {bookpage}{excerpt}{note}
   \ifnvt@inbackmatter%%
     \begin{block}[2/0,size=small]%%
-    \strut\hspace{-2\nvt@parindent}\makebox[2\nvt@parindent]{#1\hfill}%%
+    \strut\hspace{-2\nvt@parindent}\makebox[2\nvt@parindent][r]{#1\space\space}%%
     {\char"2329}#2{\char"232A}\,:\space\,{#3}%%
     \end{block}%%
   \else%%
@@ -657,7 +657,7 @@
 \def\nvt@nocmd#1{%%
   \nvt@warn{Novelette has no command #1.^^J%%
     \spii See these commands: \string\setstyleN and \string\styleN for N=0-9,^^J%%
-    \spii\string\sethead, and options for block environment.}
+    \spii\string\headstyle, and options for block environment.}
 }%%
 \def\footnotesize{\nvt@nocmd{\string\footnotesize}}
 \def\tiny{\nvt@nocmd{\string\tiny}}

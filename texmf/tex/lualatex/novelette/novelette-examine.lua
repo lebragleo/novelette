@@ -472,7 +472,7 @@ end
 
 local check_page_first_word = function (node, colno, footnote)
   local match = false ; local swap = false
-  local new = '' ; local minlen = nvt.fontem ; local len = 0 ; local n = node ; local pn
+  local new = '' ; local minlen = nvt.em ; local len = 0 ; local n = node ; local pn
   while n and n.id ~= GLYPH and n.id ~= DISC and (n.id ~= HLIST or n.subtype == INDENT) do
      n = n.next
   end
@@ -554,7 +554,7 @@ end
 check_vtop = function (top, colno, vpos)
   local head = top.list
   local PAGEmin = 5 ; local HYPHmax = 1 ; local Stretch = 1.5
-  local LLminWD = 2*nvt.fontem ; local BackPI = nvt.fontem ; local BackFuzz = 0.1*nvt.fontem
+  local LLminWD = 2*nvt.em ; local BackPI = nvt.em ; local BackFuzz = 0.1*nvt.em
   local blskip = tex.getglue('baselineskip') ; local vpos_min = PAGEmin*blskip* 1.5
   local linewd = tex.getdimen('textwidth')
   local first_bot = true ; local done  = false ; local footnote = false ; local ftnsplit = false
@@ -625,7 +625,7 @@ check_vtop = function (top, colno, vpos)
           if pageline == 1 and parline > 1 then widowflag = true end
           local PFskip = effective_glue(pn,head)
           local llwd = linewd - PFskip
-          if llwd < LLminWD then
+          if llwd < LLminWD and llwd > 100 then
             pageflag = true ; shortline = true
             local msg = 'Short line: length=' .. string.format('%.0fpt', llwd/65536)
             log_flaw(msg, line, colno, footnote)

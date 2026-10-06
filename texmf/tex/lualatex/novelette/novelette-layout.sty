@@ -96,7 +96,7 @@
 
 %% Ensure that header texts will fit:
 \def\nvt@checkversohead#1{%%
-  \sbox0{{\nvt@headfont\nvt@headfeat{#1}}}
+  \sbox0{{\nvt@headfont\nvt@aff{\nvt@headfeat}{#1}}}
   \edef\tmphw{\fpeval{\wd0>(\textwidth-8*\nvt@em)}}
   \ifnum\tmphw=1\relax
     \gdef\nvt@versohead{HEADER TEXT TOO LONG}
@@ -104,7 +104,7 @@
   \fi
 }%%
 \def\nvt@checkrectohead#1{%%
-  \sbox0{{\nvt@headfont\nvt@headfeat{#1}}}
+  \sbox0{{\nvt@headfont\nvt@aff{\nvt@headfeat}{#1}}}
   \edef\tmphw{\fpeval{\wd0>(\textwidth-8*\nvt@em)}}
   \ifnum\tmphw=1\relax
     \gdef\nvt@rectohead{HEADER TEXT TOO LONG}
@@ -245,16 +245,16 @@
 %% a limited choice of pre-composed designs is offered. They are all you need for fiction books.
 \def\nvt@@versohead{%%
   \def\tmptest{dflt}\ifx\nvt@headcn\tmptest%%
-    \MakeLowercase{\nvt@versohead}%%
+    \nvt@headital\MakeLowercase{\nvt@versohead}%%
   \else%%
-    \nvt@versohead%%
+    \nvt@headital\nvt@versohead%%
   \fi%%
 }%%
 \def\nvt@@rectohead{%%
   \def\tmptest{dflt}\ifx\nvt@headcn\tmptest%%
-    \MakeLowercase{\nvt@rectohead}%%
+    \nvt@headital\MakeLowercase{\nvt@rectohead}%%
   \else%%
-    \nvt@rectohead%%
+    \nvt@headital\nvt@rectohead%%
   \fi%%
 }%%
 \newif\ifnvt@inheader %% True inside any header text.
@@ -262,29 +262,37 @@
   \def\ps@split{%% Header and footer, both centered.
     \nvt@getbookpage%%
     \def\@oddfoot{%%
-      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+      {\hfil\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
     }%%
     \def\@evenfoot{%%
-      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+      {\hfil\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
     }%%
-    \def\@oddhead{{\nvt@inheadertrue\nvt@headfont\nvt@headfeat\hfil\nvt@@rectohead\hfil}}%%
-    \def\@evenhead{{\nvt@inheadertrue\nvt@headfont\nvt@headfeat\hfil\nvt@@versohead\hfil}}%%
+    \def\@oddhead{{\nvt@inheadertrue\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+      \spaceskip=\nvt@headspaceskip\relax\hfil\nvt@@rectohead\hfil}}%%
+    \def\@evenhead{{\nvt@inheadertrue\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+      \spaceskip=\nvt@headspaceskip\relax\hfil\nvt@@versohead\hfil}}%%
   }%%
   \def\ps@margin{%% Only header. Page number at outside margin. Text nearby.
     \nvt@getbookpage%%
     \let\@oddfoot\@empty\let\@evenfoot\@empty%%
     \def\@oddhead{%%
       \bgroup\nvt@inheadertrue%%
-      {\nvt@headfont\nvt@headfeat\hfil\nvt@@rectohead}%%
+      {\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\hfil\nvt@@rectohead}%%
       \hspace{\nvt@parindent}%%
-      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
       \egroup%%
     }%%
     \def\@evenhead{%%
       \bgroup\nvt@inheadertrue%%
-      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
       \hspace{\nvt@parindent}%%
-      {\nvt@headfont\nvt@headfeat\nvt@@versohead\hfil}%%
+      {\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\nvt@@versohead\hfil}%%
       \egroup%%
     }%%
   }%%
@@ -293,16 +301,19 @@
     \let\@oddfoot\@empty\let\@evenfoot\@empty%%
     \def\@oddhead{%%
       \bgroup\nvt@inheadertrue%%
-      {\nvt@headfont\nvt@pnfeat\hfil\phantom{\space\nvt@pndeco\space\nvt@thispage}}%%
-      {\nvt@headfont\nvt@headfeat\nvt@@rectohead}
-      {\nvt@headfont\nvt@pnfeat\space\nvt@pndeco\space\nvt@thispage\hfil}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}
+        \hfil\phantom{\space\nvt@pndeco\space\nvt@thispage}}%%
+      {\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\nvt@@rectohead}
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}\space\nvt@pndeco\space\nvt@thispage\hfil}%%
       \egroup%%
     }%%
     \def\@evenhead{%%
       \bgroup\nvt@inheadertrue%%
-      {\nvt@headfont\nvt@pnfeat\hfil\nvt@thispage\space\nvt@pndeco\space}%%
-      {\nvt@headfont\nvt@headfeat\nvt@@versohead}%%
-      {\nvt@headfont\nvt@pnfeat\phantom{\space\nvt@pndeco\space\nvt@thispage}\hfil}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}\hfil\nvt@thispage\space\nvt@pndeco\space}%%
+      {\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\nvt@@versohead}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}\phantom{\space\nvt@pndeco\space\nvt@thispage}\hfil}%%
       \egroup%%
     }%%
   }%%
@@ -311,16 +322,22 @@
     \let\@oddfoot\@empty\let\@evenfoot\@empty%%
     \def\@oddhead{%%
       \bgroup\nvt@inheadertrue%%
-      \phantom{\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
-      {\nvt@headfont\nvt@headfeat\hfill\nvt@@rectohead\hfill}%%
-      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      \phantom{\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
+      {\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\hfill\nvt@@rectohead\hfill}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \makebox[\nvt@pnindent]{\nvt@pndeco\hfill\nvt@thispage}}%%
       \egroup%%
     }%%
     \def\@evenhead{%%
       \bgroup\nvt@inheadertrue%%
-      {\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
-      {\hfill\nvt@headfont\nvt@headfeat\nvt@@versohead\hfill}%%
-      \phantom{\nvt@headfont\nvt@pnfeat\makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      {\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
+      {\hfill\nvt@headfont\nvt@aff{\nvt@headfeat}%%
+        \spaceskip=\nvt@headspaceskip\relax\nvt@@versohead\hfill}%%
+      \phantom{\nvt@headfont\nvt@aff{\nvt@pnfeat}
+        \makebox[\nvt@pnindent]{\nvt@thispage\hfill\nvt@pndeco}}%%
       \egroup%%
     }%%
   }%%
@@ -328,10 +345,12 @@
     \nvt@getbookpage%%
     \let\@oddhead\@empty\let\@evenhead\@empty%%
     \def\@oddfoot{%%
-      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+      {\hfil\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
     }%%
     \def\@evenfoot{%%
-      {\hfil\nvt@headfont\nvt@pnfeat\nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
+      {\hfil\nvt@headfont\nvt@aff{\nvt@pnfeat}%%
+        \nvt@pndeco\space\nvt@thispage\space\nvt@pndeco\hfil}%%
     }%%
   }%%
   \def\ps@none{%% For text extraction. No header or footer, thus no page numbers.
@@ -368,10 +387,10 @@
 %% A better idea is to have footnotes direct the reader to backmatter, but not any particular
 %% place there; then merge all notes into a general discussion, written as ordinary text.
 %%   Default footnote style prints label at left margin, then a big space to the footnote text,
-%% at normal indent. You may globally change this in Preamble: \setfootnote{indent=both} indents
-%% prior to the label, then ordinary space to text. \setfootnote{indent=none} does not indent
+%% at normal indent. You may globally change this in Preamble: \footnotestyle{indent=both} indents
+%% prior to the label, then ordinary space to text. \footnotestyle{indent=none} does not indent
 %% the first line of a footnote; the label is at left margin, then ordinary space, then text.
-%% \setfootnote{indent=near} looks nice; text at indent, marker/space just before it.
+%% \footnotestyle{indent=near} looks nice; text at indent, marker/space just before it.
 %%   In all cases, when a footnote has extra paragraphs, they are indented.
 \setcounter{footnote}{0}%% Resets to 0 at each \begin{component}.
 \newif\ifnvt@infootnote %% True within footnote.

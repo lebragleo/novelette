@@ -147,6 +147,8 @@
 \def\nvt@filepath{./} %% Re-defined when compiling subdoc.
 \def\nvt@nowcompiling{} %% Empty for main doc, nonempty for \subdoc.
 \def\nvt@zrule{\rule{0pt}{0pt}} %% Provides anchor point for various fill commands.
+\newif\ifnvt@inpreamble\nvt@inpreambletrue %% Becomes false later.
+\newif\ifnvt@indisplay %% Locally true at \begin{component}, until \maintext or \end{component}.
 %%
 
 
@@ -194,7 +196,6 @@
 \newif\ifnvt@useplas
 \newif\ifnvt@usecrge
 \let\nvt@par\par\relax %% For local \par tweaks.
-\let\nvt@brk\\\relax %% For break tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
 \let\nvt@maybestopnow\relax%% Changes when compiling only subdocs.
 \catcode`\_=12\relax %% So that _ may be used as text anywhere.
@@ -203,7 +204,10 @@
   \let\language\orig@language\relax
   \typeout{Info: Completed Preamble. Now processing its settings.}
   \setlength\hoffset{-1in}\setlength\voffset{-1in} %% Removes built-in LaTeX offsets.
-  \RequirePackage{novelette-components,novelette-graphics,novelette-effects,novelette-layout}
+  \RequirePackage{novelette-components}
+  \RequirePackage{novelette-graphics}
+  \RequirePackage{novelette-effects}
+  \RequirePackage{novelette-layout}
   \nvt@processlayout %% In novelette-layout.sty.
   \let\nvt@RequirePackage\RequirePackage\relax
   \RequirePackage{novelette-subdocs}
@@ -212,7 +216,20 @@
   \renewcommand\normalsize{\@setfontsize\normalsize\nvt@em\nvt@bls}%% Calculated from settings.
   \normalsize
   \let\input\nvt@noinput\relax %% Prevents added packages or other user-loaded files in Preamble.
-  \ifnvt@draft\else\nvt@examinefalse\fi
+  \ifnvt@draft\else
+    \ifnvt@examine
+      \directlua{nvt.examinemsg=1}
+    \fi
+    \nvt@examinefalse
+    \IfFileExists{./\jobname.typo}{%%
+      \directlua{%%
+        local fileout = './' .. tex.jobname .. '.typo'
+        local out = io.open(fileout,"w+")
+        out:write('Previous typo file has been cleared by compiling without examine.')
+        io.close(out)
+      }%%
+    }{}%%
+  \fi
   \let\input\nvt@input\relax\let\RequirePackage\nvt@RequirePackage\relax
   \RequirePackage{luahyphenrules}\HyphenRules{\nvt@lang}%% Load after \normalsize.
   \def\HyphenRules#1{\nvt@err{Only one \string\HyphenRules\space is allowed.}}
@@ -232,9 +249,8 @@
     \def\pagecolor{\nvt@nocolorcmd{\string\pagecolor}}
     \def\definecolor{\nvt@nocolorcmd{\string\definecolor}}
   \fi
-  \ifnvt@didversohead\else\def\nvt@versohead{\thetitle}\fi
-  \ifnvt@didrectohead\else\def\nvt@rectohead{\theauthor}\fi
-  \def\input#1{}
+  \ifnvt@didvrheadtext\else\gdef\nvt@versohead{\theauthor}\gdef\nvt@rectohead{\thetitle}\fi
+  \def\input#1{} %% Disabled.
 }%%
 %%
 
@@ -308,6 +324,7 @@
       return nvt.check_page
     }%%
   \fi
+  \global\nvt@inpreamblefalse%%
   \directlua{nvt.preamble=false}
   \ifdefined\nvt@thisdoc
     \typeout{Info: Now beginning the subdoc.^^J}
@@ -326,7 +343,6 @@
 %% is written to Info and/or XMP. Finally, a summary report is prepared.
 \AtEndDocument{%%
   \clearpage
-  \let\\\nvt@brk\relax
   \ifnvt@noblankend\else
     \ifodd\c@page\nvt@thispagestyle{empty}\null\clearpage\fi
     \nvt@blankverso
@@ -346,15 +362,15 @@
     \def\tmptest{final}\ifx\tmpmode\tmptest\def\tmpmode{draft}\fi
   \fi
   \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
-%%  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
-%%  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
+%%%%%  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
+%%%%%  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
   \ifnvt@examine
     \directlua{%%
-      local fileout = tex.jobname .. '.typo'
+      local fileout = './' .. tex.jobname .. '.typo'
       local out = io.open(fileout,"w+")
       out:write(nvt.buffer)
       io.close(out)
-   }%%
+    }%%
   \fi
   \nvt@writepdfinfo
   \ifnvt@pdfx\nvt@declareoutputintent\fi

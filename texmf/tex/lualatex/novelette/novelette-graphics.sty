@@ -86,7 +86,7 @@
       \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=(lines per page).}%%
       \def\tmplines{3}%% Placeholder backup. Almost always an incorrect value.
     \fi%%
-    \ifnum\tmpisfile=0\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
+    \ifnum\tmpisfile<1\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
       \IfFileExists{#3}{%%
         \def\imgfake{0}%%
@@ -97,7 +97,7 @@
         \def\imgfake{1}%%
       }%%
     \fi%%
-    \ifnum\tmpisfile=2\relax%%
+    \ifnum\tmpisfile=-1\relax%%
       \nvt@err{Bad \string\image\space argument: {#3}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. Image filename does not have .png file extension.^^J%%
@@ -137,7 +137,7 @@
 
 %% SCENEIMAGE: \sceneimage[align=A]{PathTo/filename.png}  also starred version.
 %%   This is a hybid of \scene and \image. Like \scene, it creates a 3-line gap between
-%% paragraphs, with the following paragraph unindented. Also, it defaults to \setscene.
+%% paragraphs, with the following paragraph unindented. Also, it defaults to \scenestyle.
 %% But unlike \scene, this command does not print text.
 %%   Like \image, the mandatory argument is a png raster image file. \sceneimage and \sceneimage*
 %% have the same bahavior as \image and \image*, and may print a placeholder. But unlike
@@ -174,15 +174,14 @@
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad \string\sceneimage\space option.^^J%%
         \spii Format: [align=A]^^J%%
-        \spiv A -> left right center. Default from \string\setscene, or center.^^J%%
+        \spiv A -> left right center. Default from \string\scenestyle, or center.^^J%%
         \spiv \string\sceneimage\space does not have [lines=L] or other options.}%%
     \fi%%
-    \vspace{\nvt@bls}%%
     \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
     \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
     \ifnum\tmpalign=1\relax\def\imgleft{}\def\imgright{\hfill}\fi%%
     \ifnum\tmpalign=2\relax\def\imgleft{\hfill}\def\imgright{}\fi%%
-    \ifnum\tmpisfile=0\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
+    \ifnum\tmpisfile<1\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
       \IfFileExists{#3}{%%
         \def\imgfake{0}%%
@@ -193,7 +192,7 @@
         \def\imgfake{1}%%
       }%%
     \fi%%
-    \ifnum\tmpisfile=2\relax%%
+    \ifnum\tmpisfile=-1\relax%%
       \nvt@err{Bad \string\sceneimage\space argument: {#3}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. Image filename does not have .png file extension.^^J%%
@@ -206,6 +205,7 @@
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\imgfake{1}%%
     \fi%%
+    \vspace{\nvt@bls}%%
     \def\fps@figure{}%%
     \ifnum\imgfake=0\relax\nvt@realimage{#3}\else\nvt@fakeimage\fi%%
     \nvt@printimage%%
@@ -301,12 +301,12 @@
 %%
 
 
-%% LOGO: \logo{path/to/filename.png}  also starred version.
+%% LOGO: \logo{PathTo/filename.png}  also starred version.
 %%   A logo is a small image that sits inline with surrounding text. Its purpose is publisher's
 %% logo on the title or copyright page, but Novelette does not know or care why you use it.
-%%   You may only use \logo within a \styleN, with option [logo]. The logo width and height
+%%   You may only use \logo within a \styleN with option [logo]. The logo width and height
 %% may not exceed 0.32in. It will be vertically positioned so that its lower 1/4 is below
-%% textbaseline, and its upper 3/4 is above baseline. It will be horizontally padded to occupy
+%% text baseline, and its upper 3/4 is above baseline. It will be horizontally padded to occupy
 %% 3em (unscaled). Regardless of its scale, the \styleN will occupy 3 at least 3 normal lines.
 %%   The starred \logo* and unstarred \logo behave the same as the related \image* and \image.
 \DeclareDocumentCommand\logo{sm}{%%
@@ -319,20 +319,33 @@
     \IfBooleanTF{#1}%%
       {\directlua{nvt.parselogo('star','\luaescapestring{#2}')}}%%
       {\directlua{nvt.parselogo('','\luaescapestring{#2}')}}%%
+      \ifnum\tmpisfile<1\relax\def\logofake{1}\else\def\logofake{0}\fi%%
+      \ifnum\tmpisfile=1\relax%%
+        \IfFileExists{#2}{%%
+          \def\logofake{0}%%
+        }{%%
+          \nvt@err{Missing \string\logo\space file #2.^^J%%
+            \spii The path and filename have correct format, but the file is not there.^^J%%
+            \spii Either you mis-spelled the path or filename, or no such file.}%%
+          \def\logofake{1}%%
+        }%%
+      \fi%%
+      \ifnum\tmpisfile=-1\relax%%
+        \nvt@err{Bad \string\logo\space argument: {#2}.^^J%%
+        \spii There are several possibilities:^^J%%
+        \spiv 1. Image filename does not have .png file extension.^^J%%
+        \spiv 2. Path to image file is not relative to main document.^^J%%
+        \spix Do not use path relative to sub-documents.^^J%%
+        \spix Do not use absolute path, or symlink (softlink).^^J%%
+        \spiv 3. Image file is not in same folder as main document,^^J%%
+        \spix or in subfolder from main document (max 5 levels).^^J%%
+        \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
+        \spix You may use hyphen or underscore, but not space or tilde.}%%
+      \def\logofake{1}%%
+    \fi%%
   \fi%%
   \ifnum\tmplogo=1\relax%% \tmplogo is provided by \styleN.
-    \ifnum\tmpisfile=0\relax\def\logofake{1}\else\def\logofake{0}\fi%%
-    \ifnum\tmpisfile=1\relax%%
-      \IfFileExists{#2}{%%
-        \def\logofake{0}%%
-      }{%%
-        \nvt@err{Missing logo file #2.^^J%%
-          \spii The path and filename have correct format, but the file is not there.^^J%%
-          \spii Either you mis-spelled the path or filename, or no such file.}%%
-        \def\logofake{1}%%
-      }%%
-    \fi%%
-    \ifnum\tmpisfile=2\relax%%
+    \ifnum\tmpisfile=-1\relax%%
       \nvt@err{Bad logo argument: {#2}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. The filename does not have .png file extension.^^J%%

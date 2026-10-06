@@ -59,19 +59,16 @@ possible settings:</p>
 <a href="#language">\lang{<i>language code</i>}</a>
 <a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a>
 <a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a>
-<a href="#pdfx">\pdfx{<i>choice</i>}</a>
 <a href="#styles">\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
 -->deco=<i>D</i>,case=<i>C</i>}</a>
-<a href="#styles">\setstyle1{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->align=<i>A</i>,case=<i>C</i>}</a>
-<a href="#styles">\setstyle2{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->align=<i>A</i>,case=<i>C</i>}</a>
-<a href="#styles">\setstyle3{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->align=<i>A</i>,case=<i>C</i>}</a>
-<a href="#styles">\setstyle4{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+% For N = 0 to 9 :
+<a href="#vrhead">\versohead{<i>text</i>}</a>
+<a href="#vrhead">\rectohead{<i>text</i>}</a>
+<a href="#styles">\setstyle<i>N</i>{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
 -->align=<i>A</i>,case=<i>C</i>}</a>
 <a href="#styles">\scenestyle{align=<i>A</i>}</a>
 <a href="#styles">\footnotestyle{indent=<i>I</i>}</a>
+<a href="#pdfx">\pdfx{<i>choice</i>}</a>
 <a href="#enable">\enable{<i>comma,separated,choices</i>}</a>
 <a href="#disable">\disable{<i>comma,separated,choices</i>}</a>
 <a href="#examine">\examine{<i>0|1</i>}</a>
@@ -98,19 +95,24 @@ possible settings:</p>
 <p>Choices: <code>draft preview final</code>. Default <code>draft</code>.</p>
 <p>The purpose of modes is to allow faster compiling while you are writing and editing your book,
 and avoid confusion between good and bad results.</p>
-<ul>
-<li><p>Whichever mode you choose, the typesetting (line breaks, page breaks)
-will be the same.</p></li>
-<li><p>In draft mode, placeholder rectangles appear instead of images. They will occupy the same
-space and float position. The <a href="graphics.html">graphics page</a> has details..</p></li>
-<li><p>If the compiler issues any warning, error, or bad box, then the mode
-reverts to draft.</p></li>
-<li><p>Use preview mode for privately sending the PDF to a reviewer or editor.
-It shows all images, and performs all tests, same as final mode.</p></li>
-<li><p>In draft and preview modes, the metadata is changed, so that the PDF cannot be mistaken
-for your final product.</p></li>
-<li><p>Use final mode when you are ready to upload the PDF to your print service.</p></li>
-</ul>
+<ul><li>
+  <p>Whichever mode you choose, the typesetting (line breaks, page breaks)
+     will be the same.</p>
+</li><li>
+  <p>In draft mode, placeholder rectangles appear instead of images. They will occupy the same
+     space and float position. The <a href="graphics.html">graphics page</a> has details.</p>
+</li><li>
+  <p>If the compiler issues any warning, error, or bad box, then the mode
+     reverts to draft.</p>
+</li><li>
+  <p>Use preview mode for privately sending the PDF to a reviewer or editor.
+     It shows all images, and performs all tests, same as final mode.</p>
+</li><li>
+  <p>In draft and preview modes, the metadata is changed, so that the PDF cannot be mistaken
+     for your final product.</p>
+</li><li>
+  <p>Use final mode when you are ready to upload the PDF to your print service.</p>
+</li></ul>
 
 
 <p><a id="metadatatsa"></a>&nbsp;</p>
@@ -118,35 +120,43 @@ for your final product.</p></li>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p><b>Important: </b> Novelette does not use the <code>\DocumentMetadata</code> command.</p>
-<ul>
-<li><p><code>\title{<i>Book Title</i>}</code> is required in preview and final modes.
-In draft mode, you may omit it (generic default is provided).</p></li>
-<li><p><code>\subtitle{<i>Book Subtitle</i>}</code> is optional. Default empty.</p>
-<p>If you use <code>\title{<i>Title : Subtitle</i>}</code>, then do not use the separate
-<code>\subtitle</code> setting.</p></li>
-<li><p><code>\author{<i>Author Name</i>}</code> is required in preview and final modes.
-In draft mode, you may omit it (generic default is provided).</p>
-<p>The author name is as-spoken: <i>John Smith</i>, not <i>Smith, John</i>. You may use
-a pseudonym, but use your real name as copyright holder, on the copyright page.</p></li>
-<li><p>If title+subtitle+author has a very large number of characters, Novelette will complain.
-Print services may insist that title+subtitle not exceed a limit, such as 75 characters.</p></li>
-<li><p>The title, subtitle, and author must exactly match the data that you provide when
-you register your book with the print service. For example, if the registered title is
-<i>This and That</i>, it cannot appear in metadata as <i>This \& That</i>.</p></li>
-<li><p>If your book is a collection of short stories, create a short title that describes
-the common theme.</p></li>
-<li><p>All metadata settings must obey these rules:</p>
-<ul>
-<li><p>All characters must be in a
-<a href="latin1-subset.html">subset of Latin&#8209;1</a>.</p></li>
-<li><p>If you use any of <code>@ # &</code> characters, they must be escaped with backslash:
-<code>\@ \# \&</code>.</p></li>
-<li><p>Otherwise, you may not use the backslash for any purpose. In particular, you may not
-use codes such as <code>\'E</code> for Eacute. Instead, you must paste the actual characters
-from a Unicode character map.</p></li>
-<li><p>Novelette tests your metadata for compliance. Fatal error if bad characters.</p></li>
-</ul></li>
-</ul>
+<ul><li>
+  <p><code>\title{<i>Book Title</i>}</code> is required in preview and final modes.
+     In draft mode, you may omit it (generic default is provided).</p>
+</li><li>
+  <p><code>\subtitle{<i>Book Subtitle</i>}</code> is optional. Default empty.</p>
+  <p>If you use <code>\title{<i>Title : Subtitle</i>}</code>, then do not use the separate
+     <code>\subtitle</code> setting.</p>
+</li><li>
+  <p><code>\author{<i>Author Name</i>}</code> is required in preview and final modes.
+     In draft mode, you may omit it (generic default is provided).</p>
+  <p>The author name is as-spoken: <i>John Smith</i>, not <i>Smith, John</i>. You may use
+     a pseudonym, but use your real name as copyright holder, on the copyright page.</p>
+</li><li>
+  <p>If title+subtitle+author has a very large number of characters, Novelette will complain.
+     Print services may insist that title+subtitle not exceed a limit, such as 75 characters.</p>
+</li><li>
+  <p>The title, subtitle, and author must exactly match the data that you provide when
+     you register your book with the print service. For example, if the registered title is
+     <i>This and That</i>, it cannot appear in metadata as <i>This \&amp; That</i>.</p>
+</li><li>
+  <p>If your book is a collection of short stories, create a short title that describes
+     the common theme.</p>
+</li><li>
+  <p>All metadata settings must obey these rules:</p>
+  <ul><li>
+    <p>All characters must be in a <a href="latin1-subset.html">subset of Latin&#8209;1</a>.</p>
+  </li><li>
+    <p>If you use any of <code>@ # &amp;</code> characters, they must be escaped with backslash:
+       <code>\@ \# \&amp;</code>.</p>
+  </li><li>
+    <p>Otherwise, you may not use the backslash for any purpose. In particular, you may not
+       use codes such as <code>\'E</code> for Eacute. Instead, you must paste the actual
+       characters from a Unicode character map.</p>
+  </li><li>
+    <p>Novelette tests your metadata for compliance. Fatal error if bad characters.</p>
+  </li></ul>
+</li></ul>
 
 
 <p><a id="metadatavc"></a>&nbsp;</p>
@@ -162,24 +172,27 @@ document is compiled, whether or not any changes were made. Useless for version 
 special settings: <code>\docdate</code> and <code>\version</code>. When all of them are
 unchanged, the uniqueID remains fixed. The instanceID will still change with each compile,
 whether or not anything is changed.</p>
-<ul>
-<li><p><code>\docdate</code> and <code>\version</code> are optional. Default empty.</p></li>
-<li><p><code>\docdate{<i>yyyy/mm/dd</i>}</code> uses only the <i>yyyy/mm/dd</i> format.
-The format is checked, but its value is <i>not</i> checked: You may use a silly date
-such as <i>2056/93/42</i> without error. Do not do that!</p>
-<p>The docdate should be the day on which you began writing your book. Do not change it
-unless your revision is so substantial that it is effectively a different story. There is
-no legal significance to the date, but it will be shown as <i>CreationDate</i> in
-PDF metadata.</p></li>
-<li><p><code>\version{<i>text string</i>}</code> has no particular format. Write what
-you wish. If the book has different editions, or is printed at different sizes, be sure
-to change the version.</p>
-<p>For your own benefit, best practice is to change the version from time to time,
-as your writing progresses. Perhaps <code><i>1.1 build 2345</i></code>
-or something similar.</p></li>
-<li><p>You must obey the same character rules, as for title/subtitle/author.
-They are described above.</p></li>
-</ul>
+<ul><li>
+  <p><code>\docdate</code> and <code>\version</code> are optional. Default empty.</p>
+</li><li>
+  <p><code>\docdate{<i>yyyy/mm/dd</i>}</code> uses only the <i>yyyy/mm/dd</i> format.
+     The format is checked, but its value is <i>not</i> checked: You may use a silly date
+     such as <i>2056/93/42</i> without error. Do not do that!</p>
+  <p>The docdate should be the day on which you began writing your book. Do not change it
+     unless your revision is so substantial that it is effectively a different story. There is
+     no legal significance to the date, but it will be shown as <i>CreationDate</i> in
+     PDF metadata.</p>
+</li><li>
+  <p><code>\version{<i>text string</i>}</code> has no particular format. Write what
+     you wish. If the book has different editions, or is printed at different sizes, be sure
+     to change the version.</p>
+  <p>For your own benefit, best practice is to change the version from time to time,
+     as your writing progresses. Perhaps <code><i>1.1 build 2345</i></code>
+     or something similar.</p>
+</li><li>
+  <p>You must obey the same character rules, as for title/subtitle/author.
+     They are described above.</p>
+</li></ul>
 
 
 <p><a id="language"></a>&nbsp;</p>
@@ -187,20 +200,24 @@ They are described above.</p></li>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette does not load the <i>babel</i> or <i>polyglossia</i> packages.</p>
-<ul>
-<li><p>The <code>\lang{<i>code</i>}</code> setting only selects hyphenation patterns.
-It does not select spelling, date/time format, or anything else.</p></li>
-<li><p>Available languages are Western European. There are no plans to extend Novelette to other
-world languages.</p></li>
-<li><p>The language codes are <a href="lang.html">listed here</a>. Some languages have special
-tricks, so be sure to read that page.</p></li>
-<li><p>Novelette is monolingual. Only one hyphenation pattern is used throughout. Your text may
-contain words and phrases in any language supported by the fonts, but it will be hyphenated
-(badly) according to the language setting.</p></li>
-<li><p>If you do not set the language, Novelette provides generic American English. But this
-is not best, even if you are American. Choose the correct <code>en-US</code>
-or <code>en-UK</code> setting, for better hyphenation.</p></li>
-</ul>
+<ul><li>
+  <p>The <code>\lang{<i>code</i>}</code> setting only selects hyphenation patterns.
+     It does not select spelling, date/time format, or anything else.</p>
+</li><li>
+  <p>Available languages are Western European. There are no plans to extend Novelette to other
+     world languages.</p>
+</li><li>
+  <p>The language codes are <a href="lang.html">listed here</a>. Some languages have special
+     tricks, so be sure to read that page.</p>
+</li><li>
+  <p>Novelette is monolingual. Only one hyphenation pattern is used throughout. Your text may
+     contain words and phrases in any language supported by the fonts, but it will be hyphenated
+     (badly) according to the language setting.</p>
+</li><li>
+  <p>If you do not set the language, Novelette provides generic American English. But this
+     is not best, even if you are American. Choose the correct <code>en-US</code>
+     or <code>en-UK</code> setting, for better hyphenation.</p>
+</li></ul>
 
 
 <p><a id="trimsize"></a>&nbsp;</p>
@@ -210,29 +227,39 @@ or <code>en-UK</code> setting, for better hyphenation.</p></li>
 <p>Trim size is the physical, finished size of book interior pages. Print&#8209;on&#8209;demand
 softcover uses the "Prefect Print" process, which exactly fits the cover to the interior.
 Traditional hardcover binding uses a slightly larger cover.</p>
-<ul>
-<li><p>The width and height are measured with units of inches or millimeters. The same units
-must be used for both. Use <code>in</code> for inches, <code>mm</code> for millimeters.</p></li>
-<li><p>Use only standard sizes offered by your print service, with off&#8208;white
-(cream, creme) paper. Never use white paper for popular fiction.</p></li>
-<li><p>Avoid "extended distribution" (whatever it is named). You do not want booksellers to be
-ordering copies at <i>your</i> cost if they are unsold.</p></li>
-<li><p>Height must exceed width by a certain amount.</p></li>
-<li><p>Among the American stadard sizes, the smallest allowed by Novelette is
-<code>width=5in,height=8in</code> and the largest is <code>width=6in,height=9in</code>.</p></li>
-<li><p>Among the British standard sizes, the smallest allowed by Novelette is
-<code>width=129mm,height=198mm</code> (B-format), and the largest is
-<code>width=156,height=234</code> (Royal).</p></li>
-<li><p>American print services often list width before height, but British print services often
-list height before width. In the <code>\trimsize</code> command, the order does
-not matter.</p></li>
-<li><p>No cheating! Novelette fails if you attempt to use a trim size outside its limits.</p></li>
-<li><p>Default trim size is <code>width=5.5in,height=8.5in</code>, which is often used for
-such books in the USA. If you are American, this is probably your best choice. The closest
-British size is <code>width=138mm,height=216mm</code> (Demy).</p></li>
-<li><p>Web sites may claim that "most books" are 6in x 9in or larger. But that is because
-"most books" are either nonfiction how&#8209;to manuals, textbooks, or hardcover library books.
-Softcover popular fiction is rarely that large.</ul>
+<ul><li>
+  <p>The width and height are measured with units of inches or millimeters. The same units
+     must be used for both. Use <code>in</code> for inches, <code>mm</code> for millimeters.</p>
+</li><li>
+  <p>Use only standard sizes offered by your print service, with off&#8208;white
+     (cream, creme) paper. Never use white paper for popular fiction.</p>
+</li><li>
+  <p>Avoid "extended distribution" (whatever it is named). You do not want booksellers to be
+     ordering copies at <i>your</i> cost if they are unsold.</p>
+</li><li>
+  <p>Height must exceed width by a certain amount.</p>
+</li><li>
+  <p>Among the American stadard sizes, the smallest allowed by Novelette is
+     <code>width=5in,height=8in</code> and the largest is <code>width=6in,height=9in</code>.</p>
+</li><li>
+  <p>Among the British standard sizes, the smallest allowed by Novelette is
+     <code>width=129mm,height=198mm</code> (B-format), and the largest is
+     <code>width=156,height=234</code> (Royal).</p>
+</li><li>
+  <p>American print services often list width before height, but British print services often
+     list height before width. In the <code>\trimsize</code> command, the order does
+     not matter.</p>
+</li><li>
+  <p>No cheating! Novelette fails if you attempt to use a trim size outside its limits.</p>
+</li><li>
+  <p>Default trim size is <code>width=5.5in,height=8.5in</code>, which is often used for
+     such books in the USA. If you are American, this is probably your best choice. The closest
+     British size is <code>width=138mm,height=216mm</code> (Demy).</p>
+</li><li>
+  <p>Web sites may claim that "most books" are 6in x 9in or larger. But that is because
+     "most books" are either nonfiction how&#8209;to manuals, textbooks, or hardcover library
+     books. Softcover popular fiction is rarely that large.</p>
+</li></ul>
 
 
 <p><a id="layout"></a>&nbsp;</p>
@@ -241,127 +268,152 @@ Softcover popular fiction is rarely that large.</ul>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>This determines the general layout of page headers/footers and main text. Novelette
 automatically sets the margins and main font size; you cannot set them manually.</p>
-<ul>
-<li><p><code><i>L</i></code> is an integer from 28 to 35. Default <code>35</code>.</p>
-    <p>This sets the lines per page, in main textblock (not including header/footer).</p></li>
-<li><p><code><i>P</i></code> is one of <code>plain split center margin marcen</code>.
-    Default <code>marcen</code>.</p>
-    <p>This determines whether layout has page header, footers, or both. See the
-    <a href="running-headers.html">header/footer layouts</a> for illustrations.</p></li>
-<li><p><code><i>G</i></code> is either <code>normal</code> or <code>wide</code>
-    Default <code>normal</code>.</p>
-    <p>Normally, Novelette reserves an extra width of 0.125in (3.2mm) at the spine margin,
-    for binding glue. If your book has many pages (such as 300), the <code>wide</code> setting
-    will make the reserved area 50% wider.</p></li>
-<li><p><i>C</i> is a number from 62 to 72. May be decimal. Default <code>66</code>.</p>
-    <p>In English, and probably most other Western European languages, flowing text
-    is most readable when the lines do not contain too many or too few characters.</p>
-    <p>This sets the average number of characters per line. It is an estimate. Only change
-    the value if your writing style must accomodate many long words, or if you need to print
-    more or fewer pages. If in doubt, do not set it.</p></li>
-</ul>
-
-
-<p><a id="pdfx"></a>&nbsp;</p>
-<h4 class="section">PDF/X-1a:2001 Format: \pdfx{<i>choice</i>}</h4>
-<h4 class="link"><a href="#top">
-<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
-<p>Novelette has built-in capability for PDF/X-1a:2001 format. This is preferred by many
-print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
-<ul>
-<li><p>The <i>choice</i> is one of <code>fogra swop off</code>, known as
-<i>Output Intent</i>.</p></li>
-<li><p>If your language is American English (default, or <code>en-US</code>) then the
-default choice is <code>swop</code>. For all other languages, including British English,
-the default choice is <code>fogra</code>.</p></li>
-<li><p><code>swop</code> refers to <i>CGATS TR 001</i>, better known as
-"U.S. Web Coated (SWOP) v2".</p></li>
-<li><p><code>fogra</code> refers to FOGRA39.</p></li>
-<li><p><code>off</code> disables PDF/X, by omitting its required metadata. Otherwise,
-it prints the same.</p></li>
-<li><p>The PDF/X-1a:2001 specification was created for use in color offset printing.
-Its Output intent (swop or fogra) is irrelevant for your purposes, and will be ignored by the
-print service. But since it is part of the spec, it must be provided, unless you do not
-want PDF/X-1a:2001.</p></li>
-<li><p>Novelette does not name or attach an <i>icc</i> color profile.
-Ink is 100K (black) only. Grayscale images are rasterized by the printer, using methods
-that are beyond your control.</p></li>
-</ul>
+<ul><li>
+  <p><code><i>L</i></code> is an integer from 28 to 35. Default <code>35</code>.</p>
+  <p>This sets the lines per page, in main textblock (not including header/footer).</p>
+</li><li>
+  <p><code><i>P</i></code> is one of <code>plain split center margin marcen</code>.
+     Default <code>marcen</code>.</p>
+  <p>This determines whether layout has page header, footers, or both. See the
+     <a href="running-headers.html">header/footer layouts</a> for illustrations.</p>
+</li><li>
+  <p><code><i>G</i></code> is either <code>normal</code> or <code>wide</code>
+     Default <code>normal</code>.</p>
+  <p>Normally, Novelette reserves an extra width of 0.125in (3.2mm) at the spine margin,
+     for binding glue. If your book has many pages (such as 300), the <code>wide</code> setting
+     will make the reserved area 50% wider.</p>
+</li><li>
+  <p><i>C</i> is a number from 62 to 72. May be decimal. Default <code>66</code>.</p>
+  <p>In English, and probably most other Western European languages, flowing text
+     is most readable when the lines do not contain too many or too few characters.</p>
+  <p>This sets the average number of characters per line. It is an estimate. Only change
+     the value if your writing style must accomodate many long words, or if you need to print
+     more or fewer pages. If in doubt, do not set it.</p>
+</li></ul>
 
 
 <p><a id="headstyle"></a>&nbsp;</p>
-<h4 class="section">Page header Style</h4>
+<h4 class="section">Page Header Style</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The <code>\layout</code> setting determines whether or not there are page headers
 and/or footers. The <code>\headstyle</code> command determines how they appear. This is a global
-setting with no local over-ride, although header/footer does not print in some locations.</p>
+setting with no local over-ride.</p>
 <p><code>\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
-                        -->deco=<i>D</i>,case=<i>C</i>}</code></p>
-<ul>
-  <li><p><i>F</i> is a <a href="">font code</a>. Default <code>main</code>.</p></li>
-  <li><p><i>S</i> is a decimal number 0.88 - 1. Default <code>0.94</code>.</p></li>
-  <li><p><i>T</i> is an integer 0-9. Tracking, from tight to very loose.
-      Default <code>2</code>.</p></li>
-  <li><p><i>D</i> is one of <code>none bar square bullet lozenge</code>.
-      <p>Default varies with font and layout.</p>
-      <p>If layout pagestyle is <code>center</code>,
-      then <code>none</code> is actually a slash.</p></li>
-  <li><p><i>C</i> is one of <code>none titl smcp onum smon</code>. Default <code>none</code>.</p>
-      <p>Ignored unless header font is <code>main</code>.</p></li>
-    <ul>
-      <li><p>none <img src="images/pointer.svg" height="16" width="16" alt=""/>
-          No changes. Default.</p></li>
-      <li><p>titl <img src="images/pointer.svg" height="16" width="16" alt=""/>
-          Lowercase letters become titling caps.</p></li>
-      <li><p>smcp <img src="images/pointer.svg" height="16" width="16" alt=""/>
-          Lowercase letters become small caps.</p></li>
-      <li><p>onum <img src="images/pointer.svg" height="16" width="16" alt=""/>
-          Numerals become oldstyle.</p></li>
-      <li><p>smon <img src="images/pointer.svg" height="16" width="16" alt=""/>
-          Combines smcp and onum.</p></li>
-    </ul>
-</ul>
+   -->deco=<i>D</i>,case=<i>C</i>}</code></p>
+<ul><li>
+  <p><i>F</i> is a <a href="">font code</a>. Default <code>main</code>.</p>
+</li><li>
+  <p><i>S</i> is a decimal number 0.88 - 1. Default <code>0.94</code>.</p>
+</li><li>
+  <p><i>T</i> is an integer 0-9. Tracking, from tight to very loose.
+     Default <code>2</code>.</p>
+</li><li>
+  <p><i>D</i> is one of <code>none bar square bullet lozenge</code>.
+     Default varies with font and layout.</p>
+  <p>If layout pagestyle is <code>center</code>,
+     then <code>none</code> is actually a slash.</p>
+</li><li>
+  <p><i>C</i> is one of <code>dflt none titl smcp onum smon</code>.</p>
+  <ul><li>
+    <p>dflt <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Uppercase and lowercase become titling caps. This is a very popular general-purpose
+       style. Default when font=main, otherwise ignored.</p>
+</li><li>
+    <p>none <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Does not change letters or numerals. Default when font is not main.</p>
+  </li><li>
+    <p>titl <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Lowercase letters become titling caps. Ignored unless font=main.</p>
+  </li><li>
+    <p>smcp <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Lowercase letters become small caps. Ignored unless font=main.</p>
+  </li><li>
+    <p>onum <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Numerals become oldstyle. Ignored unless font=main.</p>
+   </li><li>
+    <p>smon <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Combines smcp and onum. Ignored unless font=main.</p>
+  </li></ul>
+</li></ul>
+<p class="noindent">Although it is not popular nowadays, some books use page headers with
+the author's name Italic, and the book title Regular. This is only possible if you choose
+font=main, and <i>do not</i> choose case=dflt or case=titl.</p>
+
+
+<p><a id="vrhead"></a>&nbsp;</p>
+<h4 class="section">Page Header Texts</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>If your layout uses page headers, these commands set the text that appears in them:</p>
+<p><code>\versohead{<i>Text at Verso (Left) Page Head</i>}</code></p>
+<p><code>\rectohead{<i>Text at Recto (Right) Page Head</i>}</code></p>
+<ul><li>
+  <p>The texts do not include page numbers; those are placed automatically.</p>
+</li><li>
+  <p>Defaults are <i>Untitled Document</i> and <i>Anonymous Author</i>. If your layout
+     uses page headers, and you do not set these texts to something else, then you cannot
+     proceed to preview or final mode.</p>
+</li><li>
+  <p>The texts are limited to the same characters set used by metadata. If you use any
+     of @ # &amp; they must be escaped by backslash.</p>
+</li><li>
+  <p>If you wish to print either page header in Italics, Use <code>\textit</code> as usual,
+     within <code>\versohead</code> or <code>\rectohead</code>. However, Italics are ignored
+     unless the header font is main, and the header case <i>is not</i> dflt or titl.</p>
+</li><li>
+  <p>Print-on-demand normally requires that the book title and author by the same wherever
+     they appear. That includes page headers (except on pages where no header prints).
+     Novelette allows you to reset the header texts, following any <code>\begin{component}</code>.
+     But you should not do that, unless you are certain that your print service allows it.</p>
+</li></ul>
 
 
 <p><a id="styles"></a>&nbsp;</p>
-<h4 class="section">Default \styleN style (N=0-9)</h4>
+<h4 class="section">Default \styleN Styles (N=0-9)</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The <code>\styleN</code> commands (N=0-9) are one way to style text,
 in <a href="components.html#display">display zones</a>.
 This sets the default appearance. You may locally over-ride any of these, by
 per-instance option of the related <code>\styleN</code> command.</p>
-<p><code>\styleN{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
-                        -->align=<i>A</i>,case=<i>C</i>}</code></p>
-<ul>
-<li><p><code><i>F</i></code> is a <a href="">font code</a>. Default <code>main</code>.</p></li>
-<li><p><code><i>S</i></code> is a decimal number 1-4. Default <code>2</code>.</p>
-    <p>If followed by <code>a</code> (such as <code>2.7a</code>) it will auto-adjust
-    <i>slightly</i> wide content.</p></li>
-<li><p><code><i>T</i></code> is an integer 0-9. Tracking, tight-loose.
-    Default <code>2</code>.</p></li>
-<li><p><code><i>A</i></code> is one of <code>center left right</code>.
-    Default <code>center</code>.</p></li>
-<li><p><code><i>L</i></code> is one of <code>none above below both</code>.
-    Default <code>none</code>.</p>
-    <p>Prints decorative line(s) above/below text, at its width.</p></li>
-<li><p><code><i>C</i></code> is one of <code>none titl smcp onum smon</code>.
-    Default <code>none</code>.</p>
-    <p>Ignored unless font is <code>main</code>.</p>
-    <ul>
-    <li><p><code>none</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-        No changes. Default.</p></li>
-    <li><p><code>titl</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-        Lowercase letters become titling caps.</p></li>
-    <li><p><code>smcp</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-        Lowercase letters become small caps.</p></li>
-    <li><p><code>onum</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-        Numerals become oldstyle.</p></li>
-    <li><p><code>smon</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-        Combines smcp and onum.</p></li>
-    </ul></li>
-</ul>
+<p><code>\setstyleN{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
+   -->align=<i>A</i>,case=<i>C</i>}</code></p>
+<ul><li>
+  <p><code><i>F</i></code> is a <a href="">font code</a>. Default <code>main</code>.</p>
+</li><li>
+  <p><code><i>S</i></code> is a decimal number 1-4. Default <code>2</code>.</p>
+</li><li>
+  <p><code><i>T</i></code> is an integer 0-9. Tracking, tight-loose.
+     Default <code>2</code>.</p>
+</li><li>
+  <p><code><i>A</i></code> is one of <code>center left right</code>.
+     Default <code>center</code>.</p>
+</li><li>
+  <p><code><i>L</i></code> is one of <code>none above below both</code>.
+     Default <code>none</code>.</p>
+  <p>Prints decorative line(s) above/below text, at its width.</p>
+</li><li>
+  <p><code><i>C</i></code> is one of <code>none titl smcp onum smon</code>.
+     Default <code>none</code>.</p>
+  <p>Ignored unless font is <code>main</code>.</p>
+  <ul><li>
+    <p><code>none</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       No changes. Default.</p>
+  </li><li>
+    <p><code>titl</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Lowercase letters become titling caps.</p>
+  </li><li>
+    <p><code>smcp</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Lowercase letters become small caps.</p>
+  </li><li>
+    <p><code>onum</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Numerals become oldstyle.</p>
+  </li><li>
+    <p><code>smon</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Combines smcp and onum.</p>
+  </li></ul>
+</li></ul>
 
 
 <p><a id="scenestyle"></a>&nbsp;</p>
@@ -371,10 +423,10 @@ per-instance option of the related <code>\styleN</code> command.</p>
 <p>This sets the global alignment of the <code>\scene</code> command. There is no
 local over-ride.</p>
 <p><code>\scenestyle{align=<i>A</i>}</code>.</p>
-<ul>
-  <li><p><code><i>A</i></code> is one of <code>left right center</code>.
-      Default <code>left</code>.</p></li>
-</ul>
+<ul><li>
+  <p><code><i>A</i></code> is one of <code>left right center</code>.
+      Default <code>left</code>.</p>
+</li></ul>
 
 
 <p><a id="footnotestyle"></a>&nbsp;</p>
@@ -384,20 +436,56 @@ local over-ride.</p>
 <p>This sets the appearance at the start of each footnote. If a footnote has more than
 one paragraph, the additional paragraphs are indented normally.</p>
 <p><code>\footnotestyle{indent=<i>I</i>}</code></p>
-<ul>
-<li><p><code><i>I</i></code> is one of <code>near away both none.</code>
-    Default <code>near</code>.</p>
-<ul>
-  <li><p><code>near</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-      Text at indent, label and space just before it.</p></li>
-  <li><p><code>away</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-      Label at margin, big space, text at indent.</p></li>
-  <li><p><code>both</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-      Label at indent, space, text.</p></li>
-  <li><p><code>none</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-      Label at margin, space, text.</p></li>
-</ul></li>
-</ul>
+<ul><li>
+  <p><code><i>I</i></code> is one of <code>near away both none.</code>
+     Default <code>near</code>.</p>
+  <ul><li>
+    <p><code>near</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Text at indent, label and space just before it.</p>
+  </li><li>
+    <p><code>away</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Label at margin, big space, text at indent.</p>
+  </li><li>
+    <p><code>both</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Label at indent, space, text.</p>
+  </li><li>
+    <p><code>none</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+       Label at margin, space, text.</p>
+  </li></ul>
+</li></ul>
+
+
+<p><a id="pdfx"></a>&nbsp;</p>
+<h4 class="section">PDF/X-1a:2001 Format: \pdfx{<i>choice</i>}</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Novelette has built-in capability for PDF/X-1a:2001 format. This is preferred by many
+print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
+<ul><li>
+  <p>The <i>choice</i> is one of <code>fogra swop off</code>, known as
+     <i>Output Intent</i>.</p>
+</li><li>
+  <p>If your language is American English (default, or <code>en-US</code>) then the
+     default choice is <code>swop</code>. For all other languages, including British English,
+     the default choice is <code>fogra</code>.</p>
+</li><li>
+  <p><code>swop</code> refers to <i>CGATS TR 001</i>, better known
+     as "U.S. Web Coated (SWOP) v2".</p>
+</li><li>
+  <p><code>fogra</code> refers to FOGRA39.</p>
+</li><li>
+  <p><code>off</code> disables PDF/X, by omitting its required metadata. Otherwise,
+     it prints the same.</p>
+</li><li>
+  <p>The PDF/X-1a:2001 specification was created for use in color offset printing.
+     Its Output intent (swop or fogra) is irrelevant for your purposes, and will be ignored by the
+     print service. But since it is part of the spec, it must be provided, unless you do not
+     want PDF/X-1a:2001.</p>
+</li><li>
+  <p>Novelette does not name or attach an <i>icc</i> color profile.
+     Ink is 100K (black) only. Grayscale images are rasterized by the printer, using methods
+     that are beyond your control.</p>
+</li></ul>
 
 
 <p><a id="enable"></a>&nbsp;</p>
@@ -405,74 +493,81 @@ one paragraph, the additional paragraphs are indented normally.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Each of these choices enables some optional behavior:</p>
-<ul>
-<li><p><code>xmp</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-Adds an XMP metadata packet. The technology used by Novelette
-stores metadata in a PDF Info dictionary, because it is required by the long-established
-standard for print-on-demand. If your print service requests XMP metadata, then enable it.
-If the service asks for PDF "without metadata" they mean that you should <i>not</i>
-enable this.</p></li>
-<li><p><code>guide=<i>G</i></code>
-<img src="images/pointer.svg" height="16" width="16" alt=""/>
-<i>G</i> is an integer, from 0 to lines per page. This places a guide
-marker in the left margin, at the indicated line number. The guide is only placed on the
-first page of each component. Value 0 means no guide.</p>
-<p>This is useful for vertically aligning the start of main text, beneath new chapter displays.
-The marker is "g" with an arrow pointing to the correct text baseline. Note that this does
-not force the text position; you must align it yourself.</p></li>
-<li><p><code>britq</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-If you type <code>```</code> or <code>'''</code> then Novelette
-will interpret the triple characters as American-style quotes: double on the outside,
-single inside, with a narrow nonbreaking space between them.</p>
-<p>When you enable <code>britq</code>, this interpretation is reversed, to single outside,
-double inside. Note that isolated quotes are not transformed
-<span class="nowrap">single<&#8209;>double.</span>
-The interpetation only applies to triple characters.</p>
-<p>Note: Unlike other LaTeX, Novelette does not change <code>"</code> to curly quotes.
-See the <a href="quotes.html">quotes page</a> for details.</p></li>
-</ul>
+<ul><li>
+  <p><code>xmp</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Adds an XMP metadata packet. The technology used by Novelette
+     stores metadata in a PDF Info dictionary, because it is required by the long-established
+     standard for print-on-demand. If your print service requests XMP metadata, then enable it.
+     If the service asks for PDF "without metadata" they mean that you should <i>not</i>
+     enable this.</p>
+</li><li>
+  <p><code>guide=<i>G</i></code>
+     <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     <i>G</i> is an integer, from 0 to lines per page. This places a guide
+     marker in the left margin, at the indicated line number. The guide is only placed on the
+     first page of each component. Value 0 means no guide.</p>
+  <p>This is useful for vertically aligning the start of main text, beneath new chapter
+     displays. The marker is "g" with an arrow pointing to the correct text baseline. Note that
+     this does not force the text position; you must align it yourself.</p>
+</li><li>
+  <p><code>britq</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     If you type <code>```</code> or <code>'''</code> then Novelette
+     will interpret the triple characters as American-style quotes: double on the outside,
+     single inside, with a narrow nonbreaking space between them.</p>
+  <p>When you enable <code>britq</code>, this interpretation is reversed, to single outside,
+     double inside. Isolated quotes are not transformed
+     single<&#8209;>double. The interpetation only applies to triple characters.</p>
+  <p>Note: Unlike other LaTeX, Novelette does not change <code>"</code> to curly quotes.
+     See the <a href="ligatures.html">ligatures page</a> for details.</p>
+</li></ul>
+
 
 <p><a id="disable"></a>&nbsp;</p>
 <h4 class="section">\disable{<i>comma,separated,choices</i>}</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Each of these choices disables some standard behavior:</p>
-<ul>
-<li><p><code>guide</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-Hides all guides, whether global or local. Note that guides
-only print in draft mode.</p></li>
-<li><p><code>renumber</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-Normally, Novelette begins frontmatter with lowercase roman
-numeral <code>i</code>, then resets to arabic <code>1</code> at mainmatter. This is standard
-book design. The PDF page numbers (seen in the menu bar of a PDF viewer) will not be the same as
-the printed page numbers. If you disable renumber, then arabic numerals will be used throughout,
-from <code>1</code> at frontmatter, without reset at mainmatter. Then, the PDF viewer shows
-page numbers the same as they will print.</p></li>
-<li><p><code>blankend</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-Most print services require PDF with an even number
-of pages, with the last page entirely blank. Novelette automatically does that. When you
-disable <code>blankend</code>, no pages are added.</p></li>
-<li><p><code>pageflip</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-Only obeyed in draft mode. Normally, the side margins shift from
-left to right, due to the spine glue strip width. That causes the textblock to shift back
-and forth, which is distracting when you edit. If you disable <code>pageflip</code>, the glue
-width is split, so the textblock does not shift. Typesetting is unaffected:
-same line and page breaks.</p></li>
-<li><p><code>autodeco</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-The transition frontmatter/mainmatter requires that the final
-page of frontmatter be blank verso. Normally, you do this yourself. But if Novelette detects
-that your frontmatter ends with non&#8209;blank verso, it will automatically insert
-a decorative recto page, followed by blank verso. Also applies at mainmatter/backmatter
-transition. When you disable <code>autodeco</code>, no pages are inserted.</p>
-<p>Best practice is to allow autodeco. When you review your PDF, you will notice if the
-decorative page was added. You might decide that you like it! But if you do not like it,
-it is better to create your own page there, instead of disabling autodeco.</p></li>
-<li><p><code>metasub</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-If your book has a subtitle, Novelette creates a custom
-PDF Info dictionary entry for that purpose. And if you enable XMP, the subtitle is written
-using Prism namespace. If your print service does not like that, disable <code>metasub</code>
-to remove Info and Prism metadata for subtitle.</p></li>
-</ul>
+<ul><li>
+  <p><code>guide</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Hides all guides, whether global or local. Note that guides
+     only print in draft mode.</p>
+</li><li>
+  <p><code>renumber</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Normally, Novelette begins frontmatter with lowercase roman numeral
+     <code>i</code>, then resets to arabic <code>1</code> at mainmatter. This is standard
+     book design. The PDF page numbers (seen in the menu bar of a PDF viewer) will not be
+     the same as the printed page numbers. If you disable renumber, then arabic numerals
+     will be used throughout, from <code>1</code> at frontmatter, without reset at mainmatter.
+     Then, the PDF viewer shows page numbers the same as they will print.</p>
+</li><li>
+  <p><code>blankend</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Most print services require PDF with an even number of pages, with the last page
+     entirely blank. Novelette automatically does that. When you disable <code>blankend</code>,
+     no pages are added.</p>
+</li><li>
+  <p><code>pageflip</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Only obeyed in draft mode. Normally, the side margins shift from left to right, due to the
+     spine glue strip width. That causes the textblock to shift back and forth, which is
+     distracting when you edit. If you disable <code>pageflip</code>, the glue
+     width is split, so the textblock does not shift. Typesetting is unaffected:
+     same line and page breaks.</p>
+</li><li>
+  <p><code>autodeco</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     The transition frontmatter/mainmatter requires that the final
+     page of frontmatter be blank verso. Normally, you do this yourself. But if Novelette detects
+     that your frontmatter ends with non&#8209;blank verso, it will automatically insert
+     a decorative recto page, followed by blank verso. Also applies at mainmatter/backmatter
+     transition. When you disable <code>autodeco</code>, no pages are inserted.</p>
+  <p>Best practice is to allow autodeco. When you review your PDF, you will notice if the
+     decorative page was added. You might decide that you like it! But if you do not like it,
+     it is better to create your own page there, instead of disabling autodeco.</p>
+</li><li>
+  <p><code>metasub</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     If your book has a subtitle, Novelette creates a custom
+     PDF Info dictionary entry for that purpose. And if you enable XMP, the subtitle is written
+     using Prism namespace. If your print service does not like that, disable <code>metasub</code>
+     to remove Info and Prism metadata for subtitle.</p>
+</li></ul>
 
 
 <p><a id="examine"></a>&nbsp;</p>

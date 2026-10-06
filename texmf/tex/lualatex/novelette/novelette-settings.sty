@@ -255,46 +255,64 @@
 
 
 %% CONTENT OF HEADER TEXTS:
-%%   If layout uses a header, these settings determine what prints there. Regardless of layout,
-%% default behavior does not print headers in frontmatter or backmatter, or above the first page
-%% of a component (for these, local over-ride with component option).
-%%   The header texts may use commands such as \smcp and \textit, in the usual fashion. They will
-%% be applied if the header font has them; otherwise, they will be silently ignored.
+%%   If layout uses a header, these settings determine what prints in the header text. Does not
+%% affect page numbers.
+%%   Regardless of layout, default behavior does not print headers in frontmatter or backmatter,
+%% or above the first page of a component (for these, local over-ride with component option).
+%%   The header texts may not use commands such as \smcp or \onum. These are controlled by the
+%% \headstyle{case=C}. Once upon a time, some books put the author name in Italics, but this
+%% is out of fashion. Novelette will not use Italics in page headers; if you write \textit
+%% it will be silently ignored.
 %%   Most print-on-demand services insist that the title and author be the same, wherever they
 %% are printed. That includes page headers. For most popular fiction novels, this is not an issue.
-%% So \versohead and \rectohead are global, and cannot be changed locally (other than empty).
+%% Default \vrheadtext is a global setting that cannot be changed locally (other than empty).
 %%   That could be an issue if your book is a collection of short stories, because you cannot
 %% locally change headers to match story titles or authors. In this case, choose a book title
 %% that generically encompasses all of the stories, such as "Tales From Whereville" or
 %% "Twenty Escapes", and perhaps list official author as editor: "Joe Schmo, Ed.".
 %%   Traditional publishing allows changing headers, because copies are made in a production run,
 %% and persons familiar with the book can inspect the results. P.O.D. does not do it that way.
-\def\nvt@versohead{Verso Header Text} %% Default.
-\def\nvt@rectohead{Recto Header Text} %% Default.
-\newif\ifnvt@didversohead
-\newif\ifnvt@didrectohead
-\DeclareDocumentCommand\versohead{m}{%% Ignored when page payout has no header.
-  \ifnvt@didversohead
-    \nvt@warn{Multiple setting for \string\versohead\space in preamble, or in same component.^^J%%
-       First obeyed, others ignored.}
-  \fi
-  \nvt@didversoheadtrue
-  \def\nvt@versohead{#1}
+%% But if your P.O.D. service allows it, or if your book will be printed as production run,
+%% use option [local] in preamble, and at each change. That permits you to use these commands
+%% just below \begin{component}, and they will apply only to that component.
+\newif\ifnvt@didvrheadtext
+\newif\ifnvt@allowvrchange %% True if local changes to header text allowed.
+\gdef\nvt@versohead{}\gdef\nvt@rectohead{}
+\DeclareDocumentCommand\vrheadtext{O{}mm}{%% Parsed but ignored, when page layout has no header.
+  \directlua{nvt.parsevrheadtext('\luaescapestring{#1}')}%% Do not parse #2 or #3.
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@err{Did not understand \string\vrheadtext\space option.^^J%%
+      \spii Normally, do not set the option.^^J%%
+      \spii If [local] in preamble, permits [local] for components.^^J%%
+      \spii Do not use [local] unless you know what you are doing.}%%
+  \fi%%
+  \ifnum\tmpreturn=2\relax%%
+    \ifnvt@inpreamble\global\nvt@allowvrchangetrue\else\nvt@allowvrchangetrue\fi%%
+  \fi%%
+  \ifnum\tmpreturn>0\relax%%
+    \ifnvt@didvrheadtext%%
+      \nvt@warn{Multiple settings for \string\vrheadtext\space in preamble,^^J%%
+          or in same component. First obeyed, others ignored.}%%
+    \else%%
+      \ifnvt@inpreamble%%
+        \gdef\nvt@versohead{#2}\gdef\nvt@rectohead{#3}%%
+      \else%%
+        \ifnvt@indisplay%%
+          \ifnvt@allowvrchange%%
+            \def\nvt@versohead{#2}\def\nvt@rectohead{#3}%%
+          \else%%
+            \nvt@warn{Local change of \string\vrheadtext\space is prohibited,^^J%%
+              \spii unless its preamble setting has option [local],^^J%%
+              \spii and each local setting also has option [local].}%%
+          \fi%%
+        \else%%
+          \nvt@warn{Local \string\vrheadtext\space may only be set in display zone.}%%
+        \fi%%
+      \fi%%
+    \fi%%
+  \fi%%
+  \nvt@didvrheadtexttrue%%
 }%%
-\DeclareDocumentCommand\rectohead{m}{%% Ignored when page payout has no header.
-  \ifnvt@didrectohead
-    \nvt@warn{Multiple setting for \string\rectohead\space in preamble, or in same component.^^J%%
-       First obeyed, others ignored.}
-  \fi
-  \nvt@didrectoheadtrue
-  \def\nvt@rectohead{#1}%%
-}%%
-%% Hackers: If you comment-out the following two \@onlypreamble, and you comment-out the above
-%% lines \nvt@didversoheadtrue, and \nvt@didrectoheadtrue, then you can re-set the header texts
-%% using \versohead and \rectohead between components. Do that at your own risk!
-%% Print-on-demand often insists that page header texts must not change.
-%%%%%\@onlypreamble\versohead
-%%%%%\@onlypreamble\rectohead
 %%
 
 
@@ -304,9 +322,7 @@
   \nvt@fatal{Do not write \string\setstyle{N}{setting}.^^J%%
     \spii Write \string\setstyleN{setting} with N=1-9.}%%
 }%%
-\def\setstyle{%%
-  \@ifnextchar\bgroup\nvt@badsetstyle\nvt@setstylecmd
-}%%
+\def\setstyle{\@ifnextchar\bgroup\nvt@badsetstyle\nvt@setstylecmd}%%
 \DeclareDocumentCommand\nvt@setstylecmd{mm}{%%
   \directlua{nvt.parsesetstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
   %%%% get the space
@@ -331,14 +347,15 @@
 }%%
 \setstyle0{font=main,scale=1,track=0,align=center,case=none} %% developer test.
 %%
-\DeclareDocumentCommand\sethead{m}{%%
-  \directlua{nvt.parsesethead('\luaescapestring{#1}')}
+\def\nvt@headspaceskip{.21em} %% Default, for Serif.
+\DeclareDocumentCommand\headstyle{m}{%%
+  \directlua{nvt.parseheadstyle('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\sethead. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\headstyle. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\sethead.^^J%%
-      \spii Format: \sethead{font=F,scale=S,track=T,deco=D,case=C}^^J%%
+    \nvt@err{Bad setting for \string\headstyle.^^J%%
+      \spii Format: \headstyle{font=F,scale=S,track=T,deco=D,case=C}^^J%%
       \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
       \spix Default main.^^J%%
       \spiv S -> Decimal number 0.83-1. Default 0.93.^^J%%
@@ -354,31 +371,31 @@
       \spix none -> No changes.}%%
   \fi
 }%%
-\sethead{font=main,scale=0.93,track=2,deco=bar,case=dflt}
-\directlua{nvt.didsethead=0}
+\headstyle{font=main,scale=0.93,track=2,deco=bar,case=dflt}
+\directlua{nvt.didheadstyle=0}
 %%
-\DeclareDocumentCommand\setscene{m}{%%
-  \directlua{nvt.parsesetscene('\luaescapestring{#1}')}
+\DeclareDocumentCommand\scenestyle{m}{%%
+  \directlua{nvt.parsescenestyle('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\setscene. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\scenestyle. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\setscene.^^J%%
-      \spii Format: \string\setscene{align=A}^^J%%
+    \nvt@err{Bad setting for \string\scenestyle.^^J%%
+      \spii Format: \string\scenestyle{align=A}^^J%%
       \spiv A -> left right center. Default center.}%%
   \fi
 }%%
-\setscene{align=center} %% Default
-\directlua{nvt.didsetscene=0}
+\scenestyle{align=center} %% Default
+\directlua{nvt.didscenestyle=0}
 %%
-\DeclareDocumentCommand\setfootnote{m}{%%
-  \directlua{nvt.parsesetfootnote('\luaescapestring{#1}')}
+\DeclareDocumentCommand\footnotestyle{m}{%%
+  \directlua{nvt.parsefootnotestyle('\luaescapestring{#1}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate setting for \string\setfootnote. First obeyed, others ignored.}
+    \nvt@warn{Duplicate setting for \string\footnotestyle. First obeyed, others ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad setting for \string\setfootnote.^^J%%
-      \spii Format: \string\setfootnote{indent=I}^^J%%
+    \nvt@err{Bad setting for \string\footnotestyle.^^J%%
+      \spii Format: \string\footnotestyle{indent=I}^^J%%
       \spiv I -> near away both none. Default near.^^J%%
       \spix near -> Text at indent, label and space just before it.^^J%%
       \spix away -> Label at margin, big space, text at indent.^^J%%
@@ -386,13 +403,13 @@
       \spix none -> Label at margin, space, text.}%%
   \fi
 }%%
-\setfootnote{indent=near} %% Default.
-\directlua{nvt.didsetfootnote=0}
+\footnotestyle{indent=near} %% Default.
+\directlua{nvt.didfootnotestyle=0}
 %%
-\@onlypreamble\sethead
+\@onlypreamble\headstyle
 \@onlypreamble\setstyle
-\@onlypreamble\setscene
-\@onlypreamble\setfootnote
+\@onlypreamble\scenestyle
+\@onlypreamble\footnotestyle
 %%
 
 
@@ -487,6 +504,8 @@
 \newif\ifnvt@nometasub
 \newif\ifnvt@noguide
 \def\disable#1{%%
+  \def\tmpnoblankend{0}\def\tmpnorenumber{0}\def\tmpnopageflip{0}
+  \def\tmpnoautodeco{0}\def\tmpnometasub{0}\def\tmpnoguide{0}
   \directlua{nvt.parsedisable('\luaescapestring{#1}')}
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\disable.^^J%%
@@ -494,6 +513,12 @@
       \spiv Choices: blankend renumber pageflip autodeco metasub guide^^J%%
       \spix If you \string\disable{guide}, it over-rides \string\enable{guide=G}.}%%
   \fi
+  \ifnum\tmpnoblankend=1\relax\global\nvt@noblankendtrue\fi
+  \ifnum\tmpnorenumber=1\relax\global\nvt@norenumbertrue\fi
+  \ifnum\tmpnopageflip=1\relax\global\nvt@nopagefliptrue\fi
+  \ifnum\tmpnoautodeco=1\relax\global\nvt@noautodecotrue\fi
+  \ifnum\tmpnometasub=1\relax\global\nvt@nometasubtrue\fi
+  \ifnum\tmpnoguide=1\relax\global\nvt@noguidetrue\fi
 }%%
 \@onlypreamble\disable
 %%
@@ -504,14 +529,21 @@
 %% It reports "flaws" in a separate text file. This is time-consuming, so do not set \examine
 %% until you are near completion. 
 \newif\ifnvt@examine
+\newif\ifnvt@didexamine
 \DeclareDocumentCommand\examine{m}{%% Choice 1 or 0 (on/off).
-  \directlua{parseexamine('\luaescapestring{#1}')}
-  \ifnum\tmpreturn=-1\relax
-    \nvt@warn{Duplicate settings for \string\examine. First obeyed, others ignored.}
+  \begingroup\def\tmpreturn{1}
+  \ifnvt@didexamine
+    \nvt@warn{Multiple \string\examine\space in preamble. First obeyed, others ignored.}
+  \else
+    \directlua{nvt.parseexamine('\luaescapestring{#1}')}
+    \ifnum\tmpreturn=1\relax
+      \ifnum\tmpex=1\global\nvt@examinetrue\fi
+    \else
+      \nvt@fatal{Bad choice for \string\examine{choice}. Choose 0 or 1. Default 0.}
+    \fi
   \fi
-  \ifnum\tmpreturn=0\relax
-    \nvt@err{Bad choice for \string\examine{choice}. Either 1 or 0. Default 0.}
-  \fi
+  \endgroup
+  \global\nvt@didexaminetrue
 }%%
 \@onlypreamble\examine
 %%
@@ -588,7 +620,7 @@
 \long\def\center{\nvt@warn{%%
   \spii The center environment, and \string\centering, cannot be used in Novelette.^^J%%
   \spii The block environment has [align=center] option, which serves that purpose.^^J%%
-  \spii \string\setstyleN (N = 1 2 3 4), and \string\setscene, allow {align=center}.^^J%%
+  \spii \string\setstyleN (N = 1 2 3 4), and \string\scenestyle, allow {align=center}.^^J%%
   \spii \string\styleN, \string\scene, and \string\image\space allow [align=center].}%%
 }%%
 \let\endcenter\par
