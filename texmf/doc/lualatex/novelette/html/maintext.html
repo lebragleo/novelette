@@ -64,34 +64,51 @@ of <code>\baselineskip</code>, not <code>pt</code>, like this:</p>
 
 
 <p><a id="init"></a>&nbsp;</p>
-<h4 class="section">Initial Letter</h4>
+<h4 class="section">Initial Letter: \init</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>When main text is the start of a chapter, most book designs apply a special style to its
-first letter. Novelette has <code>\init{<i>letter</i>}</code> for that purpose. It styles its
-<i>letter</i> with the main font, but at double the normal size. The baseline is the same
-as normal baseline, so the top of <i>letter</i> rises above the other text on the first line.</p>
+first letter. Novelette has <code>\init{<i>letter</i>}[<i>more text</i>]</code> for that purpose.
+It styles its <i>letter</i> with the main font, but at double the normal size. The baseline
+is the same as normal baseline, so the top of <i>letter</i> rises above the other text on
+the first line. Optional (recommended) <i>more text</i> is a few letters or words that will be
+printed with lowercase to small caps.</p>
 <p>This command may only be used at the very start of main text, immediately after the
 <code>\maintext</code> command. If you place anything (even (<code>\blankline</code>)
 between <code>\maintext</code> and the <code>\init</code> or <code>\dcap</code>, then the
 code will fail.</p>
-<p><code>\init{<i>letter</i>}</code> usage:</p>
-<ul>
-<li><p>Code such as <code>\'E</code> is treated as a single letter.</p></li>
-<li><p>If the text begins with quotation marks, guillemets, or Spanish inverted marks,
-place them within the command, along with the first letter. The punctuation will be automatically
-adjusted for best appearance.</p></li>
-<li><p>Avoid using more than one letter. But Novelette does not enforce this rule.</p></li>
-<li><p>Do not put a space after this command, unless the initial letter is a word.</p></li>
-<li><p>Often, the next few letters (whole words) look best with small caps:</p>
-<p><code>\init{I}\smcp{t was dark.} The heavy gloom...</code></p>
-<p>In the above example, note that <code>I</code> is not repeated in small caps, because
-it is already printed as the initial letter.</p></li>
-</ul>
+<p><code>\init{<i>letter</i>}[<i>more</i>]</code> also starred <code>\init*</code> usage:</p>
+<ul><li>
+  <p>Code such as <code>\'E</code> is treated as a single letter.</p>
+</li><li>
+  <p>If the text begins with quotation marks, guillemets, or Spanish inverted marks,
+     place them within the command, along with the first letter. The punctuation will be
+     automatically adjusted for best appearance.</p>
+</li><li>
+  <p>Except for Dutch IJ, avoid using more than one letter. But Novelette does not enforce
+     this rule.</p>
+</li><li>
+  <p>If the initial letter is a word in itself (such as English I), put the space
+     within the braces, next to the letter.</p>
+</li><li>
+  <p><code>[</i>more text</i>]</code> prints its text with lowercase letters in small caps.
+     This is desirable. The text should be only a few letters or words. It cannot extend all
+     the way to the right margin.</p>
+  <p><code>\init{I}[t was dark.] The heavy gloom...</code></p>
+  <p>In the above example, note that <code>I</code> is not repeated in small caps, because
+     it is already printed as the initial letter.</p>
+</li><li>
+  <p><code>\init</code> automatically kerns the initial letter, so that there is not a large gap
+     to whatever follows. If that is too tight for you, the starred <code>\init*</code> provides
+     a little more room.</p>
+  <p>If you need to manually kern after the initial letter, write the <code>\kern</code>
+     or <code>\sk</code> command inside the braces, immediately following the initial letter.
+     Do not write it at the start of <code>[<i>more text</i>]</code>.</p>
+</li></ul>
 
 
 <p><a id="dcap"></a>&nbsp;</p>
-<h4 class="section">Drop Cap</h4>
+<h4 class="section">Drop Cap: \dcap</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Instead of <code>\init</code>, you may use a <i>drop cap</i> for the first letter of main text.
@@ -100,28 +117,58 @@ This is an enlarged letter occupying the first two lines, with other text wrappe
 have enough lines to surround them, without excessive white space. But popular fiction usually has
 short paragraphs (sometimes one line), dialog with punctuation, and other text that interferes
 with good-looking drop caps.</p>
-<p>If you use <code>\dcap</code>, it must immediately follow <code>\maintext</code>. But you
-should use <code>\init</code> instead. Most actual books do it this way. But if you
+<p>If you use <code>\dcap</code>, it must immediately follow <code>\maintext</code>.
+Prefer <code>\init</code>. Most actual books do it this way. But if you
 are determined to use drop caps, here is how:</p> 
 <p class="noindent"><code>\dcap{<i>letter</i>}</code>, <code>\dcap*{<i>letter</i>}</code></p>
-<ul>
-<li><p>This prints the <i>letter</i> as a "drop cap".</p></li>
-<li><p>Do not place punctuation. If necessary, re-write your text, so that
-the sentence does not begin with quotation marks, guillemets, or Spanish inverted marks.
-Or, omit the marks there. If you cannot do that consistently, then avoid drop caps.</p></li>
-<li><p>Code such as <code>\'E</code> is treated as a single letter.</p></li>
-<li><p>The drop cap occupies two lines. No more, no less.</p></li>
-<li><p>The top of the letter (without diacritical) is at the top of normal uppercase in the
-first line. The baseline of the letter is at the baseline of the second normal line.</p></li>
-<li><p>If a diacritical above the letter, it will appear higher.</p></li>
-<li><p>Letters J, Q, and Ccedilla are specially shaped to fit.</p></li>
-<li><p>Unstarred <code>\dcap</code> spaces both lines equally (they vertically align) whether
-or not the drop cap is a one-letter word. Starred <code>\dcap*</code> affects the first line;
-it brings the immediately following text closer to the drop cap. But if the drop cap is a
-one-letter word, a space restores vertical alignment.</p></li>
-<li><p>If the first paragraph occupies only one line, do not end it with <code>\par</code>.
-Use <code>\fakepar</code> instead.</p></li>
-</ul>
+<ul><li>
+  <p>This prints the <i>letter</i> as a "drop cap".</p>
+</li><li>
+  <p>Do not place punctuation. If necessary, re-write your text, so that
+     the sentence does not begin with quotation marks, guillemets, or Spanish inverted marks.
+     Or, omit the marks there. If you cannot do that consistently, then avoid drop caps.</p>
+</li><li>
+  <p>Code such as <code>\'E</code> is treated as a single letter.</p>
+</li><li>
+  <p>The drop cap occupies two lines. No more, no less.</p>
+</li><li>
+  <p>The top of the letter (without diacritical) is at the top of normal uppercase in the
+     first line. The baseline of the letter is at the baseline of the second normal line.</p>
+</li><li>
+  <p>If a diacritical is above the letter, it will appear higher.</p>
+</li><li>
+  <p>Letters J, Q, and Ccedilla are specially shaped to fit.</p>
+</li><li>
+  <p>Unstarred <code>\dcap</code> spaces both lines equally (they vertically align) whether
+     or not the drop cap is a one-letter word. Starred <code>\dcap*</code> affects the first line;
+     it brings the immediately following text closer to the drop cap. But if the drop cap is a
+     one-letter word, a space restores vertical alignment.</p>
+</li><li>
+  <p><img src="images/warning.svg" style="vertical-align:baseline" height="16" alt="warning"/>
+     If the first paragraph occupies only one line, do not end it with <code>\par</code>.
+     Use <code>\fakepar</code> instead.</p>
+</li></ul>
+<p class="noindent"><b>Example 1:</b></p>
+<p class="code"><code>
+\dcap*{O}n the next day, all hell broke loose. An overnight storm had severed the power lines,
+dropping wires all over the roads. Nobody was sure whether they were live. To make matters worse,
+pizza delivery was at a standstill.\par
+</code></p>
+<p class="noindent"><b>Result 1:</b></p>
+<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+<img src="images/dcap-cont.png" style="width:80%" alt="result of above code"/>
+</div>
+<p class="noindent"><b>Example 2:</b></p>
+<p class="code"><code>
+\dcap*{O}n the next day, all hell broke loose.\fakepar An overnight storm had severed the
+power lines, dropping wires all over the roads. Nobody was sure whether they were live.
+To make matters worse, pizza delivery was at a standstill.\par
+</code></p>
+<p class="noindent"><b>Result 2:</b></p>
+<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+<img src="images/dcap-fp.png" style="width:80%" alt="result of above code"/>
+</div>
+
 
 
 <p><a id="scene"></a>&nbsp;</p>

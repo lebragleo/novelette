@@ -195,6 +195,7 @@
 \newif\ifnvt@usegero
 \newif\ifnvt@useplas
 \newif\ifnvt@usecrge
+\newif\ifnvt@uselight
 \let\nvt@par\par\relax %% For local \par tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
 \let\nvt@maybestopnow\relax%% Changes when compiling only subdocs.

@@ -174,15 +174,38 @@ in Novelette. So the command is re&#8209;written with custom syntax:</p>
 
 <p><a id="titlepage"></a>&nbsp;</p>
 <h4>Example: Book Title Page</h4>
-<p>\begin{component}[single,recto]<br>
-\vspace{4\baselineskip}<br>
-\style1{The Conspiracy}<br>
-\vspace{1.5\baselineskip}<br>
-\style3{Act Four}<br>
-\vspace{4.3\baselineskip}{Fay Cawthor}<br>
-\vfill<br>
-\style6{Potboiler Press • London Paris}<br>
-\end{component}</p>
+<p>Styles 1, 2, and 3 were chosen for appearance. Styles 6 and 7 are defaults. The width of the
+typeset title was measured by <code>[info]</code> Then the widths of the
+surrounding lines were set to that value. The <code>\vfill</code> is one way to insert vertical
+space (it is standard LaTeX, not specific to Novelette).</p>
+<pre class="code">\documentclass{novelette}
+\setstyle1{font=dark,align=center,scale=6,track=0}
+\setstyle2{font=dark,align=center,scale=1.6,track=2}
+\setstyle3{font=main,align=center,scale=4.5,track=0}
+\begin{document}
+\frontmatter
+% Other pages here.
+\begin{component} % Starts with display zone.
+\vfill
+\line{align=center,thick=9,width=14.48em}
+\style1[info]{DORKUS}
+\line{align=center,thick=9,width=14.48em}
+\blankline
+\style2{A Novel}
+\vfill
+\style3{Fay Cawthor}
+\vfill
+\style6[logo]{\logo*{images/fp-logo.png}}
+\style6{Firble Press}
+\style7{Moosonee • Paris • Tuktuyaktuk • New York}
+\end{component} % Did not use \mainmatter.
+% Other pages here.
+\end{document}</pre>
+<p class="noindent"><b>Result:</b> Note that the left margin is slightly wider, because this is
+a recto page, with glue strip at left. This is shown at reduced size.</p>
+<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+<img src="images/dorkus-titlepage.png" style="width:50%" alt="result of above code"/>
+</div>
 
 
 <p><a id="chapter"></a>&nbsp;</p>

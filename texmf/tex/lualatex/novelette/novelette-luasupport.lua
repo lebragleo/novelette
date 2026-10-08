@@ -88,17 +88,17 @@ nvt.pagelist = '' -- Might become nonempty when nvt.examine==true.
 nvt.thisdoc = '' -- Becomes nonempty when compiling only subdoc files.
 nvt.preamble = true -- Becomes false AtBeginDocument.
 nvt.guide = 0 -- Becomes nonzero if guide enabled.
-nvt.allfonts = 'main,dark,heavy,black,wide,thick,thin,srir,gero,plas,crge,'
+nvt.allfonts = 'main,dark,heavy,black,wide,thick,thin,light,srir,gero,plas,crge,'
 nvt.usefont = {}
 nvt.usefont['main'] = true ; nvt.usefont['dark'] = false ; nvt.usefont['heavy'] = false
 nvt.usefont['black'] = false ; nvt.usefont['wide'] = false ; nvt.usefont['thick'] = false
 nvt.usefont['thin'] = false ; nvt.usefont['srir'] = false ; nvt.usefont['gero'] = false
-nvt.usefont['plas'] = false ; nvt.usefont['crge'] = false
+nvt.usefont['plas'] = false ; nvt.usefont['crge'] = false ; nvt.usefont['light'] = false
 nvt.space = {} -- em width of space character in font
 nvt.space['main'] = 0.21 ; nvt.space['dark'] = 0.21 ; nvt.space['heavy'] = 0.24
 nvt.space['black'] = 0.3 ; nvt.space['wide'] = 0.336 ; nvt.space['thick'] = 0.24
 nvt.space['thin'] = 0.24 ; nvt.space['srir'] = 0.240 ; nvt.space['gero'] = 0.238
-nvt.space['plas'] = 0.426 ; nvt.space['crge'] = 0.264
+nvt.space['plas'] = 0.426 ; nvt.space['crge'] = 0.264 ; nvt.space['light'] = 0.21
 nvt.headfont = 'main'
 nvt.headscale = 0.93
 nvt.headfeat = ''
@@ -703,7 +703,7 @@ end
 -- Parse \line argument:
 nvt.parseline = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ',' ; s = string.gsub(s, 'thickness', 'thick')
-  local n, a, w, t, d ; local tt = 0.76
+  local n, a, w, t, r ; local tt = 0.76
   if string.find(s, 'align=') then
     a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
     if n == 1 and a == 'left' then
@@ -744,8 +744,8 @@ nvt.parseline = function (s)
     end
   end
   tex.sprint('\\def\\tmpthick{' .. tt .. 'pt }')
-  d = -0.5 * tt
-  tex.sprint('\\def\\tmpdrop{' .. d .. 'pt}')
+  r = 0.5 * (nvt.bls - tt - 0.65*nvt.em)
+  tex.sprint('\\def\\tmpr{' .. r .. 'pt}')
   s = string.gsub(s, ',', '')
   if s == '' then
     tex.sprint('\\def\\tmpreturn{1}')

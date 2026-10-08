@@ -42,10 +42,11 @@
 %% where the blank line might not be noticed. It consists of three widely-spaced low asterisks.
 %% The following line is not indented.
 \newcommand\dinkus{%%
-  \par\noindent%%
+  \par\begingroup\setlength\parindent{0pt}%%
   \nvt@center%%
   \strut\upshape\char"204E\hspace{2em}\char"204E\hspace{2em}\char"204E\par%%
   \nvt@endcenter%%
+  \endgroup%%
   \@afterindentfalse\@afterheading%%
 }%%
 %%
@@ -229,7 +230,7 @@
 %%
 
 
-%% ATTRIBUTION:
+%% ATTRIB:
 %%   This may be used within a block, after its last paragraph ends. The text of the attribution
 %% must fit within the block width, one line only. If more, break it into several \attrib.
 %%   The text will be preceded by em dash, and right-aligned to either block right offset,
@@ -443,6 +444,18 @@
 %%
 
 
+%% Attribution : User 'wipet'
+\def\firstcharacter#1{\expandafter\firstcharacterA#1{}\end}
+\def\firstcharacterA#1#2\end{#1}
+%%\firstcharacter{école} % returns é
+%%\def\example{Lorem ipsum}
+%%\firstcharacter{\example} % returns L
+%%\firstcharacter{This is a string} % returns T
+%%\firstcharacter{\S} % returns section symbol
+%%\firstcharacter{} % returns nothing
+
+
+
 %% INITIAL LETTER(S): \init{character} also starred \init*
 %%   The \init command scales its character to larger than normal size. It may be used immediately
 %% following \maintext. Typically, this is at the start of a chapter.
@@ -460,7 +473,7 @@
 %% adjusts some characters for proper appearance at scale.
 %%   If the following text is too close for your taste, use \init*{character}. That inserts
 %% a tiny amount of space between the initial character and whatever follows.
-\DeclareDocumentCommand\init{sm}{%%
+\DeclareDocumentCommand\init{smO{}}{%%
   \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%%
   \def\tmptest{1}\ifx\nvt@initscale\tmptest\relax\def\tmpok{0}\fi%%
   \ifnvt@infootnote\def\tmpok{0}\fi%%
@@ -469,18 +482,21 @@
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnvt@instyle\def\tmpok{0}\fi%%
   \begingroup\let\itshape\relax%%
-  \def~{\hspace{.2\nvt@em}}%%
+  \def~{\hspace{.08em}}%%
   \ifnum\tmpok=1\relax%%
     \sbox1{%%
-      \nvt@aff{RawFeature={-smcp,-c2sc,+ss20},Scale=\nvt@initscale,FakeStretch=.94}%%
-        \char"2060{#2}\char"2060%%
+      \nvt@aff{RawFeature={-smcp,-c2sc,+cv48},Scale=\nvt@initscale,FakeStretch=.94}%%
+        %%\char"2060
+        {#2}%%
+        %%\char"2060%%
     }%%
     {\strut\smash{\usebox1}}%%
-    \IfBooleanTF{#1}{\hspace{.04em}}{}%%
+    \IfBooleanTF{#1}{\hspace{.08em}}{}%%
+    \smcp{#3}%%
   \else
     \nvt@warn{\string\init only allowed at start of paragraph following ^^J%%
       \spii \string\maintext. Do not use \string\indent, or \string\noindent\space there.}%%
-    {#2}%%
+    {#2#3}%%
   \fi%%
   \endgroup%%
   \obeyspaces%%
@@ -523,10 +539,10 @@
     \edef\tmpscale{\fpeval{(\nvt@bls+.856\nvt@em)/(.65*\nvt@em)}}%%
     \edef\tmpstretch{\fpeval{3.17/\tmpscale}}%%
 \edef\tmpback{\fpeval{((\tmpscale-1)*\tmpstretch*.044em)+.1\nvt@em}pt}%% for O
-\def\tmpback{.1\nvt@em}%%
+\def\tmpback{.1\nvt@em}%% %%%%%
     \sbox0{%%
       \hspace{-\tmpback}%%
-      \nvt@aff{RawFeature={-smcp,-c2sc,-ss14,+ss20,+cv18},Scale=\tmpscale,FakeStretch=\tmpstretch}%%
+      \nvt@aff{RawFeature={-smcp,-c2sc,+cv49},Scale=\tmpscale,FakeStretch=\tmpstretch}%%
       {\char"200D{#2}\char"200D}%%
     }%%
     \xdef\tmpwd{\fpeval{\wd0 + .1\nvt@em}pt}%%
@@ -536,7 +552,7 @@
 \edef\tmpdn{\fpeval{-\nvt@bls-.206*\nvt@em}pt}%%
 %%\strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
 \strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
-    \IfBooleanTF{#1}{\hspace{-.1\nvt@em}}{}%%
+    \IfBooleanTF{#1}{\hspace{-.1\nvt@em}}{}%% %%%%%
   \else%%
     \nvt@warn{\string\init, or \string\dcap, only allowed at start of paragraph.^^J%%
       \spii Do not use \string\indent, or \string\noindent\space there.}%%
@@ -560,12 +576,32 @@
 %%
 
 
+%% RE-DEFINE \underline:
+\DeclareDocumentCommand\underline{m}{%%
+  \ifnvt@indisplay%%
+    {#1}%%
+    \begingroup%%
+    \sbox0{#1}%%
+    \hspace{-\wd0}%%
+    \edef\tmpdrop{\fpeval{.3*\nvt@em + .76}pt}%%
+    \smash{\rule[-\tmpdrop]{\wd0}{0.76pt}}%%
+    \vspace{.3\nvt@em}%% %%%%%
+    \endgroup%%
+  \else%%
+    \nvt@warn{\string\underline\space only available in display zone.}%%
+    {#1}%%
+  \fi%%
+}%%
+
+%%
+
+
 %% RE-DEFINE \line:
 %%   The standard LaTeX \line is not needed, so it is re-defined. Novelette \line is an \hrule
 %% with minimum and maximum dimensions, vertically padded to always occupy baselineskip.
 %%   To track possible layout changes, the width must be measured in normal em. The thickness
 %% is a number without units (requesting units would likely cause user confusion).
-\def\line#1{%%
+\DeclareDocumentCommand\line{m}{%%
   \def\tmpshow{1}\def\tmpleft{\hfill}\def\tmpright{\hfill}%%
   \def\tmpwidth{10em}\def\tmpthick{.76pt}%%
   \ifnvt@indisplay\def\tmpok{1}\else\def\tmpok{0}\fi%%
@@ -578,9 +614,7 @@
     \ifnum\tmpreturn=1\relax%%
       \begingroup\setlength\parindent{0pt}%%
       \ifnum\tmpshow=1\relax%%
-        \vspace{-\tmpdrop}%%
-        \strut\tmpleft\smash{\rule[-\tmpdrop]{\tmpwidth}{\tmpthick}}\tmpright\strut\par%%
-        \vspace{\tmpdrop}%%
+        \strut\tmpleft\smash{\raisebox{\tmpr}{\rule{\tmpwidth}{\tmpthick}}}\tmpright\strut\par%%
       \else%%
         \strut\par%%
       \fi%%
