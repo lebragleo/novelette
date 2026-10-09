@@ -456,26 +456,25 @@
 
 
 
-%% INITIAL LETTER(S): \init{character} also starred \init*
+%% INITIAL LETTER(S): \init{character}[text in small caps] also starred \init*
 %%   The \init command scales its character to larger than normal size. It may be used immediately
 %% following \maintext. Typically, this is at the start of a chapter.
 %%   You cannot use \init anywhere else. If you do that, the character prints at normal size,
-%% and a warning results.
+%% small caps are not applied, and a warning results.
 %%   The {character} may include preceding punctuation, such as quotes, guillemet, or Spanish
-%% inverted marks. Except for Dutch IJ, use only a single alphabetic character. Do not use
-%% \init for creating a numbered list. You may choose to place the following few words in
-%% small caps, for an interesting effect.
-%%   A blank line is inserted above \init, to prevent the enlarged character from crashing into
-%% whatever is above it. The descender on characters such as Ccedilla will not crash into
-%% the line below.
-%%   The enlarged character kerns against its surrounding U+2060 control characters. At left,
-%% that absorbs excess bearing. At right, it lets T hang above the following text. Feature ss20
-%% adjusts some characters for proper appearance at scale.
+%% inverted marks. Except for Dutch IJ, use only a single alphabetic character. You may choose
+%% to place the following few words in small caps, for an interesting effect.
+%%   The \maintext command always inserts at least one preceding blank line, so the enlarged
+%% \init character will not crash into something higher on the page. Scale 2.19 is the ratio
+%% (max letter height + min baselineskip)/(max letter height). A special glyph for Ccedilla
+%% has shortened cedilla, to prevent it from crashing into the line below.
+%%   The scaled character is from a special style set, designed for this purpose. Glyphs that
+%% tower over following normal-scale characters have adjusted side bearing.
 %%   If the following text is too close for your taste, use \init*{character}. That inserts
 %% a tiny amount of space between the initial character and whatever follows.
 \DeclareDocumentCommand\init{smO{}}{%%
-  \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%%
-  \def\tmptest{1}\ifx\nvt@initscale\tmptest\relax\def\tmpok{0}\fi%%
+  \ifvmode\def\tmpok{1}\else\def\tmpok{0}\fi%% Tests if \init precedes anything else in paragraph.
+  \ifnvt@allowinit\else\def\tmpok{0}\fi%%
   \ifnvt@infootnote\def\tmpok{0}\fi%%
   \ifnvt@inheader\def\tmpok{0}\fi%%
   \ifnvt@indisplay\def\tmpok{0}\fi%%
@@ -484,21 +483,17 @@
   \begingroup\let\itshape\relax%%
   \def~{\hspace{.08em}}%%
   \ifnum\tmpok=1\relax%%
-    \sbox1{%%
-      \nvt@aff{RawFeature={-smcp,-c2sc,+cv48},Scale=\nvt@initscale,FakeStretch=.94}%%
-        %%\char"2060
-        {#2}%%
-        %%\char"2060%%
-    }%%
+    \sbox1{\nvt@aff{RawFeature={-smcp,-c2sc,+cv48},Scale=2.19,FakeStretch=.94}#2}%%
     {\strut\smash{\usebox1}}%%
-    \IfBooleanTF{#1}{\hspace{.08em}}{}%%
+    \IfBooleanTF{#1}{}{\hspace{.08em}}%%
     \smcp{#3}%%
   \else
-    \nvt@warn{\string\init only allowed at start of paragraph following ^^J%%
+    \nvt@warn{\string\init\space only allowed at start of paragraph following ^^J%%
       \spii \string\maintext. Do not use \string\indent, or \string\noindent\space there.}%%
     {#2#3}%%
   \fi%%
   \endgroup%%
+  \ifdefined\honkingbigdev\else\global\nvt@allowinitfalse\fi%%
   \obeyspaces%%
 }%%
 %%

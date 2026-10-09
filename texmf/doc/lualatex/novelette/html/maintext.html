@@ -30,6 +30,10 @@
 or occupy the entire component, or anywhere in between.</p>
 <p>In most cases, such as new chapters, you end the zone somewhere in the middle of the
 component's first page.</p>
+<p>Do not confuse <i>main text</i> with <i>main matter</i>. Main text, discussed on this page,
+is within a <a href="components.html">component</a>, no matter where it appears in the book.
+Main matter is the portion of the book located after front matter, and perhaps before
+back mattr.</p>
 
 
 <p><a id="maintext"></a>&nbsp;</p>
@@ -37,30 +41,43 @@ component's first page.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <code>\maintext</code> command ends the display zone. Then:</p>
-<ul>
-<li><p>One or two blank lines are automatically inserted above <code>\maintext</code>.</p></li>
-<li><p>The display content is usually off&#8209;grid, due to style scaling. Novelette applies
-whatever vertical space is needed, to restore the following text to grid.</p></li>
-<li><p><code>\style<i>N</i></code> commands are no longr available.</p></li>
-<li><p>A <a href="block-env.html">block environment</a> may not use small text.</p></li>
-<li><p>Except in <a href="frontmatter.html">front matter</a>
-and <a href="backmatter.html">back matter</a>, images may float.</p></li>
-<li><p>The <code>\init</code>, <code>\dcap</code>, and <code>\scene</code> commands
-are available.</p></li>
-</ul>
+<ul><li>
+  <p>One or two blank lines are automatically inserted above <code>\maintext</code>.</p>
+</li><li>
+  <p>The display content is usually off&#8209;grid, due to style scaling. Novelette applies
+     whatever vertical space is needed, to restore the following text to grid.</p>
+</li><li>
+  <p><code>\style<i>N</i></code> commands are no longer available.</p>
+</li><li>
+  <p>A <a href="block-env.html">block environment</a> may not use small text.</p>
+</li><li>
+  <p>Except in <a href="frontmatter.html">front matter</a> and
+     <a href="backmatter.html">back matter</a>, images may float.</p>
+</li><li>
+  <p>The <code>\init</code>, <code>\dcap</code>, <code>\scene</code>, and <code>\sceneimage</code>
+     commands are available.</p>
+</li></ul>
 
 
 <p><a id="guide"></a>&nbsp;</p>
 <h4 class="section">Guide Marker</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
-<p>If you use a <a href="preamble.html#guide">guide marker</a>, the first line of main text
-is not forced to align with the guide. Whether or not it aligns, is your decision; Novelette
-does not care.</p>
-<p>Use <code>\blankline</code> or <code>\vspace</code> <i>within the display zone,</i>
-to adjust its height. Always measure <code>\vspace</code> with units
-of <code>\baselineskip</code>, not <code>pt</code>, like this:</p>
-<p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p>
+<p>If you use a <a href="preamble.html#guide">guide marker</a> (recommended):</p>
+<ul><li>
+  <p>The first line of main text is not forced to align with the guide. Whether or not it aligns,
+     is your decision; Novelette does not care.</p>
+</li><li>
+  <p>Within the display zone, use <code>\blankline</code> or <code>\vspace</code> to adjust
+     its height.</p>
+  <p>Measure <code>\vspace</code> with units of <code>\baselineskip</code>,
+     not <code>pt</code>, like this:</p>
+  <p>Good: <code>\vspace{2.3\baselineskip}</code>. Bad: <code>\vspace{10pt}</code>.</p>
+</li><li>
+  <p><img src="images/warning.svg" class="warning" height="16" alt="warning"/>
+     Outside of display zones, you may use <code>\blankline</code> but <i>not</i>
+     <code>\vspace</code> or <code>\vskip</code>.</p>
+</li></ul>
 
 
 <p><a id="init"></a>&nbsp;</p>
@@ -68,17 +85,20 @@ of <code>\baselineskip</code>, not <code>pt</code>, like this:</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>When main text is the start of a chapter, most book designs apply a special style to its
-first letter. Novelette has <code>\init{<i>letter</i>}[<i>more text</i>]</code> for that purpose.
-It styles its <i>letter</i> with the main font, but at double the normal size. The baseline
-is the same as normal baseline, so the top of <i>letter</i> rises above the other text on
-the first line. Optional (recommended) <i>more text</i> is a few letters or words that will be
-printed with lowercase to small caps.</p>
+first letter. The most common design is to enlarge the letter, so that it sits on the
+normal first baseline, and rises above normal text. This is distinctive, without disrupting
+the following lines. Novelette has a command for this purpose:</p>
+<p class="code"><code>\init{<i>letter</i>}[<i>more text</i>]</code></p>
 <p>This command may only be used at the very start of main text, immediately after the
 <code>\maintext</code> command. If you place anything (even (<code>\blankline</code>)
 between <code>\maintext</code> and the <code>\init</code> or <code>\dcap</code>, then the
 code will fail.</p>
-<p><code>\init{<i>letter</i>}[<i>more</i>]</code> also starred <code>\init*</code> usage:</p>
+<p><code>\init{<i>letter</i>}[<i>more</i>]</code></p>
 <ul><li>
+  <p>This command may only be used immediately following <code>\maintext</code>. If any text
+     or command is between <code>\maintext</code> and <code>\init</code>, then <code>\init</code>
+     will fail.</p>
+</li><li>
   <p>Code such as <code>\'E</code> is treated as a single letter.</p>
 </li><li>
   <p>If the text begins with quotation marks, guillemets, or Spanish inverted marks,
@@ -91,20 +111,28 @@ code will fail.</p>
   <p>If the initial letter is a word in itself (such as English I), put the space
      within the braces, next to the letter.</p>
 </li><li>
-  <p><code>[</i>more text</i>]</code> prints its text with lowercase letters in small caps.
+  <p><code>[<i>more text</i>]</code> prints its text with lowercase letters in small caps.
      This is desirable. The text should be only a few letters or words. It cannot extend all
-     the way to the right margin.</p>
-  <p><code>\init{I}[t was dark.] The heavy gloom...</code></p>
+     the way to the right margin. Example:</p>
+  <p><code>\init{W}[hen they left,] the room was silent. ... etc.</code></p>
   <p>In the above example, note that <code>I</code> is not repeated in small caps, because
      it is already printed as the initial letter.</p>
+  <p><img src="images/warning.svg" style="vertical-align:baseline" height="16" alt="warning"/>
+     If the initial letter is followed by a left bracket, it means the start of <i>more text</i>
+     with small caps. But if that is not what you mean (unlikely), use <code>\[</code> there,
+     which prints the ordinary left bracket, and does not signal <i>more text</i>.</p>
 </li><li>
   <p><code>\init</code> automatically kerns the initial letter, so that there is not a large gap
-     to whatever follows. If that is too tight for you, the starred <code>\init*</code> provides
-     a little more room.</p>
-  <p>If you need to manually kern after the initial letter, write the <code>\kern</code>
-     or <code>\sk</code> command inside the braces, immediately following the initial letter.
-     Do not write it at the start of <code>[<i>more text</i>]</code>.</p>
+     to whatever follows. If that too narrow for you, the starred <code>\init*</code>
+     kerns a little looser.</p>
 </li></ul>
+<p class="noindent"><b>Example:</b></p>
+<p class="code"><code>\init{T}[hey were lost.] Sadly, they had no pizza. ... etc.</p>
+<p class="noindent"><br>Result:</b></p>
+<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+<img src="images/init-text.png" style="width:80%" alt="result of above code"/>
+</div>
+
 
 
 <p><a id="dcap"></a>&nbsp;</p>
@@ -116,19 +144,18 @@ This is an enlarged letter occupying the first two lines, with other text wrappe
 <p>Popular fiction almost never uses drop caps. They only look good when the opening paragraphs
 have enough lines to surround them, without excessive white space. But popular fiction usually has
 short paragraphs (sometimes one line), dialog with punctuation, and other text that interferes
-with good-looking drop caps.</p>
-<p>If you use <code>\dcap</code>, it must immediately follow <code>\maintext</code>.
-Prefer <code>\init</code>. Most actual books do it this way. But if you
-are determined to use drop caps, here is how:</p> 
-<p class="noindent"><code>\dcap{<i>letter</i>}</code>, <code>\dcap*{<i>letter</i>}</code></p>
+with good-looking drop caps. Prefer <code>\init</code>.</p>
+<p class="code"><code>\dcap{<i>letter</i>}</code></p>
 <ul><li>
-  <p>This prints the <i>letter</i> as a "drop cap".</p>
+  <p>This command may only be used immediately following <code>\maintext</code>. If any text
+     or command is between <code>\maintext</code> and <code>\init</code>, then <code>\dcap</code>
+     will fail.</p>
+</li><li>
+  <p>Code such as <code>\'E</code> is treated as a single letter.</p>
 </li><li>
   <p>Do not place punctuation. If necessary, re-write your text, so that
      the sentence does not begin with quotation marks, guillemets, or Spanish inverted marks.
      Or, omit the marks there. If you cannot do that consistently, then avoid drop caps.</p>
-</li><li>
-  <p>Code such as <code>\'E</code> is treated as a single letter.</p>
 </li><li>
   <p>The drop cap occupies two lines. No more, no less.</p>
 </li><li>
@@ -139,10 +166,11 @@ are determined to use drop caps, here is how:</p>
 </li><li>
   <p>Letters J, Q, and Ccedilla are specially shaped to fit.</p>
 </li><li>
-  <p>Unstarred <code>\dcap</code> spaces both lines equally (they vertically align) whether
-     or not the drop cap is a one-letter word. Starred <code>\dcap*</code> affects the first line;
-     it brings the immediately following text closer to the drop cap. But if the drop cap is a
-     one-letter word, a space restores vertical alignment.</p>
+  <p>Unstarred <code>\dcap</code> kerns the immediately following letter. It is slightly
+     closer to the drop cap, compared to the second line.</p>
+  <p>Starred <code>\dcap*</code> does not kern the immediately following letter. It is vertically
+     aligned with the second line. This is appropriate when the drop cap is a one-letter word,
+     although you may use it always, if your prefer the appearance.</p>
 </li><li>
   <p><img src="images/warning.svg" style="vertical-align:baseline" height="16" alt="warning"/>
      If the first paragraph occupies only one line, do not end it with <code>\par</code>.
@@ -150,7 +178,7 @@ are determined to use drop caps, here is how:</p>
 </li></ul>
 <p class="noindent"><b>Example 1:</b></p>
 <p class="code"><code>
-\dcap*{O}n the next day, all hell broke loose. An overnight storm had severed the power lines,
+\dcap{O}n the next day, all hell broke loose. An overnight storm had severed the power lines,
 dropping wires all over the roads. Nobody was sure whether they were live. To make matters worse,
 pizza delivery was at a standstill.\par
 </code></p>
@@ -160,7 +188,7 @@ pizza delivery was at a standstill.\par
 </div>
 <p class="noindent"><b>Example 2:</b></p>
 <p class="code"><code>
-\dcap*{O}n the next day, all hell broke loose.\fakepar An overnight storm had severed the
+\dcap{O}n the next day, all hell broke loose.\fakepar An overnight storm had severed the
 power lines, dropping wires all over the roads. Nobody was sure whether they were live.
 To make matters worse, pizza delivery was at a standstill.\par
 </code></p>
@@ -170,32 +198,48 @@ To make matters worse, pizza delivery was at a standstill.\par
 </div>
 
 
-
 <p><a id="scene"></a>&nbsp;</p>
 <h4 class="section">Scenes</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
-<p>In general, use <code>\blankline</code> one or more times, to separate scenes. Do not use
-<code>\null</code>.</p>
-<p>If the blank line happens to fall at the last or first line of a page, use
-<code>\dinkus</code> instead. Yes, that is its name in typography. It prints three spaced
-asterisks, so that the gap is more noticeable. You may also use <code>\dinkus</code> as the
-standard scene separator. For a larger gap,  write <code>\blankline</code>
-above and/or below a dinkus.</p>
-<p>You may use <code>\image[scene]{<i>filename</i>}</code> to place a specially-formatted
-image. See the <a href="graphics.html#scene">graphics page</a> for details.
-This method is especially well-suited for chapters (or long stories) that consist of
-distinct episodes.</p>
-<p>Novelette provides the <code>\scene{text}</code> command. The text must fit on one line,
-and not exceed the textblock width, less two normal paragraph indents. The appearance of
-this text is set by <a href="preamble.html#scenestyle"><code>\scenestyle</code></a> in preamble.
-There are no local options, but you may place a <code>\blankline</code> above and/or below.</p>
-<p>Scenes are not numbered automatically. If your scenes need numbers, use the placeholder
-<code>\next</code> command, until you know their numbers.</p>
-<p>When you use <code>\blankline</code>, <code>\dinkus</code>, <code>\scene{<i>text</i>}</code>,
-or <code>\image[scene]{<i>filename</i>}</code>, the following paragraph is not indented.
-This is standard book design.</p>
-
+<p>Most chapters have some kind of scene break. The break may vary from barely noticeable
+(only a blank line), to more prominent methods.</p>
+<ul><li>
+  <p>In general, use <code>\blankline</code> one or more times, to separate scenes. Do not use
+     <code>\null</code>.</p>
+  <p>If the blank line happens to fall at the last or first line of a page, use
+     <code>\dinkus</code> there. Yes, that is its name in typography. It prints three spaced
+     asterisks, so that the gap is more noticeable.</p>
+</li><li>
+  <p>You may also use <code>\dinkus</code> as the standard scene separator.</p>
+</li><li>
+  <p><code>\scene{<i>text</i>}</code> prints its text with slightly different style than
+     normal main text. The difference is enough to notice, but not enough to be distracting.</p>
+  <p>Blank lines are inserted above and below the scene text, to occupy a total of 3 lines.
+     However, if the scene break occurs at the top of a page, the upper blank is omitted.</p>
+  <p>The width of the scene text is limited, to less than one full line.</p>
+</li><li>
+  <p><code>\sceneimage{<i>PathTo/filename.png</i>}</code> places a specially-formatted image.
+     See the <a href="graphics.html#scene">graphics page</a> for details.</p>
+  <p>This method is especially well-suited for chapters (or long stories) that consist of
+     distinct episodes.</p>
+  <p>Or, you may use an ordinary <code>\image</code>.</p> 
+</li><li>
+  <p>The <a href="preamble.html#scenestyle"><code>\scenestyle</code></a> setting (in preamble)
+     determines how <code>\scene</code> and <code>\sceneimage</code> are horizontally aligned.
+     Default center. There are no local options.</p>
+</li><li>
+  <p>For larger scene gaps, add <code>\blankine</code> above and/or below.</p>
+</li><li>
+  <p>When you use <code>\blankline</code>, <code>\dinkus</code>, or <code>\sceneimage</code>,
+     the following paragraph is not indented. This is automatic.</p>
+  <p>If you use an ordinary <code>\image</code>, then you must write <code>\noindent</code>
+     at the start of the next paragraph.</p>
+</li><li>
+  <p><img src="images/warning.svg" style="vertical-align:baseline" height="16" alt="warning"/>
+  Scenes are not numbered automatically. If your scenes need numbers, use the placeholder
+  <code>\next</code> command, until you know their numbers.</p>
+</li></ul>
 
 
 <h4 class="section">&nbsp;</h4>

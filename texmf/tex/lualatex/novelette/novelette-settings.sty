@@ -325,7 +325,6 @@
 \def\setstyle{\@ifnextchar\bgroup\nvt@badsetstyle\nvt@setstylecmd}%%
 \DeclareDocumentCommand\nvt@setstylecmd{mm}{%%
   \directlua{nvt.parsesetstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
-  %%%% get the space
   \ifnum\tmpreturn=-1\relax
     \nvt@warn{One or more duplicate \string\setstyle settings. Duplicates ignored.}
   \fi

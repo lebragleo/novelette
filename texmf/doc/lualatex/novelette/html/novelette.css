@@ -4,6 +4,8 @@ html {font-size:100%}
 body {font-family:serif; background:#cccccc url(images/cbkg.png); line-height:1.4}
 
 img {vertical-align:middle;}
+img.warning {vertical-align:baseline; hiehgt:1rem;}
+
 
 #master {max-width:40em; position: relative;
          margin-left:auto; margin-right:auto; margin-top:2rem; margin-bottom:2rem;

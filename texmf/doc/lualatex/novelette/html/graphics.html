@@ -58,8 +58,8 @@ LaTeX tutorials. Pay attention here:</p>
 </li><li>
   <p>Image files may be monochrome or true grayscale (not RGB).</p>
   <p>If you have a raster <i>png</i> or <i>jpg</i> images that do not meet specifications,
-     (wrong color space, missing or too much metadata), Novelette provides shell scripts
-     that can fix the problems for you.</p>
+     (wrong color space, missing or too much metadata), Novelette provides
+     <a href="#scripts">shell scripts</a> that can fix the problems for you.</p>
 </li><li>
   <p>The <code>\image</code> command inserts an image, in its own paragraph. Depending on
      where you use it, the image may or may not be able to float.</p>
@@ -370,23 +370,29 @@ Novelette fonts, as long as its license permits commercial usage in rasterized f
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>In its documentation <i>utilities</i> folder, Novelette provides several shell scripts.
 These are coded for Linux or Linux-compatible shells (including Mac OS/X and Android/Termux).
-If you are on Windows, use the Linux subsystem.</p>
-<p>These scripts will take off&#8209;spec image files, and convert them to on&#8209;spec.
-You will probably need to do this for preview and final modes. Instructions are
-in <i>utilities</i>.</p>
-<p>The scripts require ImageMagick, which can be installed via your Linux distribution.</p>
-<p>What they do: Most printers do not care about image specs; anything that can be printed
-on your home or office printer, is acceptable to them. But the strictest standards, still used
-by many print-on-demand services, require that the images do not contain any color profile
-or internal metadata that is not minimally necessary. Above all, grayscale images must be
-single-channel gray without transparency, rather then the RGB grays that most graphics programs
-create. The scripts fix these problems.</p>
-<p>Since you cannot control whether your print jobs will be sent to slack or strict printers,
-Novelette requires strict.</p>
-<p>Also, the paper and process used for your book cannot produce photo-quality grayscale images.
-Print services advise that grays near black should become black, and grays near white
-should become white. The scripts do this, so that your processed images, when viewed on monitor,
-will more closely resemble how they will print.</p>
+Instructions are also in that folder.</p>
+<p>If you are on Windows, use its Linux subsystem. Although it is possible to write
+Windows scripts that do the same thing, the Novelette developer does not have that technology.</p>
+<p>To use the scripts, you need ImageMagick, which can be installed via your
+Linux distribution.</p>
+<p>What the scripts do:</p>
+<ul><li>
+  <p>They ensure that all images have no color profile, no private metadata
+     (such as camera and exposure, or name of graphics program), and no instructions that require
+     the printer to perform transforms.</p>
+</li><li>
+  <p>They ensure that grayscale images are single-channel without alpha.</p>
+</li><li>
+  <p>They ensure that images state their resolution (density). If an image does not
+     state its resolution, the scripts will suggest a value.</p>
+</li><li>
+  <p>They adjust the contrast of grayscale images, so that values near black become black,
+     and values near white become white.</p>
+</li></ul>
+<p class="noindent">None of that is necessary for Internet-ready images, or for home printers.
+But commercial printers sometimes insist on those specifications. Since you cannot control
+whether your print jobs will be sent to slack or strict printers, Novelette uses strict.</p>
+
 
 
 <p>&nbsp;</p>

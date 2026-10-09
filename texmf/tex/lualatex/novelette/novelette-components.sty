@@ -69,8 +69,6 @@
   \fi%%
   \def\temptest{drop}\ifx\tmptps\tmptest%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
-  \else%%
-    \blankline%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad component [option]. Format: [style=S,guide=G,keywords]^^J%%
@@ -91,7 +89,7 @@
     \spiv G -> Integer 0 to lines per page. Over-rides global guide setting.}%%
   \fi%%
   \ifnum\tmplegal=1\relax%%
-    \def\init##1{##1}\def\maintext{}\setlength\parindent{0pt}%%
+    \def\maintext{}\setlength\parindent{0pt}%%
     \setlength\parskip{\nvt@bls}\nvt@aff{RawFeature={+ss19}}%%
     \hyphenpenalty=10000\relax\exhyphenpenalty=10000\relax%%
     \char"0020\char"00A0\par\vfil%% Some machine-readers like to know space advance width.
@@ -150,7 +148,8 @@
 %% will have markers.
 %%   Warning if duplicate \maintext within a component.
 \newif\ifnvt@didmaintext %% True when \maintext appears, until next component.
-\def\nvt@initscale{1} %% \init is ineffective, except when following \maintext.
+\newif\ifnvt@allowinit %% \init is ineffective,unless this is true.
+\ifdefined\honkingbigdev\nvt@allowinittrue\fi %% Don't ask.
 \def\maintext{%%
   \par%%
   \global\nvt@didvrheadtexttrue%%
@@ -160,25 +159,27 @@
     \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
     \ifnvt@infootnote\def\tmpok{0}\fi%%
     \ifnvt@inblock\def\tmpok{0}\fi%%
-%%%%% in page header?
+    \ifnvt@inheader\def\tmpok{0}\fi%%
     \ifnvt@indisplay\else\def\tmpok{0}\fi%%
     \ifnum\tmpok=1\relax%%
       \setlength\parindent{\nvt@parindent}%%
       \ifnvt@indisplay%%
         \null\vspace*{-\nvt@bls}%%
+        \strut\par%% Always inserts at least one empty line.
+        \def\temptest{drop}\ifx\tmptps\tmptest\else\strut\par\fi%% And another, unless drop folio.
         \edef\tmpa{\fpeval{round(\pagetotal/\nvt@bls,4)}}%%
         \edef\tmpb{\fpeval{ceil(\tmpa - 1)- \tmpa +1}}%%
         \edef\tmpc{\fpeval{\tmpb*\nvt@bls}pt}%%
         \vspace{\tmpc}%% Restores text to line grid.
-        \@afterindentfalse\@nobreaktrue\gdef\nvt@initscale{2.19}%%
+        \@afterindentfalse\@nobreaktrue\global\nvt@allowinittrue%%
         \everypar{%%
           \if@nobreak%%
             \@nobreakfalse\clubpenalty\@M%%
             \if@afterindent\else{\setbox\z@\lastbox}\fi%%
+            \ifdefined\honkingbigdev\else\global\nvt@allowinitfalse\fi%%
           \else%%
             \clubpenalty\@clubpenalty\everypar{}%%
           \fi%%
-          \gdef\nvt@initscale{1}%%
         }%%
       \fi%%
     \else%%
