@@ -72,6 +72,7 @@ nvt.evensidemargin = 0.5*nvt.inch
 nvt.oddsidemargin = 0.625*nvt.inch
 nvt.topmargin = 0.5*nvt.inch
 nvt.textwidth = 3.875*nvt.inch
+nvt.entrylist = ''
 nvt.pdfx = true
 nvt.oi = 'fogra'
 nvt.examine = false
@@ -135,6 +136,8 @@ nvt.didlayout = false
 nvt.didheadstyle = false
 nvt.didscenestyle = false
 nvt.didfootnotestyle = false
+nvt.entry = {} -- For \entry: nvt.entry[id] = 'bookpage in table'
+nvt.actual = {} -- Actual location of component: nvt.actual[id] = 'actual bookpage'
 local GLYPH = node.id('glyph')
 local GLUE = node.id('glue')
 local HLIST = node.id('hlist')
@@ -157,6 +160,33 @@ nvt.parsesk = function (s)
     tex.sprint('\\def\\tmpkern{' .. k .. '}') ; tex.sprint('\\def\\tmpreturn{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}')
+  end
+end
+--
+
+
+-- Parse \entry id and page:
+nvt.parseentry = function (id, c, p)
+  id = string.gsub(id, ' ', '') ; p = string.gsub(p, ' ', '')
+  c = string.gsub(c, ' ', '') ; c = string.gsub(c, '%.', '')
+  if c == '<' then tex.sprint('\\def\\tmpback{0}\\def\\tmpcn{0}')
+  elseif c == '' then tex.sprint('\\def\\tmpback{1}\\def\\tmpcn{0}')
+  else
+    local cc = tonumber(c)
+    if cc and cc > 0 and cc <= 99 then
+      tex.sprint('\\def\\tmpcn{' .. c .. '}')
+    else
+      tex.sprint('\\def\\tmpcn{-1}')
+    end
+    tex.sprint('\\def\\tmpback{0}')
+  end
+  if p == '' then tex.sprint('\\def\\tmphash{1}') else tex.sprint('\\def\\tmphash{0}') end
+  local z = string.gsub(id, '%a', '') ; id = string.gsub(id, '%d', '')
+  if z == '' then
+    if id ~= '' then nvt.pagelist = nvt.pagelist .. id .. ':' .. p .. ';' end
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
 end
 --
@@ -901,20 +931,6 @@ end
 --
 
 
--- Parse toc environment option:
-nvt.parsetoc = function (s)
-  s = string.gsub(s, ' ', '')
-  s = tonumber(s)
-  if s and s >= 0 and s <= 8 then
-    local r = s + 0.6
-    tex.sprint('\\def\\tmptocl{' .. s .. '}\\def\\tmptocr{' .. r .. '}\\def\\tmpreturn{1}')
-  else
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
-  end
-end
---
-
-
 -- Parse \padentry option:
 function nvt.parsepad (s)
   s = string.gsub(s,' ','') ; if s == '' then s = 0 end
@@ -985,7 +1001,7 @@ function nvt.parseblock (s,d)
       tex.sprint('\\def\\tmpblockleft{' .. l .. '}\\def\\tmpblockright{' .. r .. '}')
       s = string.gsub(s, l .. '/' .. r, '')
     else
-      tex.sprint('\\def\\tmpblockleft{2}\\def\\tmpblockright{0}')
+      tex.sprint('\\def\\tmpblockleft{0}\\def\\tmpblockright{0}')
     end
   end
   if s == '' then
@@ -997,23 +1013,49 @@ end
 --
 
 
+-- Parse option of toc environment:
+nvt.parsetoc = function (s)
+  s = string.gsub(s, ' ', '') ; s = s .. ','
+  local y, p, n
+  if string.find(s, 'format=') then
+    y, n = string.gsub(s, '.*format=', '') ; y = string.gsub(y, ',.*', '')
+    if n == 1 then
+      if y == 'center' then
+        tex.sprint('\\def\\tmptocformat{0}')
+        s = string.gsub(s, 'format=center', '')
+      else
+        local yy = tonumber(y)
+        if yy and yy >= 0 and yy <= 8 then
+          tex.sprint('\\def\\tmptocformat{1}\\def\\tmptocside{' .. y .. '}')
+          s = string.gsub(s, 'format=' .. y, '')
+        end
+      end
+    end
+  end
+  if string.find(s, 'pad=') then
+    p, n = string.gsub(s, '.*pad=', '') ; p = string.gsub(p, ',.*', '')
+    if n == 1 then
+      local pp = tonumber (p)
+      if pp and pp >= 0 and pp <= 1 then
+        tex.sprint('\\def\\tmppad{' .. p .. '}')
+        s = string.gsub(s, 'pad=' .. p, '')
+      end
+    end
+  end
+  s = string.gsub(s, ',', '')
+  if s == '' then
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  end
+end
+--
+
+
 -- Parse option of component environment:
-function nvt.parsecomponent (s1,s2)
+function nvt.parsecomponent (s1,s2) -- option,bookpage
   s1 = string.gsub(s1, ' ', '') ; s1 = s1 .. ','
   tex.sprint('\\def\\tmpguide{' .. nvt.guide .. '}')
-  if string.find(s1, 'legal,') then
-    tex.sprint('\\def\\tmplegal{1}\\def\\tmprecto{0}\\def\\tmpsingle{1}')
-    tex.sprint('\\def\\tmptps{empty}\\def\\tmpguide{0}')
-    s1 = '' -- other options ignored.
-  else
-    tex.sprint('\\def\\tmplegal{0}')
-  end
-  if string.find(s1, 'single,') then
-    tex.sprint('\\def\\tmpsingle{1}') ; s1 = string.gsub(s1, 'single', '')
-  end
-  if string.find(s1, 'recto,') then
-    tex.sprint('\\def\\tmprecto{1}') ; s1 = string.gsub(s1, 'recto', '')
-  end
   if string.find(s1, 'guide=') then
     local g, n = string.gsub(s1, '.*guide=', '') ; g = string.gsub(g, ',.*', '')
     g = tonumber(g)
@@ -1021,10 +1063,46 @@ function nvt.parsecomponent (s1,s2)
       tex.sprint('\\def\\tmpguide{' .. g .. '}') ; s1 = string.gsub(s1, 'guide=' .. g, '')
     end
   end
-  if string.find(s1, 'style=') then
-    local p, n = string.gsub(s1, '.*style=', '') ; p = string.gsub(p, ',.*', '')
-    if n == 1 and (p == 'normal' or p == 'empty' or p == 'plain' or p == 'drop' or p == 'layout')
-    then tex.sprint('\\def\\tmptps{' .. p .. '}') ; s1 = string.gsub(s1, 'style=' .. p, '')
+  if string.find(s1, 'id=') then
+    local id, n = string.gsub(s1, '.*id=', '') ; id = string.gsub(id, ',.*', '')
+    if n == 1 and id ~= '' and string.len(id) <= 8 then
+      local z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
+      if z == '' and not nvt.actual[id] then
+        nvt.actual[id] = s2 ; s1 = string.gsub(s1, 'id=' .. id, '')
+        texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. s2 .. '\n')
+      end
+    end
+  end
+  if string.find(s1, 'class=') then
+    local c, n = string.gsub(s1, '.*class=', '') ; c = string.gsub(c, ',.*', '')
+    if c == 'legal' then
+      tex.sprint('\\def\\tmplegal{1}\\def\\tmprecto{0}\\def\\tmpsingle{1}')
+      tex.sprint('\\def\\tmptps{empty}\\def\\tmpguide{0}')
+      s1 = '' -- will ignore this=T and all=A.
+    else
+      tex.sprint('\\def\\tmplegal{0}')
+    end
+    if c == 'single' then
+      tex.sprint('\\def\\tmpsingle{1}') ; s1 = string.gsub(s1, 'class=single', '')
+    end
+    if c == 'recto' then
+      tex.sprint('\\def\\tmprecto{1}') ; s1 = string.gsub(s1, 'class=recto', '')
+    end
+    if c == 'single+recto' then
+      tex.sprint('\\def\\tmpsingle{1}\\def\\tmprecto{1}')
+      s1 = string.gsub(s1, 'class=single+recto', '')
+    end
+  end
+  if string.find(s1, 'first=') then
+    local p, n = string.gsub(s1, '.*first=', '') ; p = string.gsub(p, ',.*', '')
+    if n == 1 and (p == 'obey' or p == 'empty' or p == 'plain' or p == 'drop' or p == 'force')
+    then tex.sprint('\\def\\tmpfps{' .. p .. '}') ; s1 = string.gsub(s1, 'first=' .. p, '')
+    end
+  end
+  if string.find(s1, 'rest=') then
+    local p, n = string.gsub(s1, '.*rest=', '') ; p = string.gsub(p, ',.*', '')
+    if n == 1 and (p == 'obey' or p == 'empty' or p == 'plain' or p == 'force')
+    then tex.sprint('\\def\\tmprps{' .. p .. '}') ; s1 = string.gsub(s1, 'rest=' .. p, '')
     end
   end
   s1 = string.gsub(s1, ',', '')
@@ -1169,7 +1247,9 @@ function nvt.flagbad()
     texio.write_nl('   If the message mentions \\text@command, this is the most likely problem.') 
     texio.write_nl('   Solution: Break the command at paragraph boundaries:')
     texio.write_nl('   "from \\textit{here}\\par\\textit{to} there" succeeds.')
-    texio.write_nl('3. Unescaped percent symbol was interpreted as comment.')
+    texio.write_nl('3. If the message says "paragraph ended before [something] was complete",')
+    texio.write_nl('   then you cannot put a paragraph break within that command.')
+    texio.write_nl('4. Unescaped percent symbol was interpreted as comment.')
     texio.write_nl('   Example: 30% fails. But 30\\% succeeds.')
     texio.write_nl('Best response: x<return> to exit now, fix the problem, then try again.')
     texio.write_nl('  If you continue, this error will likely cause other errors.\n')

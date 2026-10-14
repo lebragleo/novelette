@@ -57,36 +57,54 @@
   \ifnvt@allowvrchange\nvt@didvrheadtextfalse\fi%%
   \nvt@indisplaytrue\nvt@didmaintextfalse\setcounter{footnote}{0}%%
   \ifnvt@inmainmatter%%
-    \ifnvt@hasfooter\def\tmptps{plain}\else\def\tmptps{empty}\fi%%
-  \fi%%
-  \ifnvt@infrontmatter\def\tmptps{empty}\fi%%
-  \ifnvt@inbackmatter\def\tmptps{empty}\fi%%
-  \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\the\c@page}')}%% %%%%%
-  \def\tmptest{layout}\ifx\tmptps\tmptest\else\@specialpagetrue\fi%%
-  \def\tmptest{empty}\ifx\tmptps\tmptest\nvt@thispagestyle{empty}\fi%%
-  \def\tmptest{plain}\ifx\tmptps\tmptext%%
+    \@nameuse{ps@normal}%%
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
   \fi%%
-  \def\temptest{drop}\ifx\tmptps\tmptest%%
-    \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
-  \fi%%
+  \ifnvt@infrontmatter\@nameuse{ps@empty}\nvt@thispagestyle{empty}\fi%%
+  \ifnvt@inbackmatter\@nameuse{ps@empty}\nvt@thispagstyle{empty}\fi%%
+  \nvt@getbookpage\edef\tmpbp{\nvt@thispage}%%
+  \def\tmplegal{0}\def\tmpsingle{0}\def\tmprecto{0}%%
+  \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\tmpbp}')}%%
+  \def\tmptest{force}%%
+    \ifx\tmpfps\tmptest\nvt@thispagestyle{normal}\fi%%
+    \ifx\tmprps\tmptest\@nameuse{ps@normal}\fi%%
+  \def\tmptest{empty}%%
+    \ifx\tmpfps\tmptest\nvt@thispagestyle{normal}\fi%%
+    \ifx\tmprps\tmptest\@nameuse{ps@empty}\fi%%
+  \def\tmptest{plain}%%
+    \ifx\tmpfps\tmptest%%
+      \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
+    \fi%%
+    \ifx\tmprps\tmptest%%
+      \ifnvt@hasfooter\@nameuse{ps@plain}\else\@nameuse{ps@empty}\fi%%
+    \fi%%
+  \def\temptest{drop}%%
+    \ifx\tmpfps\tmptest%%
+      \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
+    \fi%%
   \ifnum\tmpreturn=0\relax%%
-    \nvt@err{Bad component [option]. Format: [style=S,guide=G,keywords]^^J%%
-    \spiv keywords -> single recto legal. Default is none of those.^^J%%
-    \spix single -> Issues warning if entire component does not fit on one page.^^J%%
-    \spix recto -> Issues warning if page is not recto.^^J%%
-    \spxi Combination single,recto is allowed.^^J%%
-    \spix legal -> Special formats for copyright page. See Novelette docs.^^J%%
-    \spxi Issues warning if page is not single verso.^^J%%
-    \spxi Ignores other keywords, style, and guide options.^^J%%
-    \spiv S -> normal empty plain drop layout. Default normal.^^J%%
-    \spix Applied only at first page of component.^^J%%
+    \nvt@err{Bad component [option]. Format: [id=I,guide=G,first=F,rest=R,class=C]^^J%%
+    \spiv I -> ASCII letters and numerals. For table of contents (if used).^^J%%
+    \spix No space or punctuation. Maximum 8 characters.^^J%%
+    \spix Same I may not be used more than once.^^J%%
+    \spiv G -> Integer 0 to lines per page. Over-rides global guide number.^^J%%
+    \spiv F -> obey force empty plain drop. Default obey.^^J%%
+    \spix Applies only to first page of component.^^J%%
+    \spix obey -> Obeys context-dependent layout rules.^^J%%
+    \spix force -> Prints header and/or footer, if in layout.^^J%%
     \spix empty -> Does not print header or footer.^^J%%
-    \spix plain -> Prints footer, only if layout pagestyle is plain/split.^^J%%
-    \spix drop -> Same as plain, if layout pagestyle is plain or split.^^J%%
+    \spix plain -> Prints only footer, if in layout.^^J%%
+    \spix drop -> Same as plain, if layout has footer.^^J%%
     \spxi Else reduces text height, creates fake footer beneath.^^J%%
-    \spix layout -> Prints both header/footer, if in layout pagestyle.^^J%%
-    \spiv G -> Integer 0 to lines per page. Over-rides global guide setting.}%%
+    \spiv R -> obey force empty plain. Default obey.^^J%%
+    \spix Like F, but applies to rest of component (not first page).^^J%%
+    \spix Note that all=drop is not available.^^J%%
+    \spiv C -> normal single recto single+recto legal. Default normal.^^J%%
+    \spix normal -> No special warnings.^^J%%
+    \spix single -> Warning if entire component does not fit on one page.^^J%%
+    \spix recto -> Warning if page is not recto.^^J%%
+    \spix single+recto -> Both of the above.^^J%%
+    \spix legal -> Special formats for copyright page. See Novelette docs.}%%
   \fi%%
   \ifnum\tmplegal=1\relax%%
     \def\maintext{}\setlength\parindent{0pt}%%
@@ -109,12 +127,12 @@
       \AddToHookNext{shipout/background}{%% Print guide marker.
         \xdef\tmpgput{\fpeval{1in+\topmargin+\headheight+\headsep+(\tmpthisguide*\nvt@bls)}pt}%%
         \ifodd\c@page%%
-          \put(1in+\oddsidemargin-\nvt@em,-\tmpgput){%%
-            {\upshape\normalfont\nvt@aff{RawFeature={+cv59}}g}%%
+          \put(1in+\oddsidemargin-1.5\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\char"21EB}%%
           }%%
         \else%%
-          \put(1in+\evensidemargin-\nvt@em,-\tmpgput){%%
-            {\upshape\normalfont\nvt@aff{RawFeature={+cv59}}g}%%
+          \put(1in+\evensidemargin-1.5\nvt@em,-\tmpgput){%%
+            {\upshape\normalfont\char"21EB}%%
           }%%
         \fi%%
       }%%
@@ -211,7 +229,7 @@
   \enlargethispage{-\nvt@bls}%%
   \AddToHookNext{shipout/foreground}{%%
     \sbox0{%%
-      {\nvt@headfont\nvt@aff{RawFeature={-onum,-smcp,+titl},Scale=.88}--\nvt@compstart--}%%
+      {\nvt@headfont\nvt@aff{RawFeature={-onum,-smcp,+titl},Scale=.875}--\nvt@compstart--}%%
     }%%
     \xdef\tmpva{\fpeval{1in+\pageheight-\topmargin-\headheight-\headsep+2*\nvt@bls}pt}%%
     \ifodd\c@page%%

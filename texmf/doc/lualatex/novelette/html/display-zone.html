@@ -178,6 +178,8 @@ in Novelette. So the command is re&#8209;written with custom syntax:</p>
 typeset title was measured by <code>[info]</code> Then the widths of the
 surrounding lines were set to that value. The <code>\vfill</code> is one way to insert vertical
 space (it is standard LaTeX, not specific to Novelette).</p>
+<p>Since this page is recto, its left margin is slightly wider than its right margin,
+due to the glue strip (area resered for binding).</p>
 <pre class="code">\documentclass{novelette}
 \setstyle1{font=dark,align=center,scale=6,track=0}
 \setstyle2{font=dark,align=center,scale=1.6,track=2}
@@ -201,8 +203,6 @@ space (it is standard LaTeX, not specific to Novelette).</p>
 \end{component} % Did not use \mainmatter.
 % Other pages here.
 \end{document}</pre>
-<p class="noindent"><b>Result:</b> Note that the left margin is slightly wider, because this is
-a recto page, with glue strip at left. This is shown at reduced size.</p>
 <div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
 <img src="images/dorkus-titlepage.png" style="width:50%" alt="result of above code"/>
 </div>

@@ -63,7 +63,12 @@ back mattr.</p>
 <h4 class="section">Guide Marker</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
-<p>If you use a <a href="preamble.html#guide">guide marker</a> (recommended):</p>
+<p>You may <a href="preamble.html#guide">enable guide</a> in preamble. It places this marker
+<img src="images/guide.svg" height="16" width="16" alt="guide marker"/> in the left margin,
+on (most) pages with a display zone, in draft mode only.</p>
+<p>Best practice is to use a guide. Then, by adjusting content in the display zone, you can align
+the first line of main text with the guide. This creates a uniform appearance for chapter
+start pages.</p>
 <ul><li>
   <p>The first line of main text is not forced to align with the guide. Whether or not it aligns,
      is your decision; Novelette does not care.</p>
@@ -77,6 +82,8 @@ back mattr.</p>
   <p><img src="images/warning.svg" class="warning" height="16" alt="warning"/>
      Outside of display zones, you may use <code>\blankline</code> but <i>not</i>
      <code>\vspace</code> or <code>\vskip</code>.</p>
+  <p>Do not use <code>\blankline</code> immediately after <code>\maintext</code>. Adjustment of
+     the vertical position is performed in the display zone.</p>
 </li></ul>
 
 
@@ -88,7 +95,7 @@ back mattr.</p>
 first letter. The most common design is to enlarge the letter, so that it sits on the
 normal first baseline, and rises above normal text. This is distinctive, without disrupting
 the following lines. Novelette has a command for this purpose:</p>
-<p class="code"><code>\init{<i>letter</i>}[<i>more text</i>]</code></p>
+<div class="code"><code>\init{<i>letter</i>}[<i>more text</i>]</code></div>
 <p>This command may only be used at the very start of main text, immediately after the
 <code>\maintext</code> command. If you place anything (even (<code>\blankline</code>)
 between <code>\maintext</code> and the <code>\init</code> or <code>\dcap</code>, then the
@@ -125,14 +132,13 @@ code will fail.</p>
   <p><code>\init</code> automatically kerns the initial letter, so that there is not a large gap
      to whatever follows. If that too narrow for you, the starred <code>\init*</code>
      kerns a little looser.</p>
+</li><li>
+  <p class="noindent">Example:</p>
+  <div class="code"><code>\init{T}[hey were lost.] Sadly, they had no pizza. ... etc.</code></div>
+  <div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+  <img src="images/init-example.png" style="width:80%" alt="result of above code"/>
+  </div>
 </li></ul>
-<p class="noindent"><b>Example:</b></p>
-<p class="code"><code>\init{T}[hey were lost.] Sadly, they had no pizza. ... etc.</p>
-<p class="noindent"><br>Result:</b></p>
-<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
-<img src="images/init-text.png" style="width:80%" alt="result of above code"/>
-</div>
-
 
 
 <p><a id="dcap"></a>&nbsp;</p>
@@ -145,7 +151,7 @@ This is an enlarged letter occupying the first two lines, with other text wrappe
 have enough lines to surround them, without excessive white space. But popular fiction usually has
 short paragraphs (sometimes one line), dialog with punctuation, and other text that interferes
 with good-looking drop caps. Prefer <code>\init</code>.</p>
-<p class="code"><code>\dcap{<i>letter</i>}</code></p>
+<div class="code"><code>\dcap{<i>letter</i>}</code></div>
 <ul><li>
   <p>This command may only be used immediately following <code>\maintext</code>. If any text
      or command is between <code>\maintext</code> and <code>\init</code>, then <code>\dcap</code>
@@ -175,27 +181,27 @@ with good-looking drop caps. Prefer <code>\init</code>.</p>
   <p><img src="images/warning.svg" style="vertical-align:baseline" height="16" alt="warning"/>
      If the first paragraph occupies only one line, do not end it with <code>\par</code>.
      Use <code>\fakepar</code> instead.</p>
+</li><li>
+  <p class="noindent">Example, with large paragraph:</p>
+  <div class="code"><code>
+     \dcap{O}n the next day, all hell broke loose. An overnight storm had severed the power lines,
+     dropping wires all over the roads. Nobody was sure whether they were live. To make matters
+     worse, pizza delivery was at a standstill.\par
+  </code></div>
+  <div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+  <img src="images/dcap-cont.png" style="width:80%" alt="result of above code"/>
+  </div>
+</li><li>
+  <p class="noindent">Example, with paragraph ending on first line::</p>
+  <div class="code"><code>
+     \dcap{O}n the next day, all hell broke loose.\fakepar An overnight storm had severed the
+     power lines, dropping wires all over the roads. Nobody was sure whether they were live.
+     To make matters worse, pizza delivery was at a standstill.\par
+  </code></div>
+  <div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+  <img src="images/dcap-fp.png" style="width:80%" alt="result of above code"/>
+  </div>
 </li></ul>
-<p class="noindent"><b>Example 1:</b></p>
-<p class="code"><code>
-\dcap{O}n the next day, all hell broke loose. An overnight storm had severed the power lines,
-dropping wires all over the roads. Nobody was sure whether they were live. To make matters worse,
-pizza delivery was at a standstill.\par
-</code></p>
-<p class="noindent"><b>Result 1:</b></p>
-<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
-<img src="images/dcap-cont.png" style="width:80%" alt="result of above code"/>
-</div>
-<p class="noindent"><b>Example 2:</b></p>
-<p class="code"><code>
-\dcap{O}n the next day, all hell broke loose.\fakepar An overnight storm had severed the
-power lines, dropping wires all over the roads. Nobody was sure whether they were live.
-To make matters worse, pizza delivery was at a standstill.\par
-</code></p>
-<p class="noindent"><b>Result 2:</b></p>
-<div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
-<img src="images/dcap-fp.png" style="width:80%" alt="result of above code"/>
-</div>
 
 
 <p><a id="scene"></a>&nbsp;</p>
@@ -209,7 +215,9 @@ To make matters worse, pizza delivery was at a standstill.\par
      <code>\null</code>.</p>
   <p>If the blank line happens to fall at the last or first line of a page, use
      <code>\dinkus</code> there. Yes, that is its name in typography. It prints three spaced
-     asterisks, so that the gap is more noticeable.</p>
+     asterisks, so that the gap is more noticeable:</p>
+     <div style="width:80%; margin:.5rem auto .5rem auto; text-align:center;">
+     <img src="images/dinkus.png" style="width:80%" alt="dinkus"/>
 </li><li>
   <p>You may also use <code>\dinkus</code> as the standard scene separator.</p>
 </li><li>
