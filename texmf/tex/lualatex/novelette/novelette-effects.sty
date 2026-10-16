@@ -268,10 +268,9 @@
 
 
 %% TABLE OF CONTENTS ENVIRONMENT:  \begin{toc}[format=F,pad=P] ... entries ... \end{toc}
-%%   The toc environment is a form of block.
-%% F -> Either center, or number 0<=N<=8.
-%%   If center, is block [0/0,align=center]. If N, is block [N/N,align=justify].
-%% P -> Number 0<-P<=1. Applies padding above each \entry command. The padding is a multiple
+%% F -> Either center, or number 0<=F<=8.
+%%   If center, is block [0/0,align=center]. If number, is block [F/F,align=justify].
+%% P -> Number 0<=P<=1. Applies padding above each \entry command. The padding is a multiple
 %%   of normal baselineskip. Thus P=.5 applies half-line padding.
 \newif\ifnvt@intoc %% True within toc environment.
 \DeclareDocumentEnvironment{toc}{O{}}{%%
@@ -292,10 +291,10 @@
     \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad option for toc environment.^^J%%
-        \spii Option: [format=S,pad=P]^^J%%
-        \spiv F -> Either center or number N, 0<=N<=8.^^J%%
+        \spii Option: [format=F,pad=P]^^J%%
+        \spiv F -> Either center, or number 0<=F<=8.^^J%%
         \spix center -> Table entries are centered. Default.^^J%%
-        \spix N -> Block sides, offset N indents from margins.^^J%%
+        \spix number -> Block sides, offset F indents from margins.^^J%%
         \spiv P -> Number 0<=P<=1. Pads N*baselineskip above each \string\entry.}%%
       \strut\char"FFFD \smcp{bad option for toc environment} \char"FFFD\par%%
     \else%%
@@ -326,68 +325,49 @@
 %%
 
 
-%% \entry{id}{number}{name}{page}[subname]
-%%   The {id} may use only ascii letters, and numerals. No space or punctuation. Maximum 8
-%% characters. It will be correlated with subsequent component [id=value].
-%%   The {number} is usually a one or two digit numeral, without punctuation. If empty {} then
-%% the {name} aligns with where the number would start. If less {<} then the name
-%% aligns with where the number.space would end (the < does not print). Otherwise,
-%% the number is printed as number.space in a right-aligned column.
-%%   The {name} is the chapter title. Do not repeat its number.
-%%   The {page} is the bookpage number (not necessarily the PDFpage number). It may be roman
-%% or arabic, same as it will print. Novelette does not have automatic page numbering.
-%% Until you know the actual numbers, use page {} or {0}.
-\DeclareDocumentCommand\entry{mm+mm+O{}}{%% \entry{id}{number}{name}{page}[subname]
+%% \entry[id=I,page=P,lead=L]{name}
+%%   I -> Matches id of a subsequent component. Only ascii letters and numerals.
+%%        Max 8 characters. Default empty.
+%%   P -> Bookpage number (as printed). Usually not same as PDFpage number.
+%%        Default empty, means entry does not show a page number.
+%%        If P is nonempty, then I is required.
+%%        Use page=0 for page numbers that will be shown, but you do not yet know them.
+%%   L -> May be one or two arabic digits, or empty. Default empty.
+%%        If empty, does not create space in front of entry name.
+%%        If 0 and toc format=N, creates empty space in front of entry name. Ignored if center.
+%%        If number 1-99, creates space in front of entry name. In the space, prints
+%%        right-aligned number, followed by period and space. Right-aligned
+%%   name -> Must fit on one line, allowing for table width, numbers.
+\DeclareDocumentCommand\entry{O{}m}{%%
   \par%%
   \ifnvt@intoc%%
-    \directlua{%%
-      nvt.parseentry('\luaescapestring{#1}','\luaescapestring{#2}','\luaescapestring{#4}')
-    }%%
+    \def\tmpentryid{}\def\tmpentrypage{}\def\tmpentrylead{}\def\tmplead{-1}%%
+    \directlua{nvt.parseentry('\luaescapestring{#1}')}%%
     \vspace*{\tmpentrypad}%%
-    \sbox0{#3}%%
+    \sbox0{#2}%%
     \edef\tmpl{\fpeval{\wd0 > (\linewidth - 8em)}}%%
     \ifnum\tmpl=1\relax%%
       \nvt@warn{\string\entry\space name is too wide for one line.}%%
       \strut\char"FFFD\space\string\entry is too wide.\par%%
-    \else%% Box for chapter numbers widened to accomodate roman numerals.
-      \sbox1{00. }\edef\tmptocnumwd{\the\wd1}%%
-      \ifnum\tmpcn=0\relax\def\tmpcnchar{}\else\def\tmpcnchar{\tmpcn. }\fi%%
-      \ifnum\tmpcn=-1\relax%%
-        \nvt@warn{Bad \string\entry\space number. May be 1 or 2 digits, empty, or < symbol.}%%
-        \def\tmpcnchar{\char"FFFD. }%%
-      \fi%%
-      \ifnum\tmphash=0\relax%%
-        \def\tmpbpnum{#4}%%
-      \else%%
-        \def\tmpbpnum{\#\#\#}%%
+    \else%%
+      \ifnum\tmplead=-1\relax\def\tmpleadbox{}\fi%%
+      \ifnum\tmplead=0\relax\def\tmpleadbox{\makebox[1.58\nvt@em]{}}\fi%% Digit width = 0.5em.
+      \ifnum\tmplead=1\relax%%
+        \def\tmpleadbox{\makebox[1.58\nvt@em][r]{%%
+          \tmpentrylead{\nvt@aff{RawFeature={+cv45}}.\space}%%
+        }}%%
       \fi%%
       \ifnum\tmptocformat=0\relax%%
-        \strut\tmpcnchar{#3} . . . \tmpbpnum\par%%
-      \else%%
-        \ifnum\tmpback=1\relax%%
-          \makebox[\linewidth]{\strut{#3} {\dotfill} \tmpbpnum}\par%%
+        \ifx\tmpentrypage\@empty%%
+          \strut\tmpleadbox{#2}\par%%
         \else%%
-          \makebox[\linewidth]{%%
-            \strut\makebox[\tmptocnumwd][r]{\tmpcnchar}#3 {\dotfill} \tmpbpnum%%
-          }\par%%
+          \strut\tmpleadbox{#2} . . . \makebox[1.58\nvt@em][r]{\tmpentrypage}\par%%
         \fi%%
-      \fi%%
-      \def\tmpse{#5}\ifx\tmpse\@empty\else%%
-        \ifnum\tmptocformat=1\relax%%
-          \begingroup%%
-            \setlength\baselineskip{.875\nvt@bls}%%
-            \setlength{\leftmargin}{\tmptocnumwd}%%
-            \setlength\rightmargin{0pt}%%
-            \advance\linewidth -\leftmargin%%
-            \advance\linewidth -\rightmargin%%
-            \advance\@totalleftmargin\leftmargin%%
-            \@setpar{{\@@par}}%%
-            \parshape 1 \@totalleftmargin \linewidth%%
-            \nvt@aff{Scale=.875}#5\par%%
-            \vspace{.3\nvt@bls}%%
-          \endgroup%%
+      \else%%
+        \ifx\tmpentrypage\@empty%%
+          \strut\tmpleadbox{#2}\par%%
         \else%%
-          {#5\par}%%
+          \strut\tmpleadbox{#2} \dotfill\space\makebox[1.7\nvt@em][r]{\tmpentrypage}\par%%
         \fi%%
       \fi%%
     \fi%%
@@ -395,6 +375,31 @@
     \nvt@warn{Cannot use \string\entry\space outside toc environment.}%%
     \par\char"FFFD\space\string\entry\space cannot be used here.\par%%
   \fi%%
+}%%
+%%
+
+
+%%
+\DeclareDocumentCommand\subentry{O{}+m}{%%
+  \begingroup\def\indent{\hspace{\nvt@parindent}}\def\tmpsmsub{0}\def\tmpreturn{1}%%
+  \directlua{nvt.parsesubentry('\luaescapestring{#1}')}%%
+  \ifnum\tmpsmsub=1\relax%%
+    \setlength\baselineskip{.875\nvt@bls}\nvt@aff{Scale=.875}%%
+  \fi%%
+  \edef\tmpsuboffset{\fpeval{1.7*\nvt@em}pt}%%
+  \setlength{\leftmargin}{\tmpsuboffset}%%
+  \setlength{\rightmargin}{\tmpsuboffset}%%
+  \advance\linewidth -\leftmargin%%
+  \advance\linewidth -\rightmargin%%
+  \advance\@totalleftmargin\leftmargin%%
+  \@setpar{{\@@par}}%%
+  \parshape 1 \@totalleftmargin \linewidth%%
+  {#2\par}%%
+  \ifnum\tmpsmsub=1\relax\vspace{.2625\nvt@bls}\fi%%
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@warn{\string\subentry\space allows option [small], or no option.}%%
+  \fi%%
+  \endgroup%%
 }%%
 %%
 

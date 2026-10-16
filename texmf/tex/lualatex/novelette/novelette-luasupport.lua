@@ -165,26 +165,61 @@ end
 --
 
 
--- Parse \entry id and page:
-nvt.parseentry = function (id, c, p)
-  id = string.gsub(id, ' ', '') ; p = string.gsub(p, ' ', '')
-  c = string.gsub(c, ' ', '') ; c = string.gsub(c, '%.', '')
-  if c == '<' then tex.sprint('\\def\\tmpback{0}\\def\\tmpcn{0}')
-  elseif c == '' then tex.sprint('\\def\\tmpback{1}\\def\\tmpcn{0}')
+-- Parse \entry option:
+nvt.parseentry = function (s)
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, a, id, p, pp, l, ll
+  a = string.gsub(s, '%a', '') ; a = string.gsub(a, '%d', '')
+  a = string.gsub(a, ',', '') ; a = string.gsub(a, '=', '') ; a = string.gsub(a, '%.', '')
+  if a ~= '' then -- the option contains forbidden characters
+    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
   else
-    local cc = tonumber(c)
-    if cc and cc > 0 and cc <= 99 then
-      tex.sprint('\\def\\tmpcn{' .. c .. '}')
-    else
-      tex.sprint('\\def\\tmpcn{-1}')
+    if string.find(s, 'id=') then
+      id, n = string.gsub(s, '.*id=', '') ; id = string.gsub(id, ',.*', '')
+      if n == 1 then
+        if string.len(id) <= 8 then
+          s = string.gsub(s, 'id=' .. id, '') ; tex.sprint('\\def\\tmpentryid{' .. id .. '}')
+        end
+      end
     end
-    tex.sprint('\\def\\tmpback{0}')
+    if string.find(s, 'page=') then
+      p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
+      if n == 1 then
+        pp = tonumber(p)
+        if pp and pp >= 0 and pp <= 999 then
+          s = string.gsub(s, 'page=' .. p, '') ; tex.sprint('\\def\\tmpentrypage{' .. p .. '}')
+        end
+      end
+    end
+   if string.find(s, 'lead=') then
+      l, n = string.gsub(s, '.*lead=', '') ; l = string.gsub(l, ',.*', '')
+      if n == 1 then
+        ll = tonumber(l)
+        if ll and ll >= 0 and ll <= 99 then
+          s = string.gsub(s, 'lead=' .. l, '') ; tex.sprint('\\def\\tmpentrylead{' .. l .. '}')
+          if ll == 0 then tex.sprint('\\def\\tmplead{0}') else tex.sprint('\\def\\tmplead{1}') end
+        end
+      end
+    end
+    s = string.gsub(s, ',', '')
+    if s == '' then
+      if id == '' and p ~= '' then
+        tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+      else
+        tex.sprint('\\def\\tmpreturn{1}')
+      end
+    else
+      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    end
   end
-  if p == '' then tex.sprint('\\def\\tmphash{1}') else tex.sprint('\\def\\tmphash{0}') end
-  local z = string.gsub(id, '%a', '') ; id = string.gsub(id, '%d', '')
-  if z == '' then
-    if id ~= '' then nvt.pagelist = nvt.pagelist .. id .. ':' .. p .. ';' end
-    tex.sprint('\\def\\tmpreturn{1}')
+end
+--
+
+
+-- Parse \subentry option:
+nvt.parsesubentry = function (s)
+  s = string.gsub(s, ' ', '')
+  if s == 'small' then
+    tex.sprint('\\def\\tmpsmsub{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
@@ -1053,60 +1088,61 @@ end
 
 
 -- Parse option of component environment:
-function nvt.parsecomponent (s1,s2) -- option,bookpage
-  s1 = string.gsub(s1, ' ', '') ; s1 = s1 .. ','
+function nvt.parsecomponent (s,p) -- option,bookpage
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, g, gg, id, z, c, f, r
   tex.sprint('\\def\\tmpguide{' .. nvt.guide .. '}')
-  if string.find(s1, 'guide=') then
-    local g, n = string.gsub(s1, '.*guide=', '') ; g = string.gsub(g, ',.*', '')
-    g = tonumber(g)
-    if n == 1 and g and g == math.floor(g) and g >= 0 and g <= nvt.lines then
-      tex.sprint('\\def\\tmpguide{' .. g .. '}') ; s1 = string.gsub(s1, 'guide=' .. g, '')
+  if string.find(s, 'guide=') then
+    g, n = string.gsub(s, '.*guide=', '') ; g = string.gsub(g, ',.*', '')
+    gg = tonumber(g)
+    if n == 1 and gg and gg == math.floor(gg) and gg >= 0 and gg <= nvt.lines then
+      tex.sprint('\\def\\tmpguide{' .. g .. '}') ; s = string.gsub(s, 'guide=' .. g, '')
     end
   end
-  if string.find(s1, 'id=') then
-    local id, n = string.gsub(s1, '.*id=', '') ; id = string.gsub(id, ',.*', '')
+  if string.find(s, 'id=') then
+    id, n = string.gsub(s, '.*id=', '') ; id = string.gsub(id, ',.*', '')
     if n == 1 and id ~= '' and string.len(id) <= 8 then
-      local z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
+      s = string.gsub(s, 'id=' .. id, '')
+      z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
       if z == '' and not nvt.actual[id] then
-        nvt.actual[id] = s2 ; s1 = string.gsub(s1, 'id=' .. id, '')
-        texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. s2 .. '\n')
+        nvt.actual[id] = p ; s = string.gsub(s, 'id=' .. id, '')
+        texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. p .. '\n')
       end
     end
   end
-  if string.find(s1, 'class=') then
-    local c, n = string.gsub(s1, '.*class=', '') ; c = string.gsub(c, ',.*', '')
+  if string.find(s, 'class=') then
+    c, n = string.gsub(s, '.*class=', '') ; c = string.gsub(c, ',.*', '')
     if c == 'legal' then
       tex.sprint('\\def\\tmplegal{1}\\def\\tmprecto{0}\\def\\tmpsingle{1}')
       tex.sprint('\\def\\tmptps{empty}\\def\\tmpguide{0}')
-      s1 = '' -- will ignore this=T and all=A.
+      s = '' -- will ignore this=T and all=A.
     else
       tex.sprint('\\def\\tmplegal{0}')
     end
     if c == 'single' then
-      tex.sprint('\\def\\tmpsingle{1}') ; s1 = string.gsub(s1, 'class=single', '')
+      tex.sprint('\\def\\tmpsingle{1}') ; s = string.gsub(s, 'class=single', '')
     end
     if c == 'recto' then
-      tex.sprint('\\def\\tmprecto{1}') ; s1 = string.gsub(s1, 'class=recto', '')
+      tex.sprint('\\def\\tmprecto{1}') ; s = string.gsub(s, 'class=recto', '')
     end
     if c == 'single+recto' then
       tex.sprint('\\def\\tmpsingle{1}\\def\\tmprecto{1}')
-      s1 = string.gsub(s1, 'class=single+recto', '')
+      s = string.gsub(s, 'class=single%+recto', '')
     end
   end
-  if string.find(s1, 'first=') then
-    local p, n = string.gsub(s1, '.*first=', '') ; p = string.gsub(p, ',.*', '')
-    if n == 1 and (p == 'obey' or p == 'empty' or p == 'plain' or p == 'drop' or p == 'force')
-    then tex.sprint('\\def\\tmpfps{' .. p .. '}') ; s1 = string.gsub(s1, 'first=' .. p, '')
+  if string.find(s, 'first=') then
+    f, n = string.gsub(s, '.*first=', '') ; f = string.gsub(f, ',.*', '')
+    if n == 1 and (f == 'obey' or f == 'empty' or f == 'plain' or f == 'drop' or f == 'force')
+    then tex.sprint('\\def\\tmpfps{' .. f .. '}') ; s = string.gsub(s, 'first=' .. f, '')
     end
   end
-  if string.find(s1, 'rest=') then
-    local p, n = string.gsub(s1, '.*rest=', '') ; p = string.gsub(p, ',.*', '')
-    if n == 1 and (p == 'obey' or p == 'empty' or p == 'plain' or p == 'force')
-    then tex.sprint('\\def\\tmprps{' .. p .. '}') ; s1 = string.gsub(s1, 'rest=' .. p, '')
+  if string.find(s, 'rest=') then
+    r, n = string.gsub(s, '.*rest=', '') ; r = string.gsub(r, ',.*', '')
+    if n == 1 and (r == 'obey' or r == 'empty' or r == 'plain' or r == 'force')
+    then tex.sprint('\\def\\tmprps{' .. r .. '}') ; s = string.gsub(s, 'rest=' .. r, '')
     end
   end
-  s1 = string.gsub(s1, ',', '')
-  if s1 == '' then
+  s = string.gsub(s, ',', '')
+  if s == '' then
     tex.sprint('\\def\\tmpreturn{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
