@@ -81,20 +81,20 @@ LaTeX tutorials. Pay attention here:</p>
 starred versions <code>\image*</code>, <code>\logo*</code>, and <code>\sceneimage*</code>.</p>
 <ul><li>
   <p>In preview and final modes, the starred and unstarred commands behave the same:
-  The file must exist, be in an allowable path, fit its allowed width and height, and
-  pass detailed inspection. The inspection takes time.</p>
+     The file must exist, be in an allowable path, fit its allowed width and height, and
+     pass detailed inspection. The inspection takes time.</p>
   <p>In draft mode, the starred and unstarred commands have different behavior:</p>
   <ul><li>
     <p>The starred commands behave like they will behave in preview and final modes,
-    except that the time-consuming detailed inspection is not performed.</p>
+       except that the time-consuming detailed inspection is not performed.</p>
   </li><li>
     <p>The unstarred commands do not look for the image file. It does not need to exist,
-    and will be ignored if it does exist. The text in <code>{PathTo/filename.png}</code>
-    may be anything, and may be empty (but you must write the braces).</p>
+       and will be ignored if it does exist. The text in <code>{PathTo/filename.png}</code>
+       may be anything, and may be empty (but you must write the braces).</p>
     <p>Instead, a gray placeholder rectangle is printed where the image will print, It displaces
-    the same area that the image will displace, and (if float) floats to the same place.
-    This compiles much faster than the starred commands, yet preserves the line breaks and
-    page breaks. It allows you to "write your story now, design its images later."</p>
+       the same area that the image will displace, and (if float) floats to the same place.
+       This compiles much faster than the starred commands, yet preserves the line breaks and
+       page breaks. It allows you to "write your story now, design its images later."</p>
   </li></ul>
 </li></ul>
 
@@ -109,24 +109,25 @@ something is missing? Novelette feels your pain. For that reason, you must follo
   <p>Image file names must have the lowercase <i>.png</i> file extension.</p>
 </li><li>
   <p>File paths are always <i>relative to the main document</i>, even if the files are called
-  by a sub-document.</p>
+     by a sub-document.</p>
 </li><li>
   <p>You cannot use <code>\graphicspath</code> to change anything.</p>
 </li><li>
   <p>The names and paths may not contain spaces, or any character that is not a valid path/file
-  name in all modern operating systems. No backslash. You may use hyphen or underscore.</p>
+     name in all modern operating systems. No backslash. You may use hyphen or underscore.</p>
 </li><li>
   <p>No absolute paths: No Linux <code>/home/john/</code>. No Windows <code>C://john/</code>.
-  No asciitilde <code>~/john/</code>.</p>
+     No asciitilde <code>~/john/</code>.</p>
 </li><li>
   <p>No symlinks (softlinks).</p>
 </li><li>
   <p>Files must be located in the same folder as the main document, or in a subfolder
-  (maximum 5 levels) down from the main document.</p>
+     (maximum 5 levels) down from the main document.</p>
 </li><li>
-  <p>Best Practice: Within the main document folder, create a folder for storing the finished
-  <i>png</i> images, and another folder for storing their native-format graphics files.
-  Then, if you ever need to edit them, you have the originals where they can easily be found.</p>
+  <p><img src="images/best-practice.svg" height="16" width="16" alt=""/>
+     Best Practice: Within the main document folder, create a folder for storing the finished
+     <i>png</i> images, and another folder for storing their native-format graphics files. Then,
+     if you ever need to edit them, you have the originals where they can easily be found.</p>
 </li></ul>
 
 
@@ -139,51 +140,52 @@ by Novelette. No exceptions. You cannot create TiKz drawings. You cannot include
 or <i>eps</i> or <i>pdf</i> files. This is intentional.</p>
 <ul><li>
   <p>Novelette does not have <code>\caption</code> or anything similar, and cannot draw a frame.
-  If you need these, you must design them into the image file.</p>
+     If you need these, you must design them into the image file.</p>
   <p>If the image has text (such as place names in a map), be aware that rasterization
-  may reduce readability.</p>
+     may reduce readability.</p>
   <p>Unless the text is bold or enlarged, best results will be obtained with
-  the kind of sans&#8209;serif font that is used for viewing programmer text.
-  Fonts such as Roboto&trade; and NotoSans&trade; appear suitable.</p>
+     the kind of sans&#8209;serif font that is used for viewing programmer text.
+     Fonts such as Roboto&trade; and NotoSans&trade; appear suitable.</p>
   <p>You may use Novelette fonts, but your graphics program may be unable to find them,
-  unless you copy the fonts to your operating system fonts directory.</p>
+     unless you copy the fonts to your operating system fonts directory.</p>
   <p>Whatever fonts you use, it is your responsibility to ensure that the font license allows you
-  to use them (rasterized) for commercial print.</p>
+     to use them (rasterized) for commercial print.</p>
 </li><li>
   <p>Internally, each file must state its resolution (density). This is normal for
-  graphics design software.</p>
+     graphics design software.</p>
   <p>Note: This documentation shows resolution in terms of <i>pixels per inch</i>. The <i>png</i>
-  internal format stores it as the equivalent <i>pixels per centimeter</i>.
-  This is automatic; have no fear.</p>
+     internal format stores it as the equivalent <i>pixels per centimeter</i>.
+     This is automatic; have no fear.</p>
 </li><li>
   <p>Image color space must be either monochrome (black/white at 1&#8209;bit per pixel),
-  or single-channel grayscale (8&#8209;bits per pixel).</p>
+     or single-channel grayscale (8&#8209;bits per pixel).</p>
 </li><li>
   <p>Preview and final modes require that the files pass <a href="#validation">validation</a>
-  tests.</p>
+     tests.</p>
 </li><li>
   <p>In most cases, files that do not meet all of the above requirements can be easily repaired
-  using <a href="#scripts">utility scripts</a> that come with Novelette.</p>
+     using <a href="#scripts">utility scripts</a> that come with Novelette.</p>
 </li><li>
   <p>The file will print at its exact size, without rescale or other transform. Thus, a file
-  that is 150x450 pixels at 300px/inch, will print at 0.5x1.5 inches.</p>
+     that is 150x450 pixels at 300px/inch, will print at 0.5x1.5 inches.</p>
 </li><li>
-  <p>Best Practice: Design graphics for print&#8209;on&#8209;demand.</p>
+  <p><img src="images/best-practice.svg" height="16" width="16" alt=""/>
+     Best Practice: Design graphics for print&#8209;on&#8209;demand.</p>
   <ul><li>
     <p>A monochrome file (1&#8209;bit per pixel) should use 600&nbsp;pixels/inch resolution,
-    or greater (if your print service allows it).</p>
+       or greater (if your print service allows it).</p>
   </li><li>
     <p>A grayscale file should use 300&nbsp;pixels/inch. There is no advantage to using
-    a higher value, although some print services prefer a slightly higher value.</p>
+       a higher value, although some print services prefer a slightly higher value.</p>
   </li><li>
     <p>The technology does a poor job with smooth gradients, and a poor job for grays that
-    are close to white or black. When you process your files using Novelette's
-    <a href="#scripts">utility scripts</a>, grays close to white are forced to white,
-    and grays close to black are forced to black.</p>
+       are close to white or black. When you process your files using Novelette's
+       <a href="#scripts">utility scripts</a>, grays close to white are forced to white,
+       and grays close to black are forced to black.</p>
   </li><li>
     <p>If possible, test your files by printing them with inkjet, and also by printing them
-    with toner (like photocopier, but can read digital files).
-    Be sure that only black ink is used, not CMYK.</p>
+       with toner (like photocopier, but can read digital files).
+       Be sure that only black ink is used, not CMYK.</p>
   </li></ul>
 </li></ul>
 
@@ -195,50 +197,50 @@ or <i>eps</i> or <i>pdf</i> files. This is intentional.</p>
 <ul><li>
   <p><code><i>L</i></code> is an integer 1&lt;L&lt;(lines per page).</p>
   <p>Although it is written as an option, each <code>\image</code> <i>must</i> reserve
-  the number of lines that it will occupy, in terms of normal text lines.</p>
+     the number of lines that it will occupy, in terms of normal text lines.</p>
   <p>If the image does not fit in its reserved area, it is a problem. It will not increase
-  the area, and will not be printed somewhere else. Instead, a gray placeholder rectangle prints
-  where the image should print, occupying the reserved space.</p>
+     the area, and will not be printed somewhere else. Instead, a gray placeholder rectangle
+     prints where the image should print, occupying the reserved space.</p>
   <p>If the image is shorter than its reserved space, it will be automatically padded to occupy
-  the full reserved space.</p>
+     the full reserved space.</p>
   <p>There is no default value for <i>L</i>. If an image does not fit, and you ignore the problem,
-  the result will be wrong.</p>
+     the result will be wrong.</p>
 </li><li>
   <p><code><i>A</i></code> is one of <code>left right center</code>.</p>
   <p>Horizontal alignment. Default <code>center</code>.</p>
 </li><li>
   <p><code><i>F</i></code> is one of <code>none here top bottom</code>.</p>
   <p>In frontmatter, backmatter, and component display areas, only <code>none</code> permitted;
-  it is the default.</p>
+     it is the default.</p>
   <p>In main text, the default is <code>here</code>. Novelette automatically uses <code>top</code>
-  as fallback for <code>here</code>. These have the same meaning as ordinary LaTeX.</p>
+     as fallback for <code>here</code>. These have the same meaning as ordinary LaTeX.</p>
   <p>There are no "page" floats. If you need an image on a page by itself, use a component
-  environment with <code>[single]</code> option. Then the image can (if desired) occupy the full
-  textblock. This should never be done in the middle of a chapter, where it would break
-  the text flow.</p>
+     environment with <code>[single]</code> option. Then the image can (if desired) occupy the full
+     textblock. This should never be done in the middle of a chapter, where it would break
+     the text flow.</p>
 </li><li>
   <p><code><i>T</i></code> is one of <code>up down mid</code>.</p>
   <p>When the height of an image is less than its maximum (for any particular lines=L), it will be
-  padded above and/or below. Tweak changes where padding is applied. Choice <code>up</code> moves
-  the image as high as it can go (all padding beneath). Choice <code>down</code> moves the image
-  as low as it can go (all padding above). Choice <code>mid</code> is the default, which splits
-  the padding.</p>
+     padded above and/or below. Tweak changes where padding is applied. Choice <code>up</code>
+     moves the image as high as it can go (all padding beneath). Choice <code>down</code> moves
+     the image as low as it can go (all padding above). Choice <code>mid</code> is the default,
+     which splits the padding.</p>
   <p>Tweak does not change where an image floats, and does not change the number of displaced
-  lines.</p>
+     lines.</p>
 </li></ul>
 <p class="noindent">Mandatory: <code>{<i>PathTo/filename.png</i>}</code></p>
 <ul><li>
   <p>In draft mode, unstarred <code>\image</code> does not look for an image file. It prints
-  a placeholder, whether or not the file exists. You may use empty braces, or write a short note,
-  such as <code>{Map of Whereville}</code>, as a reminder to yourself.</p>
+     a placeholder, whether or not the file exists. You may use empty braces, or write a short
+     note, such as <code>{Map of Whereville}</code>, as a reminder to yourself.</p>
   <p>If you write a reminder, do not use macros such as <code>\textit</code> or
-  <code>\smcp</code>. Do not use diacritical codes such as \'E for Eacute. The reminder will
-  print as a label, within the placeholder area (no more than final 32 characters).</p>
+     <code>\smcp</code>. Do not use diacritical codes such as \'E for Eacute. The reminder will
+     print as a label, within the placeholder area (no more than final 32 characters).</p>
 </li><li>
   <p>Placeholder <code>\image</code> rectangles occupy the correct number of lines, and have
-  the correct float, alignment, and tweak. But since the height and width of the real image
-  is unknown, the placeholder occupies the maximum possible height for its reserved area,
-  and about 2/3 the textwidth.</p>
+     the correct float, alignment, and tweak. But since the height and width of the real image
+     is unknown, the placeholder occupies the maximum possible height for its reserved area,
+     and about 2/3 the textwidth.</p>
 </li></ul>
 
 
@@ -247,22 +249,22 @@ or <i>eps</i> or <i>pdf</i> files. This is intentional.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>This applies to ordinary images, using the <code>\image</code> command. It does not apply
-to <code>\logo</code> or to <code>\sceneimage</code> commands.</p> 
+   to <code>\logo</code> or to <code>\sceneimage</code> commands.</p> 
 <ul><li>
   <p>Run a test document with your Preamble settings, in draft mode. The Terminal Summary will
-  show the textwidth, font em size, and baselineskip. These are specific to your settings.
-  If you change anything in Preamble, then the values may change.</p>
+     show the textwidth, font em size, and baselineskip. These are specific to your settings.
+     If you change anything in Preamble, then the values may change.</p>
 </li><li>
   <p>The maximum width of an image depends only on the textwidth. For example, if the textwidth
-  is 4.2in, a grayscale image at 300px/in cannot exceed 4.2*300 = 1260px width.</p>
+     is 4.2in, a grayscale image at 300px/in cannot exceed 4.2*300 = 1260px width.</p>
 </li><li>
   <p>The maximum height of an image depends on font em size, baselineskip, and number of text
-  lines that the image will displace. The number of lines is declared as option for the
-  <code>\image</code> command.</p>
+     lines that the image will displace. The number of lines is declared as option for the
+     <code>\image</code> command.</p>
 </li><li>
   <p><b>Equation</b> for calculating the maximum height of an image: <i>P</i> is its maximum
-  height in pixels, <i>L</i> is the declared number of lines, <i>em</i> and <i>baselineskip</i>
-  are measured in <i>pt</i>, and <i>R</i> is the image resolution in <i>pixels/inch</i>:</p>
+     height in pixels, <i>L</i> is the declared number of lines, <i>em</i> and <i>baselineskip</i>
+     are measured in <i>pt</i>, and <i>R</i> is the image resolution in <i>pixels/inch</i>:</p>
   <ul><li>
     <p>P = R*[0.84*em&nbsp;+&nbsp;(L-1)*baselineskip]&nbsp;/&nbsp;72.27</p>
     <p>For example, if R=300px/in, L=5, em=11.7pt, and baselineskip=14.8pt:</p>
@@ -277,14 +279,14 @@ to <code>\logo</code> or to <code>\sceneimage</code> commands.</p>
   </li></ul>
 </li><li>
   <p>Unsure of the book trim size, or other Preamble settings? If you design images so that they
-  do not exceed 3.4in width and 3.4in height, then they will fit all sizes provided by Novelette,
-  although the number of displaced lines will vary.</p>
+     do not exceed 3.4in width and 3.4in height, then they will fit all sizes provided by
+     Novelette, although the number of displaced lines will vary.</p>
   <p>That height allows for at least 7 lines of text on the same page as an image. Better results
-  will be obtained if you first decide on trim size and layout, then decide on the displacement
-  for each image, then design the images.</p>
+     will be obtained if you first decide on trim size and layout, then decide on the displacement
+     for each image, then design the images.</p>
 </li><li>
   <p>When an image is at or near its maximum height, the above/below clearance to text
-  will be adequate, but not very great.</p>
+     will be adequate, but not very great.</p>
 </li></ul>
 
 
@@ -293,8 +295,8 @@ to <code>\logo</code> or to <code>\sceneimage</code> commands.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>A Novelette "logo" is a special kind of image. It may be used inline with text.
-Its purpose is to print something such as a publisher's logo, in places such as the title
-and copyright pages; but Novelette does not know or care why you use it.</p>
+   Its purpose is to print something such as a publisher's logo, in places such as the title
+   and copyright pages; but Novelette does not know or care why you use it.</p>
 <p><code>\logo{PathTo/filename.png}</code></p>
 <ul><li>
   <p>A logo may only be used within a <code>\style<i>N</i></code> command that has
@@ -317,10 +319,10 @@ and copyright pages; but Novelette does not know or care why you use it.</p>
      the other unstarred and starred graphics commands.</p>
 </li><li>
   <p>Example:
-  <code>\style5[logo]{Firble Press \logo{images/fp-logo.png} Brisbane Paris}</code></p>
+     <code>\style5[logo]{Firble Press \logo{images/fp-logo.png} Brisbane Paris}</code></p>
   <p class="center" style="margin-top:.5rem">Pathetic Press
-  <img src="images/pp-logo.png" style="height:1.5rem;vertical-align:top;" alt="PP logo"/>
-  Brisbane Paris</p>
+     <img src="images/pp-logo.png" style="height:1.5rem;vertical-align:top;" alt="PP logo"/>
+     Brisbane Paris</p>
 </li></ul>
 
 
@@ -329,11 +331,11 @@ and copyright pages; but Novelette does not know or care why you use it.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>Usually, <a href="">scene breaks</a> do not use images. You may use an ordinary
-<code>\image</code> as scene break, but the <code>\sceneimage</code> command is specially
-designed for this purpose.</p>
+   <code>\image</code> as scene break, but the <code>\sceneimage</code> command is specially
+   designed for this purpose.</p>
 <p>Typically, the image will be rasterized text in a prominent font. Intead of black, it will be
-some shade of gray, so that it is not too prominent. The font does not need to be one of the
-Novelette fonts, as long as its license permits commercial usage in rasterized form.</p>
+   some shade of gray, so that it is not too prominent. The font does not need to be one of the
+   Novelette fonts, as long as its license permits commercial usage in rasterized form.</p>
 <p>Usage: <code>\sceneimage[<i>option</i>]{<i>PathTo/filename.png</i>}</code>.</p>
 <ul><li>
   <p>The image does not float.</p>
@@ -369,12 +371,12 @@ Novelette fonts, as long as its license permits commercial usage in rasterized f
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>In its documentation <i>utilities</i> folder, Novelette provides several shell scripts.
-These are coded for Linux or Linux-compatible shells (including Mac OS/X and Android/Termux).
-Instructions are also in that folder.</p>
-<p>If you are on Windows, use its Linux subsystem. Although it is possible to write
-Windows scripts that do the same thing, the Novelette developer does not have that technology.</p>
+   These are coded for Linux or Linux-compatible shells (including Mac OS/X and Android/Termux).
+   Instructions are also in that folder.</p>
+<p>If you are on Windows, use its Linux subsystem. Although it is possible to write Windows
+   scripts that do the same thing, the Novelette developer does not have that technology.</p>
 <p>To use the scripts, you need ImageMagick, which can be installed via your
-Linux distribution.</p>
+   Linux distribution.</p>
 <p>What the scripts do:</p>
 <ul><li>
   <p>They ensure that all images have no color profile, no private metadata
@@ -390,8 +392,8 @@ Linux distribution.</p>
      and values near white become white.</p>
 </li></ul>
 <p class="noindent">None of that is necessary for Internet-ready images, or for home printers.
-But commercial printers sometimes insist on those specifications. Since you cannot control
-whether your print jobs will be sent to slack or strict printers, Novelette uses strict.</p>
+   But commercial printers sometimes insist on those specifications. Since you cannot control
+   whether your print jobs will be sent to slack or strict printers, Novelette uses strict.</p>
 
 
 

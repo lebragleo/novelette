@@ -1,4 +1,5 @@
--- This is file 'novelette-luasupport.lua', part of Novelette document class.
+-- This is file 'novelette-luasupport.lua', part of Novelette document class.parseen
+
 -- For Copyright and License, see accompanying file 'novelette.cls'.
 -- File version: 2026-08-20.
 -- Namespace: nvt prefix.
@@ -184,14 +185,12 @@ nvt.parseentry = function (s)
     if string.find(s, 'page=') then
       p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
       if n == 1 then
-        pp = tonumber(p)
-        if pp and pp >= 0 and pp <= 999 then
-          s = string.gsub(s, 'page=' .. p, '') ; tex.sprint('\\def\\tmpentrypage{' .. p .. '}')
-        end
+        s = string.gsub(s, 'page=' .. p, '') ; tex.sprint('\\def\\tmpentrypage{' .. p .. '}')
       end
     end
    if string.find(s, 'lead=') then
       l, n = string.gsub(s, '.*lead=', '') ; l = string.gsub(l, ',.*', '')
+      l = string.gsub(l, '%.', '') -- No decimal lead numbers!
       if n == 1 then
         ll = tonumber(l)
         if ll and ll >= 0 and ll <= 99 then
@@ -217,9 +216,29 @@ end
 
 -- Parse \subentry option:
 nvt.parsesubentry = function (s)
-  s = string.gsub(s, ' ', '')
-  if s == 'small' then
-    tex.sprint('\\def\\tmpsmsub{1}')
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, t, i
+  if string.find(s, 'text=') then
+    t, n = string.gsub(s, '.*text=', '') ; t = string.gsub(t, ',.*', '')
+    if n == 1 then
+      if t == 'small' then
+        tex.sprint('\\def\\tmpsmsub{1}') ; s = string.gsub(s, 'text=small', '')
+      end
+      if t == 'normal' then
+        tex.sprint('\\def\\tmpsmsub{0}') ; s = string.gsub(s, 'text=normal', '')
+      end
+    end
+  end
+  if string.find(s, 'indent=') then
+    i, n = string.gsub(s, '.*indent=', '') ; i = string.gsub(i, ',.*', '')
+    if n == 1 then
+      if i == '0' or i == '1' or i == '2' then 
+        tex.sprint('\\def\\tmpsmind{' .. i .. '}') ; s = string.gsub(s, 'indent=' .. i, '')
+      end
+    end
+  end
+  s = string.gsub(s, ',', '')
+  if s == '' then
+    tex.sprint('\\def\\tmpreturn{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
@@ -1051,7 +1070,7 @@ end
 -- Parse option of toc environment:
 nvt.parsetoc = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ','
-  local y, p, n
+  local n, y, p, d, t, i
   if string.find(s, 'format=') then
     y, n = string.gsub(s, '.*format=', '') ; y = string.gsub(y, ',.*', '')
     if n == 1 then
@@ -1075,6 +1094,37 @@ nvt.parsetoc = function (s)
         tex.sprint('\\def\\tmppad{' .. p .. '}')
         s = string.gsub(s, 'pad=' .. p, '')
       end
+    end
+  end
+  s = string.gsub(s, 'dots=', 'dot=')
+  if string.find(s, 'dot=') then
+    d, n = string.gsub(s, '.*dot=', '') ; d = string.gsub(d, ',.*', '')
+    if d == '0' and n == 1 then
+      tex.sprint('\\def\\tmptocdots{0}') ; s = string.gsub(s, 'dot=0', '')
+    end
+    if d == '1' and n == 1 then
+      tex.sprint('\\def\\tmptocdots{1}') ; s = string.gsub(s, 'dot=1', '')
+    end
+  end
+  if string.find(s, 'subtext=') then
+    t, n = string.gsub(s, '.*subtext=', '') ; t = string.gsub(t, ',.*', '')
+    if t == 'normal' and n == 1 then
+      tex.sprint('\\def\tmptocsmsub{0}') ; s = string.gsub(s, 'subtext=normal', '')
+    end
+    if t == 'small' and n == 1 then
+      tex.sprint('\\def\tmptocsmsub{1}') ; s = string.gsub(s, 'subtext=small', '')
+    end
+  end
+  if string.find(s, 'subindent=') then
+    i, n = string.gsub(s, '.*subindent=', '') ; i = string.gsub(i, ',.*', '')
+    if i == 'none' and n == 1 then
+      tex.sprint('\\def\tmptocsubind{0}') ; s = string.gsub(s, 'subindent=none', '')
+    end
+    if i == 'some' and n == 1 then
+      tex.sprint('\\def\tmptocsubind{1}') ; s = string.gsub(s, 'subindent=some', '')
+    end
+    if i == 'fill' and n == 1 then
+      tex.sprint('\\def\tmptocsubind{2}') ; s = string.gsub(s, 'subindent=fill', '')
     end
   end
   s = string.gsub(s, ',', '')

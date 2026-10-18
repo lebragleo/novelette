@@ -60,7 +60,7 @@
     \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\fi%%
   \fi%%
   \ifnvt@infrontmatter\@nameuse{ps@empty}\nvt@thispagestyle{empty}\fi%%
-  \ifnvt@inbackmatter\@nameuse{ps@empty}\nvt@thispagstyle{empty}\fi%%
+  \ifnvt@inbackmatter\@nameuse{ps@empty}\nvt@thispagestyle{empty}\fi%%
   \nvt@getbookpage\edef\tmpbp{\nvt@thispage}%%
   \def\tmplegal{0}\def\tmpsingle{0}\def\tmprecto{0}%%
   \directlua{nvt.parsecomponent('\luaescapestring{#1}','\luaescapestring{\tmpbp}')}%%

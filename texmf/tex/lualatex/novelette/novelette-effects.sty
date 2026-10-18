@@ -217,7 +217,7 @@
       \ifnum\tmpblockalign=1\relax\nvt@center\fi%%
       \ifnum\tmpblockalign=2\relax\nvt@raggedright\fi%%
       \ifnum\tmpblockalign=3\relax\nvt@raggedleft\fi%%
-      \ignorespaces%%
+      \ignorespaces%% %%%%%
     \fi%%
   \fi%%
 }{%%
@@ -267,11 +267,15 @@
 %%
 
 
-%% TABLE OF CONTENTS ENVIRONMENT:  \begin{toc}[format=F,pad=P] ... entries ... \end{toc}
+%% TABLE OF CONTENTS ENVIRONMENT:
+%%   \begin{toc}[format=F,pad=P,dots=D,subtext=S,subindent=I] ... entries ... \end{toc}
 %% F -> Either center, or number 0<=F<=8.
-%%   If center, is block [0/0,align=center]. If number, is block [F/F,align=justify].
+%%   If center, is block [0/0,align=center]. If number, is vertical block [F/F,align=justify].
 %% P -> Number 0<=P<=1. Applies padding above each \entry command. The padding is a multiple
 %%   of normal baselineskip. Thus P=.5 applies half-line padding.
+%% D -> 0 1. Default 1 means three dots for cetner, fill for vertical. 0 means no dots.
+%% S -> small or normal. Default normal. Text size for \subentry. May locally over-ride.
+%% I -> 0 1 2. Default 1. Text indent for \subentry. May locally over-ride.
 \newif\ifnvt@intoc %% True within toc environment.
 \DeclareDocumentEnvironment{toc}{O{}}{%%
   \par\strut\par\vspace{-\nvt@bls}%% Ensure fresh line.
@@ -286,16 +290,20 @@
     \strut\char"FFFD \smcp{bad nested toc environment} \char"FFFD\par%%
   \else%%
     \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
-    \def\indent{\strut\hspace{\nvt@parindent}}%% Substitute.
     \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}%%
+    \def\tmptocsubtext{0}\def\tmptocsubind{1}\def\tmptocdots{-1}%%
     \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad option for toc environment.^^J%%
-        \spii Option: [format=F,pad=P]^^J%%
+        \spii Option: [format=F,pad=P,dots-D,subtext=S,subindent=I]^^J%%
         \spiv F -> Either center, or number 0<=F<=8.^^J%%
         \spix center -> Table entries are centered. Default.^^J%%
-        \spix number -> Block sides, offset F indents from margins.^^J%%
-        \spiv P -> Number 0<=P<=1. Pads N*baselineskip above each \string\entry.}%%
+        \spix number -> Vertical block sides, offset F indents from margins.^^J%%
+        \spiv P -> Number 0<=P<=1. Pads N*baselineskip above each \string\entry.^^J%%
+        \spiv D -> 0 1. Default 1 uses dots. If 0, no dots.^^J%%
+        \spix Center format demotes fill to some.^^J%%
+        \spiv S -> small normal. Default text size for subentries.^^J%%
+        \spiv I -> 0 1 2. Default subentry indent. Only when vertical format.}%%
       \strut\char"FFFD \smcp{bad option for toc environment} \char"FFFD\par%%
     \else%%
       \nvt@intoctrue\nvt@inblocktrue%%
@@ -303,7 +311,9 @@
       \edef\tmpentrypad{\fpeval{\tmppad*\nvt@bls}pt}%%
       \ifnum\tmptocformat=0\relax%%
         \nvt@center%%
+        \ifnum\tmptocdots=-1\relax\def\tmptocdots{1}\fi%%
       \else%%
+        \ifnum\tmptocdots=-1\relax\def\tmptocdots{2}\fi%%
         \edef\tmptocoffset{\fpeval{\tmptocside*\nvt@parindent}pt}%%
         \setlength{\leftmargin}{\tmptocoffset}%%
         \setlength{\rightmargin}{\tmptocoffset}%%
@@ -313,7 +323,7 @@
         \@setpar{{\@@par}}%%
         \parshape 1 \@totalleftmargin \linewidth%%
       \fi%%
-      \ignorespaces%%
+      \ignorespaces%% %%%%%
     \fi%%
   \fi%%
 }{%%
@@ -344,32 +354,50 @@
     \def\tmpentryid{}\def\tmpentrypage{}\def\tmpentrylead{}\def\tmplead{-1}%%
     \directlua{nvt.parseentry('\luaescapestring{#1}')}%%
     \vspace*{\tmpentrypad}%%
-    \sbox0{#2}%%
-    \edef\tmpl{\fpeval{\wd0 > (\linewidth - 8em)}}%%
-    \ifnum\tmpl=1\relax%%
-      \nvt@warn{\string\entry\space name is too wide for one line.}%%
-      \strut\char"FFFD\space\string\entry is too wide.\par%%
-    \else%%
-      \ifnum\tmplead=-1\relax\def\tmpleadbox{}\fi%%
-      \ifnum\tmplead=0\relax\def\tmpleadbox{\makebox[1.58\nvt@em]{}}\fi%% Digit width = 0.5em.
-      \ifnum\tmplead=1\relax%%
-        \def\tmpleadbox{\makebox[1.58\nvt@em][r]{%%
-          \tmpentrylead{\nvt@aff{RawFeature={+cv45}}.\space}%%
-        }}%%
-      \fi%%
-      \ifnum\tmptocformat=0\relax%%
-        \ifx\tmpentrypage\@empty%%
-          \strut\tmpleadbox{#2}\par%%
-        \else%%
-          \strut\tmpleadbox{#2} . . . \makebox[1.58\nvt@em][r]{\tmpentrypage}\par%%
-        \fi%%
+    \ifnum\tmpreturn=1\relax%%
+      \sbox0{#2}%%
+      \edef\tmpl{\fpeval{\wd0 > (\linewidth - 8em)}}%%
+      \ifnum\tmpl=1\relax%%
+        \nvt@warn{\string\entry\space name is too wide for one line.}%%
+        \strut\char"FFFD\space\string\entry is too wide.\par%%
       \else%%
-        \ifx\tmpentrypage\@empty%%
-          \strut\tmpleadbox{#2}\par%%
+        \ifnum\tmplead=-1\relax\def\tmpleadbox{}\fi%%
+        \ifnum\tmplead=0\relax\def\tmpleadbox{\makebox[1.5\nvt@em]{}}\fi%% Digit width = 0.5em.
+        \ifnum\tmplead=1\relax%%
+          \def\tmpleadbox{\makebox[1.5\nvt@em][r]{%%
+            \tmpentrylead{\nvt@aff{RawFeature={+cv45}}.\space}%%
+          }}%%
+        \fi%%
+        \sbox1{\tmpleadbox}%%
+        \edef\tmpwhat{\fpeval{\linewidth-\wd0-\wd1-.5em*floor((\linewidth-\wd0-\wd1)/.5em)}pt}%%
+        \ifnum\tmptocformat=0\relax%%
+          \ifx\tmpentrypage\@empty%%
+            \strut\tmpleadbox{#2}\par%%
+          \else%%
+            \ifnum\tmptocdots=1\relax\def\tmpdots{ . . . }\else\def\tmpdots{\spii}\fi%%
+            \sbox0{\tmpentrypage}%%
+            \strut\tmpleadbox{#2}\tmpdots\tmpentrypage\par%%
+          \fi%%
         \else%%
-          \strut\tmpleadbox{#2} \dotfill\space\makebox[1.7\nvt@em][r]{\tmpentrypage}\par%%
+          \ifx\tmpentrypage\@empty%%
+            \strut\tmpleadbox{#2}\par%%
+          \else%%
+            \ifnum\tmptocdots=1\relax%%
+              \def\tmpdots{\dotfill}%%
+              \sbox0{\tmpentrypage}%%
+              \edef\tmppnpad{\fpeval{.5*\nvt@em*ceil(\wd0/(.5001*\nvt@em)) - \wd0}pt}%%
+            \else%%
+              \def\tmpdots{\hfill}%%
+              \edef\tmppnpad{0pt}%%
+            \fi%%
+            \strut\tmpleadbox{#2}%%
+            \makebox[\tmpwhat]{}\tmpdots\kern\tmppnpad\tmpentrypage\par%%
+          \fi%%
         \fi%%
       \fi%%
+    \else%%
+      \nvt@err{Bad \string\entry. See Novelette docs for correct syntax.}%%
+      {\char"FFFD} Bad entry.\par%%
     \fi%%
   \else%%
     \nvt@warn{Cannot use \string\entry\space outside toc environment.}%%
@@ -379,16 +407,22 @@
 %%
 
 
-%%
+%% \subentry[text=T,indent=I]{text}
+%%   This is a method for adding more information beneath an \entry.
+%% T -> 0 or 1. 0=normal. 1=small. Default \tmptocsubtext
+%% I -> 0 1 2. Text block indent, relative to above entry {name}. Default \tmptocsubind.
 \DeclareDocumentCommand\subentry{O{}+m}{%%
-  \begingroup\def\indent{\hspace{\nvt@parindent}}\def\tmpsmsub{0}\def\tmpreturn{1}%%
+  \begingroup\edef\tmpsmsub{\tmptocsubtext}\edef\tmpsubind{\tmptocsubind}%%
   \directlua{nvt.parsesubentry('\luaescapestring{#1}')}%%
   \ifnum\tmpsmsub=1\relax%%
     \setlength\baselineskip{.875\nvt@bls}\nvt@aff{Scale=.875}%%
   \fi%%
-  \edef\tmpsuboffset{\fpeval{1.7*\nvt@em}pt}%%
-  \setlength{\leftmargin}{\tmpsuboffset}%%
-  \setlength{\rightmargin}{\tmpsuboffset}%%
+  \ifnum\tmpsubind=0\relax\def\tmpsuboffsetl{0pt}\fi%%
+  \ifnum\tmpsubind=1\relax\edef\tmpsuboffsetl{\fpeval{1.5*\nvt@em}pt}\fi%%
+  \ifnum\tmpsubind=2\relax\edef\tmpsuboffsetl{\fpeval{2*\nvt@em}pt}\fi%%
+  \edef\tmpsuboffsetr{\fpeval{1.75*\nvt@em}pt}%%
+  \setlength{\leftmargin}{\tmpsuboffsetl}%%
+  \setlength{\rightmargin}{\tmpsuboffsetr}%%
   \advance\linewidth -\leftmargin%%
   \advance\linewidth -\rightmargin%%
   \advance\@totalleftmargin\leftmargin%%
@@ -397,7 +431,7 @@
   {#2\par}%%
   \ifnum\tmpsmsub=1\relax\vspace{.2625\nvt@bls}\fi%%
   \ifnum\tmpreturn=0\relax%%
-    \nvt@warn{\string\subentry\space allows option [small], or no option.}%%
+    \nvt@warn{Bad option for \string\subentry.}%%
   \fi%%
   \endgroup%%
 }%%
@@ -523,7 +557,7 @@
   \else%%
     \nvt@err{Command \string\scene\space cannot be nested in itself,^^J%%
       \spii or used in \string\styleN (N=0-9), \string\image, or block environment.}%%
-    \char"FFFD\obeyspaces%%
+    {\char"FFFD}%%
   \fi%%
   \endgroup\nopagebreak\blankline%%
 }%%
@@ -580,7 +614,6 @@
   \fi%%
   \endgroup%%
   \ifdefined\honkingbigdev\else\global\nvt@allowinitfalse\fi%%
-  \obeyspaces%%
 }%%
 %%
 
@@ -639,7 +672,7 @@
       \spii Do not use \string\indent, or \string\noindent\space there.}%%
     {#2}%%
   \fi%%
-  \char"200D\obeyspaces%%
+  \char"200D%%
 }%%
 %%
 
@@ -652,7 +685,6 @@
 \newcommand\next{%%
   \#\#%% Two ## placed at this Unicode slot.
   \global\nvt@didnexttrue\directlua{nvt.countnext=nvt.countnext+1}%%
-  \obeyspaces%%
 }%%
 %%
 

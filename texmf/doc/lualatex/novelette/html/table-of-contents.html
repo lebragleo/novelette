@@ -38,36 +38,57 @@ of chapters, sections, and so forth. There is a particular way to number and nam
 and a particular method for organizing it all into a table of contents. That allows academic
 readers to quickly find things, and quickly jump in any order from one place to another.</p>
 <p>But Novelette is for popular fiction, or those nonfiction books that read like popular
-finction. The reader is expected to progress in linear order. Most such books have no table
+fiction. The reader is expected to progress in linear order. Most such books have no table
 of contents, because it is unnecessary. If a book's chapters have only numbers, without
 distinctive titles, then a table should not be used.</p>
 <p>If your book is a collection of short stories, which do not need to be read in order,
 then a table is useful. If your book has chapters with distinctive names, then a table
 is a decorative method for outlining the overall plot.</p>
-<p>Novelette does not use standard LaTeX methods. If you need a table, design it yourself,
-using the environment and commands described here. Page numbers are not automatic:
-When your book is (nearly) finished, you must edit the table, and provide the numbers.
-Novelette's only assistance is to warn you when they are wrong.</p>
 <p>If you need advice regarding what goes into the table, or where to place it in your book,
 search the Internet for "book design".</p>
+
+
+<p><a id="general"></a>&nbsp;</p>
+<h4 class="section">General Information</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>Novelette does not use standard LaTeX methods. This page describes Novelette's own
+   table structure.</p>
+<ul><li>
+  <p>The table must be in the <a href="components.html#displayzone">display zone</a>
+     of a component in <a href="frontmatter.html">front matter</a>.</p>
+</li><li>
+  <p>The component may contain material in addition to the table.</p>
+</li><li>
+  <p>You may create more than one table in the same component, or in different components.</p>
+</li><li>
+  <p>The table must begin on a recto page. It may continue to additional pages.</p>
+</li><li>
+  <p>Often, the table will look better if there is some vertical space above its title,
+     and between the title and the table.</p>
+</li><li>
+  <p>Page numbers are not automatic: When your book is (nearly) finished, you must edit the table,
+     and provide the numbers. Novelette's only assistance is to warn you when they are wrong.</p>
+</li></ul>
 
 
 <p><a id="title"></a>&nbsp;</p>
 <h4 class="section">Table Title</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
-<p>The table must be in the <a href="">display zone</a> of a component
-in <a href="">front matter</a>.</p>
-<p>Use <code>\style<i>N</i></code> for the table's title. In many cases, the design will
-look better if there is some vertical space above the title, and between the title
-and the table.</p>
-<p>The title may be <code>Contents</code> or something else. One possibility is to use the
-title of the book. This is especially useful if the book is a collection of short stories.</p>
-<p>You may place a short dedication or epigraph between the title and the table. Then, you do
-not need to place that material on its own page.</p>
-<p><span class="h4">Example:</span> This is for a book titled <i>The February Tales</i>,
-which is a collection of short stories. Instead of a dedication or epigraph, there is a quick
-remark between the title and the table:</p>
+<p>The table's title sits above the table. It is not within the table itself.</p>
+<ul><li>
+  <p>Use <a href="display-zone#html#style"><code>\style<i>N</i></code></a> for the title.</p>
+</li><li>
+  <p>The title may be <code>Contents</code> or something else. One possibility is to use the title
+     of the book. This is especially useful if the book is a collection of short stories.</p>
+</li><li>
+  <p>You may place a short dedication or epigraph between the title and the table. Then, you do
+     not need to place that material on its own page.</p>
+</li></ul>
+<p class="noindent"><span class="h4">Example:</span> This is for a book titled
+   <i>The February Tales</i>, which is a collection of short stories. Instead of a dedication
+   or epigraph, there is a quick remark between the title and the table:</p>
 <div class="code"><code><!-- Do not copy code from HTML. Copy it from browser. -->
 \begin{component}<br/>
 \blankline\blankline<br/>
@@ -81,27 +102,42 @@ remark between the title and the table:</p>
 </code></div>
 
 
-<p><a id="general"></a>&nbsp;</p>
+<p><a id="toc"></a>&nbsp;</p>
 <h4 class="section">The <i>toc</i> Environment</h4>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Except for its title, the table's content must be within a <i>toc</i> environment:</p>
-<p><code>\begin{toc}[format=<i>F</i>,pad=<i>P</i>] ... <i>contents</i> ... \end{toc}</code></p>
+<p><code>\begin{toc}[format=<i>F</i>,pad=<i>P</i>,dots=<i>D</i>,<!--
+   -->subtext=<i>S</i>,subindent=<i>I</i>]</code></p>
+<p><i>entries and subentries</i></p>
+<p><code>\end{toc}</code></p>
 <ul><li>
-  <p><code><i>F</i></code> -> Either <code>enter</code> or number <i>N</i>. Selects whether
+  <p><code><i>F</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Either <code>enter</code> or number <i>N</i>. Selects whether
      the table has <a href="#center">centered entries</a>, or is a
      <a href="#vertical">vertical block</a>block with offsets <code><i>N</i></code>.</p>
 </li><li>
-  <p><code><i>P</i></code> -> Number 0<=<i>P</i><=1. Default 0. Applies padding above each
+  <p><code><i>P</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Number 0<=<i>P</i><=1. Default 0. Applies padding above each
      <code>\entry</code>. Useful for vertically stretching a short table. Amount of padding
      is <code><i>P</i></code> multiplied by the normal baseline skip.</p>
 </li><li>
-  <p>The table may extend for more than one page. You may also create more than one table,
-     on the same page, or on other pages.</p>
+  <p><code><i>D</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     0 or 1. Default 0, means no dots connect entry name to its page number. Value 1 means
+     three spaced dots when table format is center, or dot fill when table format is vertical.</p>
 </li><li>
-  <p>You cannot place other material (such <code>\style<i>N</i></code> or <code>\image</code>)
-     within the table. If necessary, break a table into multiple tables, so you can put
-     other material between them.</p>
+  <p><code><i>S</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     normal or small. Default normal. Size of text in <code>\subentry</code> commands.
+     The <code>\subentry</code> command may locally over-ride this setting.</p>
+</li><li>
+  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     0 or 1. Default 0, means left side of subentry aligns with left side of its entry.
+     Value 1 means the subentry is slightly block indented at left. The <code>\subentry</code>
+     command may locally over-ride this setting.</p>
+</li><li>
+  <p>Nothing other than <code>\entry</code>, <code>\subentry</code>, <code>\blankline</code>,
+     or <code>\vspace{<i>multiple&#8209;of&#8209;\baselineskip</i>}</code> may be within
+     the table.</p>
 </li></ul>
 
 
@@ -114,14 +150,15 @@ on a single line. This is unlikely to be a problem, unless you place entries in 
 table with excessive side offsets.</p>
 <p>Although the command always uses the same syntax, the typeset result will look different
 in the center and vertical table formats.</p>
-<p><code>\entry[id=<i>I</i>,page=<i>P</i>,list=<i>L</i>}{<i>name</i>}</code></p>
+<p><code>\entry[id=<i>I</i>,page=<i>P</i>,lead=<i>L</i>}{<i>name</i>}</code></p>
 <ul><li>
-  <p><code><i>I</i></code> -> Refers to a subsequent
-     <a href="components.html#id">component id</a>. Default empty.</p>
-     <p>If an entry has empty <code>id</code>, but nonempty <code>page</code>,
-        you will be warned.</p>
+  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Refers to a subsequent <a href="components.html#id">component id</a>. Default empty.</p>
+  <p>If an entry has empty <code>id</code>, but nonempty <code>page</code>,
+     you will be warned.</p>
 </li><li>
-  <p><code><i>P</i></code> -> The page number seen in print (bookpage). May be italic or arabic.
+  <p><code><i>P</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     The page number seen in print (bookpage). May be italic or arabic.
      Usually not the same as the PDF page number.</p>
   <p>Default <code>P</code> is empty: the table will not show a page number for this entry.
      This is appropriate for an entry such as <code>PART I</code>, which
@@ -133,7 +170,8 @@ in the center and vertical table formats.</p>
   <p>Novelette does not have automatic page numbering. If you set the wrong <code><i>P</i></code>
      for its <code><i>I</i></code>, you will be warned when compiling the whole document.</p>
 </li><li>
-  <p><code><i>L</i></code> -> May be a one or two digit arabic integer, 0&ndash;99.
+  <p><code><i>L</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     May be a one or two digit arabic integer, 0&ndash;99.
      Default empty. Note that <code>0</code> is not the same as empty.</p>
   <ul><li>
     <p>When <code><i>L</i></code> is empty (default), nothing is inserted to the left of the
@@ -150,10 +188,11 @@ in the center and vertical table formats.</p>
     <p>If the table has center format, <code>0</code> is ignored.</p>
   </li></ul>
 </li><li>
-  <p><code>{<i>name</i>}</code> -> Is the chapter name, or short story name, or other things
+  <p><code>{<i>name</i>}</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Is the chapter name, or short story name, or other things
      such as Prologue, etc.</p>
   <p>Example: If chapter <code>3</code> has chapter title <code>The Noise</code>,
-     use <code>3</code> as the list number, and <code>The Noise</code> as name.</p>
+     use <code>3</code> as the lead number, and <code>The Noise</code> as name.</p>
   <p>Example: Since the list numbers cannot be Roman, chapter <code>XV. The Knock</code>
      would use all of it as the name.
   <p>If your book contains chapters without names, then you should not be using
@@ -171,10 +210,15 @@ would name the story, and the subentry would name its author. Or, a subentry may
 that briefly describes what the reader will find in that chapter.</p>
 <p>Although either table format may use subentries, they are more effective when the format
 is vertical.</p>
-<p><code>\subentry[<i>option</i>]{text}</code></p>
+<p>Default values for <i>T</i> and <i>I</i> are set by the <i>toc</i> environment option.
+The <code>\subentry</code> option provides local, per-instance values.</p>
+<p><code>\subentry[text=<i>T</i>,indent=<i>I</i>]{text}</code></p>
 <ul><li>
-  <p>If the option is <code>[small]</code> then the text prints at reduced size and skip.
-     Otherwise, the text prints normal. No other options.</p>
+  <p><code><i>T</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     normal or small. Text size.</p>
+</li><li>
+  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     0 or 1. Whether subentry is block-indented relative to its entry.</p>
 </li><li>
   <p>No padding is applied above a subentry.</p>
 </li><li>
@@ -182,19 +226,19 @@ is vertical.</p>
      for multi-line text.</p>
 </li><li>
   <p>If the table format is vertical: The sides of the subentry are padded. Its left side begins
-     where list-numbered entry names begin. Its right side ends before page numbers begin.</p>
-  <p>You may begin the text with <code>\indent</code> if desired. Multi-line text will
-     justify and wrap.</p>
+     at half an indent from where list-numbered entry names begin. Its right side ends before
+     a three-digit page number begins.</p>
+  <p>Multi-line text will justify and wrap.</p>
 </li><li>
   <p>Avoid multi-paragraph subentry text. A subentry should be brief.</p>
 </li></ul>
 <p class="noindent"><span class="h4">Example:</span> In a table with vertical sides:</p>
 <div class="code"><code>
-\entry[id=hh,page=68,lead=4]{Horror House}
-\subentry{\indent\textit{Don't open that door!}}
+\entry[id=hh,page=68,lead=4]{Horror House}<br/>
+\subentry{\textit{Don't open that door!}}
 </code></div>
 <div class="showme">
-  <img src="images/subentry.jpg" alt="result of subentry"/>
+  <img src="images/hh.jpg" style="width:60%" alt="result of subentry"/>
 </div>
 
 
@@ -207,9 +251,12 @@ is vertical.</p>
 subentries, they print centered (if necessary, use manual line breaks).</p>
 <p>When an entry has page number, exactly three spaced dots print between the name and page.
 Without page number, nothing follows the entry name.</p>
-<p><span class="h4">Example:</span> <code>\entry[id=sw,page=183,lead=14]{Stormy Weather}</code></p>
+<p><span class="h4">Example:</span> In a table with center format:<\p>
+<div class="code"><code>\entry[id=sw,page=183,lead=14]{Stormy Weather}<br/>
+   \entry[id=twr,page=220,lead=15]{The Wonk Returns to Wherever}</code>
+</div>
 <div class="showme">
-  <img src="images/stormycenter.jpg" alt="result of above code"/>
+  <img src="images/sw.jpg" style="width:60%" alt="result center format"/>
 </div>
 
 
@@ -239,8 +286,8 @@ connecting its name to its page number.</p>
    \entry{\hfil PART I}<br/>
    \entry[id=wf,page=7,lead=1]{Wicked Flakes}<br/>
    \entry[id=ys,page=18,lead=2}{Yellow Snow}<br/>
-   \entry[id=frsu,page=32,lead=3]{Frosty's Surprise}<br/>
-   \subentry[small]{\indent Everything you heard as a child was wrong. Now, the truth
+   \entry[id=frf,page=32,lead=3]{Frosty's Freakout}<br/>
+   \subentry[small]{Everything you heard as a child was wrong. Now, the truth
      is revealed, if you can handle it.}<br/>
    \entry[id=whfo,page=68,lead=4]{When Hell Freezes Over}<br/>
    \entry[id=sco,page=103,lead=5}{School's Out}<br/>
