@@ -34,18 +34,18 @@
 
 <h3>Overview</h3>
 <p>Standard LaTeX is used for academic works, where the material is organized in a hierarchy
-of chapters, sections, and so forth. There is a particular way to number and name each portion,
-and a particular method for organizing it all into a table of contents. That allows academic
-readers to quickly find things, and quickly jump in any order from one place to another.</p>
+   of chapters, sections, and so forth. There is a particular way to number and name each portion,
+   and a particular method for organizing it all into a table of contents. That allows academic
+   readers to quickly find things, and quickly jump in any order from one place to another.</p>
 <p>But Novelette is for popular fiction, or those nonfiction books that read like popular
-fiction. The reader is expected to progress in linear order. Most such books have no table
-of contents, because it is unnecessary. If a book's chapters have only numbers, without
-distinctive titles, then a table should not be used.</p>
+   fiction. The reader is expected to progress in linear order. Most such books have no table
+   of contents, because it is unnecessary. If a book's chapters have only numbers, without
+   distinctive titles, then a table should not be used.</p>
 <p>If your book is a collection of short stories, which do not need to be read in order,
-then a table is useful. If your book has chapters with distinctive names, then a table
-is a decorative method for outlining the overall plot.</p>
+   then a table is useful. If your book has chapters with distinctive names, then a table
+   is a decorative method for outlining the overall plot.</p>
 <p>If you need advice regarding what goes into the table, or where to place it in your book,
-search the Internet for "book design".</p>
+   search the Internet for "book design".</p>
 
 
 <p><a id="general"></a>&nbsp;</p>
@@ -78,7 +78,7 @@ search the Internet for "book design".</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The table's title sits above the table. It is not within the table itself.</p>
 <ul><li>
-  <p>Use <a href="display-zone#html#style"><code>\style<i>N</i></code></a> for the title.</p>
+  <p>Use <code><a href="display-zone.html#style">\style<i>N</i></a></code> for the title.</p>
 </li><li>
   <p>The title may be <code>Contents</code> or something else. One possibility is to use the title
      of the book. This is especially useful if the book is a collection of short stories.</p>
@@ -86,19 +86,19 @@ search the Internet for "book design".</p>
   <p>You may place a short dedication or epigraph between the title and the table. Then, you do
      not need to place that material on its own page.</p>
 </li></ul>
-<p class="noindent"><span class="h4">Example:</span> This is for a book titled
+<p class="noindent"><span class="h5">Example:</span> This is for a book titled
    <i>The February Tales</i>, which is a collection of short stories. Instead of a dedication
    or epigraph, there is a quick remark between the title and the table:</p>
 <div class="code"><code><!-- Do not copy code from HTML. Copy it from browser. -->
-\begin{component}<br/>
-\blankline\blankline<br/>
-\style2{The February Tales}<br/>
-\blankline<br/>
-\style6{\textit{for those who love it cold}}<br/>
-\blankline<br/>
-% table follows<br/>
-% possibly more material<br/>
-\end{component}
+   \begin{component}<br/>
+   \blankline\blankline<br/>
+   \style2{The February Tales}<br/>
+   \blankline<br/>
+   \style6{\textit{for those who love it cold}}<br/>
+   \blankline<br/>
+   % table follows<br/>
+   % possibly more material<br/>
+   \end{component}
 </code></div>
 
 
@@ -113,7 +113,7 @@ search the Internet for "book design".</p>
 <p><code>\end{toc}</code></p>
 <ul><li>
   <p><code><i>F</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     Either <code>enter</code> or number <i>N</i>. Selects whether
+     Either <code>center</code> or number <i>N</i>. Selects whether
      the table has <a href="#center">centered entries</a>, or is a
      <a href="#vertical">vertical block</a>block with offsets <code><i>N</i></code>.</p>
 </li><li>
@@ -123,17 +123,17 @@ search the Internet for "book design".</p>
      is <code><i>P</i></code> multiplied by the normal baseline skip.</p>
 </li><li>
   <p><code><i>D</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     0 or 1. Default 0, means no dots connect entry name to its page number. Value 1 means
-     three spaced dots when table format is center, or dot fill when table format is vertical.</p>
+     0 or 1. Ignored by center format. Default 0, means no dots connect entry name to its page
+     number. Value 1 means dot fill connect name to page number.</p>
 </li><li>
   <p><code><i>S</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      normal or small. Default normal. Size of text in <code>\subentry</code> commands.
-     The <code>\subentry</code> command may locally over-ride this setting.</p>
+     Each <code>\subentry</code> command may locally over-ride this setting.</p>
 </li><li>
   <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     0 or 1. Default 0, means left side of subentry aligns with left side of its entry.
-     Value 1 means the subentry is slightly block indented at left. The <code>\subentry</code>
-     command may locally over-ride this setting.</p>
+     0 or 1. Ignored by center format. Default 1, means subentries align with name column.
+     Value 0 means subentries align to the lead column.
+     Each <code>\subentry</code> command may locally over-ride this setting.</p>
 </li><li>
   <p>Nothing other than <code>\entry</code>, <code>\subentry</code>, <code>\blankline</code>,
      or <code>\vspace{<i>multiple&#8209;of&#8209;\baselineskip</i>}</code> may be within
@@ -146,10 +146,10 @@ search the Internet for "book design".</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Each item in the table uses an <code>\entry</code> command. The entire entry must fit
-on a single line. This is unlikely to be a problem, unless you place entries in a vertical
-table with excessive side offsets.</p>
+   on a single line. This is unlikely to be a problem, unless you place entries in a vertical
+   table with excessive side offsets.</p>
 <p>Although the command always uses the same syntax, the typeset result will look different
-in the center and vertical table formats.</p>
+   in the center and vertical table formats.</p>
 <p><code>\entry[id=<i>I</i>,page=<i>P</i>,lead=<i>L</i>}{<i>name</i>}</code></p>
 <ul><li>
   <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
@@ -186,6 +186,11 @@ in the center and vertical table formats.</p>
        an empty space is inserted to the left of the entry name. Then, the name aligns
        with other names that do have numbers.</p>
     <p>If the table has center format, <code>0</code> is ignored.</p>
+  </li><li>
+    <p>If your chapters use Roman numerals, do not write them as lead. Instead, write the
+       entry name as <span class="nowrap"><code>Chapter R</code></span> (R is the Roman numeral),
+       and follow it with a subentry that has the actual chapter name. Or, if the names are short,
+       you may write <span class="nowrap"><code>Chapter R. Chapter Name</code></span>.</p>
   </li></ul>
 </li><li>
   <p><code>{<i>name</i>}</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
@@ -206,33 +211,24 @@ in the center and vertical table formats.</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>If you need to follow an entry with a short explanation, use <code>\subentry</code>.</p>
 <p>For example, if the book is a collection of short stories with different authors, the entry
-would name the story, and the subentry would name its author. Or, a subentry may be a "teaser"
-that briefly describes what the reader will find in that chapter.</p>
+   would name the story, and the subentry would name its author. Or, a subentry may be a "teaser"
+   that briefly describes what the reader will find in that chapter.</p>
+<p>No padding is applied above a subentry. Multi-line text will justify and wrap, unless
+   you manually insert line breaks.</p>
 <p>Although either table format may use subentries, they are more effective when the format
-is vertical.</p>
+   is vertical.</p>
 <p>Default values for <i>T</i> and <i>I</i> are set by the <i>toc</i> environment option.
-The <code>\subentry</code> option provides local, per-instance values.</p>
+   The <code>\subentry</code> option provides local, per-instance values.</p>
 <p><code>\subentry[text=<i>T</i>,indent=<i>I</i>]{text}</code></p>
 <ul><li>
   <p><code><i>T</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      normal or small. Text size.</p>
 </li><li>
   <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     0 or 1. Whether subentry is block-indented relative to its entry.</p>
-</li><li>
-  <p>No padding is applied above a subentry.</p>
-</li><li>
-  <p>If the table format is center: The subentry is centered. You may use manual line breaks
-     for multi-line text.</p>
-</li><li>
-  <p>If the table format is vertical: The sides of the subentry are padded. Its left side begins
-     at half an indent from where list-numbered entry names begin. Its right side ends before
-     a three-digit page number begins.</p>
-  <p>Multi-line text will justify and wrap.</p>
-</li><li>
-  <p>Avoid multi-paragraph subentry text. A subentry should be brief.</p>
+     0 or 1. No difference if table format is center. But when the table format is vertical,
+     Value 0 aligns subentry with the lead column, value 1 aligns it with the name column.</p>
 </li></ul>
-<p class="noindent"><span class="h4">Example:</span> In a table with vertical sides:</p>
+<p class="noindent"><span class="h5">Example:</span> In a table with vertical sides:</p>
 <div class="code"><code>
 \entry[id=hh,page=68,lead=4]{Horror House}<br/>
 \subentry{\textit{Don't open that door!}}
@@ -248,10 +244,10 @@ The <code>\subentry</code> option provides local, per-instance values.</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p><code>\begin{toc}[format=center,pad=<i>P</i>] ... <i>entries</i> ... \end{toc}</code></p>
 <p>This is the simplest format. Each entry prints centered, on one line. If there are
-subentries, they print centered (if necessary, use manual line breaks).</p>
+   subentries, they print centered (if necessary, use manual line breaks).</p>
 <p>When an entry has page number, exactly three spaced dots print between the name and page.
-Without page number, nothing follows the entry name.</p>
-<p><span class="h4">Example:</span> In a table with center format:<\p>
+   Without page number, nothing follows the entry name.</p>
+<p><span class="h5">Example:</span> In a table with center format:<\p>
 <div class="code"><code>\entry[id=sw,page=183,lead=14]{Stormy Weather}<br/>
    \entry[id=twr,page=220,lead=15]{The Wonk Returns to Wherever}</code>
 </div>
@@ -266,14 +262,14 @@ Without page number, nothing follows the entry name.</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p><code>\begin{toc}[format=<i>N</i>,pad=<i>P</i>] ... <i>entries</i> ... \end{toc}</code></p>
 <p>This format is block-aligned. Its sides are offset <code><i>N</i></code> normal indents
-from the margins. Thus, larger <i>N</i> means narrower table.</p>
+   from the margins. Thus, larger <i>N</i> means narrower table.</p>
 <p>The entries and subentries will be aligned, according to their options and content.
-When an entry has page number, a variable number of spaced dots are automatically inserted,
-connecting its name to its page number.</p>
+   When an entry has page number, a variable number of spaced dots are automatically inserted,
+   connecting its name to its page number.</p>
 <p>If you wish to center an entry that has no list number or page number, write
 <code>\hfil</code> (only one l) before the name, like this:
 <span class="nobreak"><code>\entry{\hfil PART I}.</code></span></p>
-<p class="noindent"><span class="h4">Example:</span></p>
+<p class="noindent"><span class="h5">Example:</span></p>
 <div class="code" style="clear:both;"><!-- Do not copy code from HTML. Copy it from browser. -->
    <code>\begin{component}<br/>
    \blankline\blankline<br/>
@@ -287,8 +283,8 @@ connecting its name to its page number.</p>
    \entry[id=wf,page=7,lead=1]{Wicked Flakes}<br/>
    \entry[id=ys,page=18,lead=2}{Yellow Snow}<br/>
    \entry[id=frf,page=32,lead=3]{Frosty's Freakout}<br/>
-   \subentry[small]{Everything you heard as a child was wrong. Now, the truth
-     is revealed, if you can handle it.}<br/>
+   \subentry[small]{Everything you heard as a child was wrong.\\<br/>
+     Now, the truth is revealed, if you can handle it.}<br/>
    \entry[id=whfo,page=68,lead=4]{When Hell Freezes Over}<br/>
    \entry[id=sco,page=103,lead=5}{School's Out}<br/>
    \entry{\hfil PART II}<br/>
@@ -313,10 +309,10 @@ connecting its name to its page number.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Both table formats allow <code>pad=<i>P</i></code> as option, where <i>P</i> is a number
-from 0 to 1 (may be decimal). This may be useful for vertically stretching a table
-that has few entries.</p>
+   from 0 to 1 (may be decimal). This may be useful for vertically stretching a table
+   that has few entries.</p>
 <p>Nonzero <i>P</i> applies that amount of extra baselineskip above each entry
-(but not above subentry).</p>
+   (but not above subentry).</p>
 <p>For example, if<i>P</i> equals 0.5, then half a baselineskip is padded above each entry.</p>
 
 
@@ -326,20 +322,20 @@ that has few entries.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette does not automatically populate the table with correct bookpage numbers.
-You must write them yourself, when you are nearly finished, and you know which components
-start on which book pages.</p>
+   You must write them yourself, when you are nearly finished, and you know which components
+   start on which book pages.</p>
 <p>When compiling a sub-document, bookpages are meaningless; Novelette pays no attention
-to them.</p>
+   to them.</p>
 <p>When compiling the whole document, Novelette reads the table of contents, and remembers
-which <i>id</i> is supposed to be at which <i>bookpage</i>. When it subsequently reaches
-that component <i>id</i>, it checks whether its actual <i>bookpage</i> is what the table said.
-If they disagree, you will be warned, and informed of the correct number. Then you must
-edit the table manually.</p>
+   which <i>id</i> is supposed to be at which <i>bookpage</i>. When it subsequently reaches
+   that component <i>id</i>, it checks whether its actual <i>bookpage</i> is what the table said.
+   If they disagree, you will be warned, and informed of the correct number. Then you must
+   edit the table manually.</p>
 <p>The document <code><i>jobname</i>.typo</code> file will contain what you need to know.</p>
 <p>The Novelette developer believes that this method is less likely to cause problems, if you
-exchange documents with a human editor. That may sound complicated, but it is actually how things
-were done, until very recent times. Did Dickens, Goethe, Rabelais, or Cervantes have automated
-page numbering? <i>No!</i> They wrote great books without it. So can you. Maybe.</p>
+   exchange documents with a human editor. That may sound complicated, but it is how things
+   were done, until very recent times. Did Dickens, Goethe, Rabelais, or Cervantes have automated
+   page numbering? <i>No!</i> They wrote great books without it. So can you. Maybe.</p>
 
 
 

@@ -326,7 +326,7 @@
 \DeclareDocumentCommand\nvt@setstylecmd{mm}{%%
   \directlua{nvt.parsesetstyle('\luaescapestring{#1}','\luaescapestring{#2}')}
   \ifnum\tmpreturn=-1\relax
-    \nvt@warn{One or more duplicate \string\setstyle settings. Duplicates ignored.}
+    \nvt@warn{One or more duplicate \string\setstyleN settings. Duplicates ignored.}
   \fi
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\setstyleN.^^J%%
@@ -608,10 +608,10 @@
 \def\dblfloatpagefraction{.5}
 %% Novelette controls alignment via command options, not by direct user commands:
 \let\nvt@raggedleft\raggedleft\relax\let\nvt@raggedright\raggedright\relax
-\def\raggedleft{\nvt@warn{\string\raggedleft\space not available in Novelette. Ignored.}}
-\def\raggedright{\nvt@warn{\string\raggedright\space not available in Novelette. Ignored.}}
-\def\flushleft{\nvt@warn{Environment flushleft not available in Novelette. Ignored.}}
-\def\flushright{\nvt@warn{Environment flushright not available in Novelette. Ignored.}}
+\def\raggedleft{\nvt@warn{\string\raggedleft\space not available in Novelette. Ignored.}}%%
+\def\raggedright{\nvt@warn{\string\raggedright\space not available in Novelette. Ignored.}}%%
+\def\flushleft{\nvt@warn{Environment flushleft not available in Novelette. Ignored.}}%%
+\def\flushright{\nvt@warn{Environment flushright not available in Novelette. Ignored.}}%%
 \let\endflushleft\relax\let\endflushright\relax
 \def\nvt@centering{\let\\\@centercr\rightskip\@flushglue\leftskip\@flushglue\parfillskip\z@skip}
 \long\def\nvt@center{\trivlist\nvt@centering\item\relax}

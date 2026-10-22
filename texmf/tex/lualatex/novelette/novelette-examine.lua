@@ -169,7 +169,7 @@ nvt.buf3 = 'Only OVERFULL is an error or warning. Rewrite!\n'
 nvt.buf4 = 'WIDOW is a very serious flaw, unless intentional. Rewrite!\n'
 nvt.buf5 = 'Other flaws show places where rewrite may improve appearance.\n'
 nvt.buf6 = 'You decide what is important. No auto-fixes. Only rewrite can fix.\n\n'
-nvt.buffer = nvt.buf1 .. nvt.buf2 .. nvt.buf3 .. nvt.buf4 .. nvt.buf5 .. nvt.buf6
+nvt.typobuffer = nvt.buf1 .. nvt.buf2 .. nvt.buf3 .. nvt.buf4 .. nvt.buf5 .. nvt.buf6
 
 local char_to_discard = { }
 char_to_discard[string.byte(',')] = true
@@ -281,7 +281,7 @@ log_flaw= function (msg, line, colno, footnote)
     local l = string.format('%2d, ', line)
     if footnote then prt = prt .. ', (ftn.) line ' .. l else prt = prt .. ', line ' .. l end
   end
-  prt =  prt .. msg ; nvt.buffer = nvt.buffer .. prt .. '\n'
+  prt =  prt .. msg ; nvt.typobuffer = nvt.typobuffer .. prt .. '\n'
 end
 
 local signature = function (node, string, swap)

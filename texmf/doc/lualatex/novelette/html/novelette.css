@@ -30,6 +30,7 @@ i {font-size:.94rem}
 
 div.code {text-indent:0px; margin-left:2rem; margin-top:.5rem; margin-bottom:.5rem;}
 code {color:#660000; font-size:.94rem;}
+code a {color: default;}
 pre.code {color:#660000;}
 pre.code a {text-decoration:none}
 
@@ -73,7 +74,7 @@ h4.link {float:right; text-align:right;}
 h4.link a {text-decoration:none; font-size:.8rem; font-weight:normal;}
 h4.link img {vertical-align:baseline;}
 
-*.h4 {font-family: sans-serif; font-size:1rem; font-weight:bold;}
+*.h5 {font-family: sans-serif; font-size:.875rem; font-weight:bold;}
 
 a {white-space:nowrap}
 *.codelink a {text-decoration: none;}

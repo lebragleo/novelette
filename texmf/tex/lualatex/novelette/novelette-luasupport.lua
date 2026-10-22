@@ -1,4 +1,4 @@
--- This is file 'novelette-luasupport.lua', part of Novelette document class.parseen
+-- This is file 'novelette-luasupport.lua', part of Novelette document class.
 
 -- For Copyright and License, see accompanying file 'novelette.cls'.
 -- File version: 2026-08-20.
@@ -42,10 +42,10 @@ nvt.subdocs[1] = 'placeholder'
 nvt.good = true -- Becomes false if error or warning. Once false, remains false.
 nvt.title = 'Untitled Document'
 nvt.author = 'Anonymous Author'
-nvt.subtitle = ''
-nvt.docdate = ''
+nvt.subtitle = '<not provided>'
+nvt.docdate = '<not provided>'
 nvt.now = nvt.now or '' -- Set in novelette.cls as nvt@now, then sent here. Format D:---
-nvt.version = ''
+nvt.version = '<not provided>'
 nvt.lang = 'en'
 nvt.nohyphens = false -- Becomes true if lang requests no hyphenation.
 nvt.filepath = './'
@@ -54,9 +54,15 @@ nvt.header = false
 nvt.footer = true
 nvt.lines = 35
 nvt.misschars = 0 -- Counts number of missing characters.
+nvt.nvterr = 0 -- Counts Novelette errors.
+nvt.nvtwarn = 0 -- Counts Novelette warnings.
+nvt.ltxerr = 0 -- Counts non-Novelette errors.
+nvt.ltxwarn = 0 -- Counts non-Novelette warnings. 
+nvt.misslist = '' -- List of missing characters, by Unicode.
+nvt.ewlist = '' -- Accumulates some of Novelette's own errors and warnings.
+nvt.nodia = '' -- Accumulates bad diacritical messages.
 nvt.overfull = 0 -- Counts overfull hboxes.
 nvt.underfull = 0 -- Counts underfull hboxes.
-nvt.misslist = '' -- List of missing characters, by Unicode.
 nvt.trimwidth = 5.5*nvt.inch -- Default finished book interior page width,
 nvt.trimheight = 5.5*nvt.inch -- and height.
 nvt.trimtext = 'width=5.5in,height=8.5in' -- Changed unless mode=usl.
@@ -73,13 +79,11 @@ nvt.evensidemargin = 0.5*nvt.inch
 nvt.oddsidemargin = 0.625*nvt.inch
 nvt.topmargin = 0.5*nvt.inch
 nvt.textwidth = 3.875*nvt.inch
-nvt.entrylist = ''
 nvt.pdfx = true
 nvt.oi = 'fogra'
 nvt.examine = false
 nvt.examinemsg = 0
 nvt.nopageflip = false
-nvt.countnext = 0 -- Increments when \next used.
 nvt.qq = 0 -- Counts bad use of " (double quotes).
 nvt.notdef = 0  -- Increments when .notdef glyph appears.
 nvt.todo = 0 -- Increments when \todo used.
@@ -137,6 +141,7 @@ nvt.didlayout = false
 nvt.didheadstyle = false
 nvt.didscenestyle = false
 nvt.didfootnotestyle = false
+nvt.sumbuffer = {} -- Will contain summary and other info.
 nvt.entry = {} -- For \entry: nvt.entry[id] = 'bookpage in table'
 nvt.actual = {} -- Actual location of component: nvt.actual[id] = 'actual bookpage'
 local GLYPH = node.id('glyph')
@@ -168,7 +173,7 @@ end
 
 -- Parse \entry option:
 nvt.parseentry = function (s)
-  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, a, id, p, pp, l, ll
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, a, id, p, l, ll
   a = string.gsub(s, '%a', '') ; a = string.gsub(a, '%d', '')
   a = string.gsub(a, ',', '') ; a = string.gsub(a, '=', '') ; a = string.gsub(a, '%.', '')
   if a ~= '' then -- the option contains forbidden characters
@@ -186,6 +191,7 @@ nvt.parseentry = function (s)
       p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
       if n == 1 then
         s = string.gsub(s, 'page=' .. p, '') ; tex.sprint('\\def\\tmpentrypage{' .. p .. '}')
+        if id and nvt.thisdoc == '' then nvt.entry[id] = p end
       end
     end
    if string.find(s, 'lead=') then
@@ -511,13 +517,12 @@ nvt.get_page_glyphs = function (h,n)
     if t.id == HLIST or t.id == VLIST then nvt.get_page_glyphs(t.list,n+1) end
     if t.id == GLYPH then
       if t.char == 34 then -- \real{"} has different char code.
-        texio.write_nl('! Problem: Double quotes' .. p .. '\n')
+        texio.write_nl('! Warning: Double quotes character " ' .. p .. '\n')
         nvt.qq = nvt.qq + 1 ; nvt.good = false
       elseif t.char == 43981 or t.char == 983040 or t.char == 65533 then
         nvt.notdef = nvt.notdef + 1
       elseif t.char ==  65532 then
-        texio.write_nl('! Problem: TODO symbol' .. p)
-        texio.write_nl('  You must replace it with some text, or remove it.\n')
+        texio.write_nl('! Warning: \\todo symbol' .. p .. '\n')
         nvt.todo = nvt.todo + 1 ; nvt.good = false
       end
     end
@@ -945,23 +950,25 @@ end
 -- Count missing characters, and flag bad. Hat tip to user 'wipet'.
 -- Note that an explicit \char"FFFD does not trigger this, because all Novelette fonts have it:
 luatexbase.add_to_callback('glyph_not_found', function(id,char)
-  local tc, tcu, tc2, tc3, sc ; nvt.good = false
+texio.write_nl('IDDDDDDDDDDD=' .. id .. ', CHAAAAAAAAAAAAR=' .. char .. '<\n')
+  local tc, tcu, tc2, tc3, sf, su, sc ; nvt.good = false
   tcu = string.format('%s U+%.4X', utf8.char(char), char) ; tc = string.gsub(tcu, '.*U%+', '')
   tc2 = string.gsub(tc,'..$','') ; tc3 = string.gsub(tc,'^..','') ; tc3 = string.gsub(tc3,'.$','')
-  local su = string.format('U+%.4X', char) ; local sun = string.format('%.4X', char)
-  local sf = string.format('%s (U+%.4X)', utf8.char(char), char)
   if tc2=='02' and string.find('BCDEF',tc3) then
-    sc = 'Combining diacritical mark ' .. sf .. ' unavailable.\n'
+    sf = string.format('%s (U+%.4X)', utf8.char(char), char)
+    sc = 'Combining diacritical mark  ' .. sf .. ' unavailable.\n'
       .. '  Characters with diacriticals are pre-composed in Novelette fonts.'
   elseif tc2 == '03' and string.find('0123456',tc3) then
-    sc = 'Combining diacritical mark ' .. sf .. ' unavailable.\n'
+    sf = string.format('%s (U+%.4X)', utf8.char(char), char)
+    sc = 'Combining diacritical mark  ' .. sf .. ' unavailable.\n'
       .. '  Characters with diacriticals are pre-composed in Novelette fonts.'
   else
-    sc = 'Character ' .. sf .. ' unavailable in Novelette fonts.'
+    su = string.format('U+%.4X', char)
+    sc = 'Unicode character ' .. su .. ' unavailable in Novelette fonts.'
   end
-  texio.write_nl('! Problem: ' .. sc .. '\n')
+  texio.write_nl('! Warning: ' .. sc .. '\n')
   nvt.misschars = nvt.misschars + 1
-  if not string.find(nvt.misslist, sun) then
+  if su and not string.find(nvt.misslist, su) then
     if nvt.misschars < 9 then
       nvt.misslist = nvt.misslist .. ' ' .. su
     else
@@ -1070,7 +1077,7 @@ end
 -- Parse option of toc environment:
 nvt.parsetoc = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ','
-  local n, y, p, d, t, i
+  local n, y, p, d, t, i, m
   if string.find(s, 'format=') then
     y, n = string.gsub(s, '.*format=', '') ; y = string.gsub(y, ',.*', '')
     if n == 1 then
@@ -1153,7 +1160,7 @@ function nvt.parsecomponent (s,p) -- option,bookpage
     if n == 1 and id ~= '' and string.len(id) <= 8 then
       s = string.gsub(s, 'id=' .. id, '')
       z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
-      if z == '' and not nvt.actual[id] then
+      if z == '' and nvt.thisdoc == '' and not nvt.actual[id] then
         nvt.actual[id] = p ; s = string.gsub(s, 'id=' .. id, '')
         texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. p .. '\n')
       end
@@ -1322,31 +1329,45 @@ end
 -- Catch LaTeX errors and warnings that may or may not use \GenericError or \GenericWarning code:
 function nvt.flagbad()
   nvt.good = false
+  nvt.ltxerr = nvt.ltxerr + 1
   local les = status.lasterrorstring or ''
   local lec = status.lasterrorcontext or ''
+  if string.find(lec, 'c@\\') then -- Bad counter.
+    texio.write_nl('\n\n' .. lec .. '\nFatal error: Bad counter.\n'
+      .. 'Likely reason: You wrote {\\CounterName} instead of {CounterName}.\n\n')
+    os.exit()
+  end
+  if string.find(les, 'Undefined control') then -- Bad macro name.
+    local lecc = string.gsub(lec, '%c%s.*', '')
+    texio.write_nl('\n' .. lecc .. '\nFatal error: Bad macro name. Mis-spelled?\n\n')
+    os.exit()
+  end
+  if string.find(lec, 'inserted text') and string.find(lec, '}') then -- Unmatched braces.
+    local lecc = string.gsub(lec, '.*l%.', '') ; lecc = string.gsub(lecc, '%s.*', '')
+    texio.write_nl('\n\nFatal error: Missing right brace, on or before line ' .. lecc .. '.\n')
+    texio.write_nl('Often, the missing brace should have appeared\n')
+    texio.write_nl('many lines before its absence was detected.\n\n')
+    os.exit()
+  end
   if string.find(les, 'Paragraph ended before') then
-    texio.write_nl('\nThis error is usually caused by one of these problems:')
-    texio.write_nl('1. Unmatched braces. An ending brace is missing, or in the wrong place.')
-    texio.write_nl('   Solution: Count the braces, and be sure that they match.')
-    texio.write_nl('2. Some macros cannot continue from one paragraph to another.')
-    texio.write_nl('   Example: "from \\textit{here\\par to} there" will fail.')
-    texio.write_nl('   If the message mentions \\text@command, this is the most likely problem.') 
-    texio.write_nl('   Solution: Break the command at paragraph boundaries:')
-    texio.write_nl('   "from \\textit{here}\\par\\textit{to} there" succeeds.')
-    texio.write_nl('3. If the message says "paragraph ended before [something] was complete",')
+    texio.write_nl('\nFatal error: Usually caused by one of these problems:')
+    texio.write_nl('1. If the message says "Paragraph ended before (something) was complete",')
     texio.write_nl('   then you cannot put a paragraph break within that command.')
-    texio.write_nl('4. Unescaped percent symbol was interpreted as comment.')
-    texio.write_nl('   Example: 30% fails. But 30\\% succeeds.')
-    texio.write_nl('Best response: x<return> to exit now, fix the problem, then try again.')
-    texio.write_nl('  If you continue, this error will likely cause other errors.\n')
+    texio.write_nl('   Note that "\\text@command" is internal to macros such as \\textit.')
+    texio.write_nl('   Example: \\textit{1\\par 2} fails. \\textit{1}\\par\\textit{2} succeeds.')
+    texio.write_nl('2. Unmatched braces. An ending brace is missing, or in the wrong place.')
+    texio.write_nl('   Solution: Count the braces, and be sure that they match.')
+    texio.write_nl('3. Unescaped percent symbol was interpreted as comment.')
+    texio.write_nl('   Example: 30% fails. 30\\% succeeds.\n\n')
+    os.exit()
   end
   if les ~= '' and les ~= 'Emergency stop' then texio.write_nl(lec .. '\n') end
-  nvt.luaerr = 0
+  nvt.luaerr = false
 end
 luatexbase.add_to_callback('show_error_hook',nvt.flagbad,'catch_errors')
 luatexbase.add_to_callback('show_lua_error_hook',
-  function() nvt.good = false ; nvt.luaerr = 1 ; local lles = status.lastluaerrorstring or ''
-    texio.write_nl(lles .. '\n') end,
+  function() nvt.good = false ; nvt.luaerr = true ; local lles = status.lastluaerrorstring or ''
+    texio.write_nl(lles .. '\n') ; nvt.ltxerr = nvt.ltxerr + 1 end,
   'catch_luaerrors')
 --
 
@@ -1368,10 +1389,10 @@ function nvt.overunderfull (incident,detail,head,first,last)
     if head.glue_set > 0 then
       stretch = string.format('%.1f%s',head.glue_set/1.5,'') .. 'x max, '
     end
-    texio.write_nl('Underfull \\hbox (badness 10000) in paragraph at lines '
+    texio.write_nl('\nUnderfull \\hbox (badness 10000) in paragraph at lines '
       .. first .. '-' .. '-' .. last)
     texio.write_nl('  ^ Alert: Excessive stretch, ' .. stretch .. 'input line '
-      .. first .. '-' .. last .. ', PDFpage ' .. tex.getcount('c@page') .. '.\n')
+      .. first .. '-' .. last .. ', PDFpage ' .. tex.getcount('c@page') .. '.\n\n')
   end
 end
 luatexbase.add_to_callback('hpack_quality',nvt.overunderfull,'overunder_full')
@@ -1419,16 +1440,16 @@ function nvt.getcharaccent (a,c) -- accent, base character
     if (d == 'macron') and string.find('AEIOUaeiou',c) then n = 1 end
     if (d == 'acute') and string.find('Jj',c) then
       e = 'Unavailable as single character: J or j with acute.\n'
-      e = e .. '\\space\\space For IJ or ij with both acute:'
-      e = e .. '\\space \\string\\IJacute\\space or \\string\\ijacute.'
+      e = e .. '\\spii For IJ or ij with both acute: \\string\\IJacute, or \\string\\ijacute.'
       em2 = e ; n = 4 ; nvt.good = false
     end
   end
   if n == 0 then
-    tex.sprint('\\gdef\\tmpnum{0}' .. c) ; nvt.good = false
+    tex.sprint('\\def\\tmpreturn{0}' .. c) ; nvt.good = false
     em2 = 'No ' .. c .. ' with ' .. d .. ' diacritical.'
+    nvt.nodia = nvt.nodia .. '  ' .. em2 .. '\n'
   else
-    tex.sprint('\\gdef\\tmpnum{1}')
+    tex.sprint('\\def\\tmpreturn{1}')
   end
   tex.sprint('\\def\\emtwo{' .. em2 .. '}')
 end
@@ -1805,7 +1826,7 @@ end
 -- Parse \examine setting: ---- nvt.didexamine ?
 nvt.parseexamine = function (s)
   s = string.gsub(s, ' ', '')
-  if s == '1' then tex.sprint('\\def\\tmpex{1}')
+  if s == '1' then tex.sprint('\\def\\tmpex{1}') ; nvt.examine = true
   elseif s == '0' then tex.sprint('\\def\\tmpex{0}')
   else tex.sprint('\\def\\tmpreturn{0}')
   end
@@ -1885,121 +1906,158 @@ end
 nvt.finalize = function ()
   if nvt.good == false then
     tex.sprint('\\def\\tmpmode{bad}') ; nvt.mode = 'draft'
-    luatexbase.add_to_callback('wrapup_run', function ()
-      texio.write_nl('\n! Fix problems: errors, warnings, or overfull boxes.\n\n')
-    end, 'nvt_wrapup')
-  else
-    tex.sprint('\\def\\tmpmode{' .. nvt.mode .. '}')
-    luatexbase.add_to_callback('wrapup_run', function ()
-      texio.write('\n\n')
-      texio.write_nl('********************************** '
-        .. 'SUMMARY **********************************')
-      texio.write_nl('Compiled at: ' .. nvt.now)
-      texio.write_nl('Title: ' .. nvt.title)
-      if nvt.subtitle ~= '' then texio.write_nl('Subtitle: ' .. nvt.subtitle) end
-      texio.write_nl('Author: ' .. nvt.author)
-      if nvt.docdate ~= '' then texio.write_nl('Docdate: ' .. nvt.docdate) end
-      if nvt.version ~= '' then texio.write_nl('Version: ' .. nvt.version) end
-      if nvt.countnext ~= 0 and nvt.mode ~= 'bad' then nvt.mode = 'draft' end
-      local ng = '.'
-      if nvt.mode == nvt.startmode then
-        texio.write_nl('Mode: ' .. nvt.mode .. '.')
-      else
-        if nvt.countnext ~= 0 and nvt.mode ~= 'draft' and nvt.mode ~= 'dev' then
-          ng = '. Requested' .. nvt.startmode .. ','
-            .. 'but denied due to ' .. nvt.countnext .. ' instances of \\next.'
-        elseif nvt.mode ~= 'draft' and nvt.mode ~= 'dev' then
-          ng = '. Requested' .. nvt.startmode .. ', but denied due to error/warning/overfull.'
-        end
-        texio.write_nl('Mode: draft' .. ng)
-      end
-      texio.write_nl('Trim Size: ' .. nvt.trimtext)
-      local twin, emin, blin
-      local l = 'lines=' .. nvt.lines .. ',pagestyle=' .. nvt.pagestyle
-      if nvt.moreglue == true then l = l .. ',glue=wide,' else l = l .. ',glue=normal,' end
-      l = l .. 'cpl=' .. nvt.charperline
-      texio.write_nl('Layout: ' .. l)
-      texio.write_nl('Font: em=' .. string.format("%.2f", nvt.em) .. 'pt, baselineskip='
-        .. string.format("%.2f", nvt.bls) .. 'pt, ratio baselineskip/em='
-        .. string.format("%.2f", nvt.bls/nvt.em))
-      if nvt.em < 11.04 then
-        texio.write_nl('Alert: Small font size. Try bigger trimsize, or fewer lines.')
-      elseif nvt.em <= 11.6 and nvt.pagestyle == 'split' then
-        texio.write_nl('Alert: Crowded layout. Will look better if pagestyle is not split.')
-      end
-      twin = nvt.textwidth/nvt.inch ; emin = nvt.em/nvt.inch ; blin = nvt.bls/nvt.inch
-      texio.write_nl('Images: max W ' .. string.format("%.4f", twin) .. 'in, '
-        .. 'max H ' .. string.format("%.4f", emin) .. 'in first line, '
-        .. string.format("%.4f", blin) .. 'in each added line.')
-      local outm, outmt, glus, glusmt
-      if nvt.metric == 1 then
-        outm = nvt.evensidemargin/nvt.mm
-        outmt = string.format("%.2f", outm) .. 'mm'
-        glus = nvt.glue/nvt.mm
-        glusmt = string.format("%.2f", glus) .. 'mm'
-      else
-        outm = nvt.evensidemargin/nvt.inch
-        outmt = string.format("%.3f", outm) .. 'in'
-        glus = nvt.glue/nvt.inch
-        glusmt = string.format("%.3f", glus) .. 'in'
-      end
-      texio.write_nl('Margins: at least ' .. outmt .. ', plus ' .. glusmt .. ' spine glue strip.')
-      if nvt.nohyphens == true then
-        texio.write_nl('Hyphenation: disabled by \\lang{xx} choice.')
-      else
-        if nvt.lang == 'en' then
-          texio.write_nl('Hyphenation: en (Default. For English, better to use en-US or en-UK)')
-        else
-          texio.write_nl('Hyphenation language: ' .. nvt.lang)
-        end
-      end
-      if nvt.countnext ~= 0 then
-        texio.write_nl('Alert: ' .. nvt.countnext .. ' instances of \\next. '
-          .. 'Prevents preview and final modes.')
-      end
-      if nvt.examine == true then
-        if nvt.pagelist == '' then
-          texio.write_nl('Info: No typographic flaws found. Good!')
-        else
-          texio.write_nl('Alert: Found typographic flaws. See file ' .. tex.jobname .. '.typo.')
-          texio.write_nl('  Whether or not to fix any flaws, is your decision.')
-        end
-      end
-      if nvt.underfull > 0 then
-        texio.write_nl('Alert: Found ' .. nvt.underfull .. ' line(s) with excessive stretch.')
-        texio.write_nl('  Too much inter-word space. If not intentional, edit text there.')
-      end
-      if nvt.overfull > 0 then
-        texio.write_nl('Problem: Found ' .. nvt.overfull .. ' overfull line(s).')
-        texio.write_nl('  Novelette does not allow lines to extend into the margins.')
-      end
-      if nvt.qq > 0 then
-        texio.write_nl('Problem: Found ' .. nvt.qq .. ' printable " straight double quotes.')
-        texio.write_nl('  You must edit them to left and right curly, or use \\real{"}.')
-      end
-      if nvt.todo > 0 then
-        texio.write_nl('Problem: Found ' .. nvt.todo .. ' TODO symbol(s).')
-        texio.write_nl('  You must replace them with text (or remove them, if no text).')
-      end
-      if nvt.misschars > 0 then
-        texio.write_nl('Problem: Missing character(s). List by Unicode:')
-        texio.write_nl(' ' .. nvt.misslist)
-      end
-      if nvt.good == false then
-        texio.write_nl('EEEEEEK !!! One or more errors, warnings, or problems.')
-      end
-      if nvt.thisdoc ~= '' then
-        texio.write_nl('Note: When compiling only subdocs, mode is never preview or final.')
-      end
-      if nvt.examinemsg == 1 then
-        texio.write_nl('Alert: Typo examine not performed unless requested mode=draft.')
-      end
-      if nvt.good == false then texio.write_nl('Note: Forced draft mode, due to problems.') end
-      texio.write_nl('******************************** '
-        .. 'END SUMMARY ********************************')
-      texio.write('\n\n')
-    end, 'nvt_wrapup')
   end
+  tex.sprint('\\def\\tmpmode{' .. nvt.mode .. '}')
+  if nvt.countnext ~= 0 then
+    if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
+  end
+  luatexbase.add_to_callback('wrapup_run', function ()
+  table.insert(nvt.sumbuffer, '\n\n********************************** '
+    .. 'SUMMARY **********************************\n')
+  table.insert(nvt.sumbuffer, 'File: ' .. tex.jobname .. '.tex. Compiled ' .. nvt.now .. '\n')
+  table.insert(nvt.sumbuffer, 'Title: ' .. nvt.title .. '\n')
+  table.insert(nvt.sumbuffer, 'Subtitle: ' .. nvt.subtitle .. '\n')
+  table.insert(nvt.sumbuffer, 'Author: ' .. nvt.author .. '\n')
+  table.insert(nvt.sumbuffer, 'Docdate: ' .. nvt.docdate .. '\n')
+  table.insert(nvt.sumbuffer, 'Version: ' .. nvt.version .. '\n')
+  if nvt.mode == nvt.startmode then
+    table.insert(nvt.sumbuffer, 'Mode: ' .. nvt.mode .. '\n')
+  else
+    table.insert(nvt.sumbuffer, 'Mode: ' .. nvt.mode .. '\n'
+      .. '  Requested mode ' .. nvt.startmode .. '. Denied due to error/warning/overfull.\n')
+  end
+  table.insert(nvt.sumbuffer, 'Trim Size: ' .. nvt.trimtext .. '\n')
+  local l = 'lines=' .. nvt.lines .. ', pagestyle=' .. nvt.pagestyle
+  if nvt.moreglue == true then l = l .. ', glue=wide,' else l = l .. ', glue=normal' end
+  l = l .. ', cpl=' .. nvt.charperline
+  table.insert(nvt.sumbuffer, 'Layout: ' .. l .. '\n')
+  local f = 'Font: em=' .. string.format("%.2f", nvt.em) .. 'pt, baselineskip='
+    .. string.format("%.2f", nvt.bls) .. 'pt, ratio baselineskip/em='
+    .. string.format("%.2f", nvt.bls/nvt.em) .. '\n'
+  table.insert(nvt.sumbuffer, f)
+  local twin, emin, blin
+  twin = nvt.textwidth/nvt.inch ; emin = nvt.em/nvt.inch ; blin = nvt.bls/nvt.inch
+  table.insert(nvt.sumbuffer, 'Maximum sizes for \\image:\n'
+    .. '  Width ' .. string.format("%.4f", twin) .. 'in.\n'
+    .. '  Height ' .. string.format("%.4f", emin) .. 'in for first line, plus '
+    .. string.format("%.4f", blin) .. 'in for each additional line.\n')
+  local outm, outmt, glus, glu
+  if nvt.metric == 1 then
+    outm = nvt.evensidemargin/nvt.mm
+    outmt = string.format("%.2f", outm) .. 'mm'
+    glus = nvt.glue/nvt.mm
+    glu = string.format("%.2f", glus) .. 'mm'
+  else
+    outm = nvt.evensidemargin/nvt.inch
+    outmt = string.format("%.3f", outm) .. 'in'
+    glus = nvt.glue/nvt.inch
+    glu = string.format("%.3f", glus) .. 'in'
+  end
+  table.insert(nvt.sumbuffer, 'Margins: at least ' .. outmt .. ', plus '
+    .. glu .. ' spine glue strip.\n')
+  if nvt.nohyphens == true then
+    table.insert(nvt.sumbuffer, 'Hyphenation: disabled by \\lang{xx} choice.\n')
+  else
+    if nvt.lang == 'en' then
+      table.insert(nvt.sumbuffer, 'Hyphenation: en (For English, prefer en-US or en-UK.)\n')
+    else
+      table.insert(nvt.sumbuffer, 'Hyphenation language: ' .. nvt.lang .. '\n')
+    end
+  end
+  if nvt.examine == true then
+    if nvt.startmode == 'draft' then
+      if nvt.pagelist == '' then
+        table.insert(nvt.sumbuffer, 'Examined document for typo flaws. Found none. Amazing!\n')
+      else
+        table.insert(nvt.sumbuffer, 'Examined document for typo flaws. Found some.\n'
+          .. '  See file ' .. tex.jobname .. '.typo for details.\n'
+          .. '  Flaws are not errors. They are places where typesetting is poor.\n'
+          .. '  They may be minor, or important. Fix them or not. Your decision.\n')
+      end
+    else
+      table.insert(nvt.sumbuffer, 'Did not examine typo flaws; requested mode is not draft.\n')
+    end
+  else
+    table.insert(nvt.sumbuffer, 'Did not examine document for typo flaws.\n')
+  end
+  if nvt.good == false then
+    table.insert(nvt.sumbuffer, 'EEEEEEK !!! One or more problems, forced bad draft mode.\n')
+    table.insert(nvt.sumbuffer, '  See file ' .. tex.jobname .. '.sum for details.\n')
+  else
+    table.insert(nvt.sumbuffer, 'This summary is saved in file ' .. tex.jobname .. '.sum.\n')
+  end
+  if nvt.thisdoc ~= '' then
+    table.insert(nvt.sumbuffer, 'Compiled subdoc, so mode cannot be preview or final.\n')
+  end
+  table.insert(nvt.sumbuffer, 
+      '******************************** END SUMMARY ********************************\n\n\n')
+  for i = 1, #nvt.sumbuffer do
+    texio.write_nl(nvt.sumbuffer[i])
+  end
+  if nvt.overfull > 0 then
+    nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.overfull .. ' overfull line(s) '
+      .. 'extending into margin.\n'
+--    nvt.nvtwarn = nvt.nvtwarn + 1
+  end
+  if nvt.qq > 0 then
+    nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.qq .. ' printable " character(s). '
+      .. 'Edit to left/right curly, or \\real{"}.\n'
+--    nvt.nvtwarn = nvt.nvtwarn + 1
+  end
+  if nvt.todo > 0 then
+    nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.todo .. ' \\todo symbol(s).\n'
+--    nvt.nvtwarn = nvt.nvtwarn + 1
+  end
+  if nvt.misschars ~= 0 then
+    nvt.ewlist = nvt.ewlist .. 'Missing character(s), not in fonts. List by Unicode:\n'
+       .. ' ' .. nvt.misslist .. '\n'
+--    nvt.nvtwarn = nvt.nvtwarn + 1
+  end
+  if nvt.nodia ~= '' then
+    nvt.ewlist = nvt.ewlist .. 'Bad character composition using diacritical macro:\n'
+       ..  nvt.nodia .. '\n'
+--    nvt.nvtwarn = nvt.nvtwarn + 1
+  end
+----- more problems
+  if nvt.ltxerr > 0 then
+    nvt.ewlist = nvt.ewlist .. 'LuaLaTeX issued ' .. nvt.ltxerr .. ' error(s).\n'
+  end
+  if nvt.ltxwarn > 0 then
+    nvt.ewlist = nvt.ewlist .. 'LuaLaTeX issued ' .. nvt.ltxwarn .. ' warning(s).\n'
+  end
+  if nvt.nvterr > 0 then
+    nvt.ewlist = nvt.ewlist .. 'Novelette issued ' .. nvt.nvterr .. ' error(s).\n'
+  end
+  if nvt.nvtwarn > 0 then
+    nvt.ewlist = nvt.ewlist .. 'Novelette issued ' .. nvt.nvtwarn .. ' warning(s).\n'
+  end
+----- other Novelette warnings and errors.
+  if nvt.ewlist ~= '' then
+    nvt.ewlist = '********** Problems that must be fixed:\n' .. nvt.ewlist .. '\n\n'
+    table.insert(nvt.sumbuffer, nvt.ewlist)
+  end
+  local alertlist = ''
+  if nvt.em < 11.04 then
+    alertlist = alertlist .. 'Small font size. Try bigger trimsize, or fewer lines.\n'
+  elseif nvt.em <= 11.6 and nvt.pagestyle == 'split' then
+    alertlist = alertlist .. 'Crowded layout. Will look better if pagestyle is not split.\n'
+  end
+  if nvt.underfull > 0 then
+    alertlist = alertlist .. 'Found ' .. nvt.underfull .. ' line(s) with excessive stretch. '
+      .. 'If not intentional, edit text.\n'
+  end
+  if alertlist ~= '' then
+    alertlist = '********** Alerts that may be fixed or ignored:\n' .. alertlist .. '\n\n'
+    table.insert(nvt.sumbuffer, alertlist)
+  end
+----- more alerts
+  local fileout = './' .. tex.jobname .. '.sum'
+  local out = io.open(fileout,"w+")
+  for i = 1, #nvt.sumbuffer do
+    out:write(nvt.sumbuffer[i])
+  end
+  io.close(out)
+   end, 'nvt_wrapup')
 end
 --
 

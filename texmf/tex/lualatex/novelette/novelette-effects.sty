@@ -173,7 +173,7 @@
           \sbox0{\nvt@keytext}\setlength\nvt@keywidth{\wd0}%%
           \edef\tmpbad{\fpeval{(\wd0 < 4*\nvt@parindent) + (\wd0 > \textwidth)}}%%
           \ifnum\tmpbad=1\relax%%
-            \nvt@warn{\string\key\space text is too short or too wide. Ignored.}%%
+            \nvt@warn{\string\key\space text is too narrow or too wide. Ignored.}%%
           \else%%
             \edef\tmphalfkeydiff{\fpeval{(\textwidth-\wd0)/2}pt}%%
           \fi%%
@@ -268,14 +268,16 @@
 
 
 %% TABLE OF CONTENTS ENVIRONMENT:
-%%   \begin{toc}[format=F,pad=P,dots=D,subtext=S,subindent=I] ... entries ... \end{toc}
+%%   \begin{toc}[format=F,pad=P,dots=D,subtext=S,subindent=I]
+%%   ... entries  and subentries ...
+%%   \end{toc}
 %% F -> Either center, or number 0<=F<=8.
 %%   If center, is block [0/0,align=center]. If number, is vertical block [F/F,align=justify].
 %% P -> Number 0<=P<=1. Applies padding above each \entry command. The padding is a multiple
 %%   of normal baselineskip. Thus P=.5 applies half-line padding.
-%% D -> 0 1. Default 1 means three dots for cetner, fill for vertical. 0 means no dots.
+%% D -> 0 1. Default 1 means three dots for center, fill for vertical. 0 means no dots.
 %% S -> small or normal. Default normal. Text size for \subentry. May locally over-ride.
-%% I -> 0 1 2. Default 1. Text indent for \subentry. May locally over-ride.
+%% I -> 0 1. Default 1. Text indent for \subentry. May locally over-ride.
 \newif\ifnvt@intoc %% True within toc environment.
 \DeclareDocumentEnvironment{toc}{O{}}{%%
   \par\strut\par\vspace{-\nvt@bls}%% Ensure fresh line.
@@ -290,7 +292,7 @@
     \strut\char"FFFD \smcp{bad nested toc environment} \char"FFFD\par%%
   \else%%
     \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
-    \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}%%
+    \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}\def\tmpmaxlead{0}%%
     \def\tmptocsubtext{0}\def\tmptocsubind{1}\def\tmptocdots{-1}%%
     \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=0\relax%%
@@ -303,7 +305,7 @@
         \spiv D -> 0 1. Default 1 uses dots. If 0, no dots.^^J%%
         \spix Center format demotes fill to some.^^J%%
         \spiv S -> small normal. Default text size for subentries.^^J%%
-        \spiv I -> 0 1 2. Default subentry indent. Only when vertical format.}%%
+        \spiv I -> 0 1. Default subentry indent. Only when vertical format.}%%
       \strut\char"FFFD \smcp{bad option for toc environment} \char"FFFD\par%%
     \else%%
       \nvt@intoctrue\nvt@inblocktrue%%
@@ -365,7 +367,7 @@
         \ifnum\tmplead=0\relax\def\tmpleadbox{\makebox[1.5\nvt@em]{}}\fi%% Digit width = 0.5em.
         \ifnum\tmplead=1\relax%%
           \def\tmpleadbox{\makebox[1.5\nvt@em][r]{%%
-            \tmpentrylead{\nvt@aff{RawFeature={+cv45}}.\space}%%
+            \tmpentrylead{\nvt@aff{RawFeature={+cv45,+cv43}}.\space}%%
           }}%%
         \fi%%
         \sbox1{\tmpleadbox}%%
@@ -410,7 +412,7 @@
 %% \subentry[text=T,indent=I]{text}
 %%   This is a method for adding more information beneath an \entry.
 %% T -> 0 or 1. 0=normal. 1=small. Default \tmptocsubtext
-%% I -> 0 1 2. Text block indent, relative to above entry {name}. Default \tmptocsubind.
+%% I -> 0 1. Text block indent, relative to above entry {name}. Default \tmptocsubind.
 \DeclareDocumentCommand\subentry{O{}+m}{%%
   \begingroup\edef\tmpsmsub{\tmptocsubtext}\edef\tmpsubind{\tmptocsubind}%%
   \directlua{nvt.parsesubentry('\luaescapestring{#1}')}%%
@@ -430,9 +432,7 @@
   \parshape 1 \@totalleftmargin \linewidth%%
   {#2\par}%%
   \ifnum\tmpsmsub=1\relax\vspace{.2625\nvt@bls}\fi%%
-  \ifnum\tmpreturn=0\relax%%
-    \nvt@warn{Bad option for \string\subentry.}%%
-  \fi%%
+  \ifnum\tmpreturn=0\relax\nvt@warn{Bad option for \string\subentry.}\fi%%
   \endgroup%%
 }%%
 %%
@@ -447,7 +447,7 @@
 %% in preamble, or the built-in defaults (if unset by user). These are fixed.
 %%   The local \styleN[option] cannot change those settings. Local option [info] writes the
 %% typeset width of the text to Terminal (console). Option [logo] allows \logo in the text.
-%%   There is no automatic chapter numbering (see \next command, for placeholder).
+%%   There is no automatic chapter numbering (see \todo command, for placeholder).
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
     \spii inside \string\styleN (N=0-9), or \string\scene, or \string\sceneimage.}%%
@@ -494,7 +494,7 @@
       \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%%
       \edef\tmpboxdp{\fpeval{\dp0 > .235*\tmpscale*\nvt@em}}%%
       \ifnum\tmpboxdp=1\relax%%
-        \nvt@warn{\string\styleN\space content has disallowed characters.}%%
+        \nvt@warn{\string\style#1\space content has disallowed characters.}%%
       \fi%%
     \endgroup%%
     \sbox0{{\tmpfont\tmpfeat\spaceskip=\tmpsp\char"200D{#3}\char"200D}}%% Re-measure with logo.
@@ -527,7 +527,7 @@
 %% paragraph is not indented.
 %%   The default \scene alignment is set in preamble by \scenestyle, or center if unset.
 %% Option [align=A] is for local over-ride (A = left right center).
-%%   Scenes have no automatic numbering. Do it yourself. See the \next command.
+%%   Scenes have no automatic numbering. Do it yourself. See the \todo command.
 \newif\ifnvt@inscene %% True inside \scene.
 \DeclareDocumentCommand\scene{O{}+m}{%% +m will be re-parsed as m.
   \ifnvt@instyle\def\tmpok{0}\else\def\tmpok{1}\fi%%
@@ -677,18 +677,6 @@
 %%
 
 
-%% PLACEHOLDER \next for chapter/scene numbers:
-%%   Novelette does not have automatic chapter/scene numbers. Do it yourself. In draft mode,
-%% the \next command prints ## there, as a reminder that you must later change it to whichever
-%% number is necessary. If any \next remains, you cannot move to preview or final mode.
-\newif\ifnvt@didnext %% Become true if 1 or more \next used.
-\newcommand\next{%%
-  \#\#%% Two ## placed at this Unicode slot.
-  \global\nvt@didnexttrue\directlua{nvt.countnext=nvt.countnext+1}%%
-}%%
-%%
-
-
 %% RE-DEFINE \underline:
 \DeclareDocumentCommand\underline{m}{%%
   \ifnvt@indisplay%%
@@ -705,8 +693,6 @@
     {#1}%%
   \fi%%
 }%%
-
-%%
 
 
 %% RE-DEFINE \line:

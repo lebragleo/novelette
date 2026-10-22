@@ -25,7 +25,7 @@
 <a href="#fonts">About Fonts</a> &nbsp;
 <a href="#pdfx">About PDF/X</a> &nbsp;
 <a href="#lua">So Much Lua</a> &nbsp;
-<a href="#chapters">No Auto TOC</a>
+<a href="#chapters">No Auto TOC</a> &nbsp;
 <a href="#graphics">Only png Images</a>
 </div>
 
@@ -95,7 +95,28 @@ be sure that they are included in whichever OpenType features are appropriate.</
 <p>If you modify any font, remove the "Manufacturer" font info. Its default is "tlbrnvt" for
 the original fonts. You may change it to your own setting. The purpose is to (hopefully) ensure
 that original fonts are not confused with modified substitutes.</p>
-
+<p>NoveletteSerif12-Regular may be used in some places where other fonts cannot be used.
+It has several font features that serve special purposes:</p>
+<ul><li>
+  <p><code>cvNN</code> is used for <code>\init</code> characters, if the glyph needs a short
+     descender or reduced-size punctuation.</p>
+  <p><code>cvNN</code> is like the above, but for <code>\dcap</code>.</p>
+  <p><code>unic</code> is a trick. If a base character cannot be used in metadata,
+     <code>unic</code> maps it to an oversize, narrow bar. The metadata is typeset as text.
+     If the text box is oversize, Novelette knows that the metadata is bad. Either way,
+     the page with typeset metadata is discarded.</p>
+  <p><code>ccmp</code> breaks several characters, such as IJ, and ff, into individual characters.
+     that allows the characters to be further manipulated, and also provides inter-character
+     expansion.</p>
+  <p>Standard TeX ligatures are not used (the <code>tlig</code> feature is disabled.
+     Instead, the TeX ligatures, except for ''->", are built into the fonts. To address the
+     situation where a word processor treats two hyphens (instead of three) as em dash,
+     the fonts condense &mdash;&#8209; to &mdash;.</p>
+  <p>Code such as <code>\'e</code> does not create its character from the base letter with
+     combining diacritical; instead, the pre-composed <code>&eacute;</code> prints.
+     You cannot create letters such as <code>\'r</code> because they are not pre-composed,
+     and the combining diacritical is not in the fonts. There is a reason for doing this.</p>
+</li></ul>
 
 <p><a id="pdfx"></a>&nbsp;</p>
 <h4 class="section">About PDF Version 1.3, and PDF/X</h4>
@@ -162,9 +183,9 @@ a double-compile while the other does not. It gets worse if (as usual) the edito
 not using TeX.</p>
 <p>So, do the numbering yourself. Did Plato have automatic numbering? No! Did Cervantes have
 automatic numbering? No!</p>
-<p>Novelette's <code>{\next}</code> command prints placeholder <code>##</code> there, and sets
+<p>Novelette's <code>{\todo}</code> command prints a placeholder symbol there, and sets
 an internal flag. Later, you will replace each of them with actual information (page number).
-Until the flag is cleared by removal of all <code>{\next}</code>, you cannot proceed to preview
+Until the flag is cleared by removal of all <code>{\todo}</code>, you cannot proceed to preview
 or final mode.</p>
 
 

@@ -106,12 +106,13 @@
 \edef\nvt@now{\nvt@expdet{\pdffeedback creationdate}} %% Date and time at compile. Format D:---
 \def\spii{\space\space}\def\spiv{\spii\spii}\def\spvi{\spiv\spii}
 \def\spix{\spiv\spiv\space}\def\spxi{\spix\spii}
+\def\nvt@misschars{}
 \ifdefined\directlua
   \IfFileExists{\jobname.typo}{%%
     \directlua{%%
       local fileout = tex.jobname .. '.typo'
       local out = io.open(fileout,"w+")
-      out:write('This file has been cleared by compiling without \\enable{examine}.')
+      out:write('This file has been cleared by compiling without \\examine{1}.')
       io.close(out)
     }%%
   }{}%%
@@ -120,6 +121,11 @@
     nvt.now = '\luaescapestring{\nvt@now}'
     require 'novelette-luasupport'
     nvt.parseclass('\luaescapestring{\@classoptionslist}')
+    local fileout = tex.jobname .. '.sum'
+    local out = io.open(fileout,"w+")
+    out:write('This file is cleared at start of compile.')
+    out:write('You see this message because compile was interrupted.')
+    io.close(out)
   }%%
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Unknown class option(s). Novelette uses settings in Preamble.^^J}
@@ -233,7 +239,7 @@
   \fi
   \let\input\nvt@input\relax\let\RequirePackage\nvt@RequirePackage\relax
   \RequirePackage{luahyphenrules}\HyphenRules{\nvt@lang}%% Load after \normalsize.
-  \def\HyphenRules#1{\nvt@err{Only one \string\HyphenRules\space is allowed.}}
+  \def\HyphenRules#1{\nvt@err{Only one \string\HyphenRules\space is allowed.}} %%%%%
   \ifx\nvt@TrimBox\@empty\else
     \begingroup\edef\nvt@AddTrimBox{\endgroup\pdfpageattr{\nvt@TrimBox}}\nvt@AddTrimBox
   \fi
@@ -358,10 +364,6 @@
   \fi
   \directlua{nvt.finalize()}
   \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
-  \ifnvt@didnext
-    \def\tmptest{preview}\ifx\tmpmode\tmptest\def\tmpmode{draft}\fi
-    \def\tmptest{final}\ifx\tmpmode\tmptest\def\tmpmode{draft}\fi
-  \fi
   \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
 %%%%%  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
 %%%%%  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
@@ -369,7 +371,7 @@
     \directlua{%%
       local fileout = './' .. tex.jobname .. '.typo'
       local out = io.open(fileout,"w+")
-      out:write(nvt.buffer)
+      out:write(nvt.typobuffer)
       io.close(out)
     }%%
   \fi

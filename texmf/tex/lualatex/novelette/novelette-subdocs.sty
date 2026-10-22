@@ -110,13 +110,14 @@
   \nvt@insubdoctrue\xdef\nvt@nowcompiling{#1}\gdef\thisdoc{}%%
   \nvt@input{\nvt@filepath/#1}%%
   \ifx\thisdoc\@empty%%
-    \nvt@err{\string\def\string\thisdoc\space missing in file #1.}%%
+    \nvt@fatal{\string\def\string\thisdoc\space missing in file #1.}%%
   \else%%
     \directlua{nvt.parsethisdoc('\luaescapestring{#1}')}%%
     \ifnum\tmpreturn=1\relax%%
 %%%%%
     \else%%
-      \nvt@err{Unable to parse \string\def\string\thisdoc, at top of file #1.}%%
+      \nvt@fatal{Unable to parse \string\def\string\thisdoc, at top of file #1.^^J%%
+        Format: \string\def\string\thisdoc{PathFromMainDocTo/ThisFileName.tex}.}%%
     \fi%%
     \directlua{%%
       nvt.comparematter('\luaescapestring{\thisdoc}','\luaescapestring{\nvt@currentmatter}')

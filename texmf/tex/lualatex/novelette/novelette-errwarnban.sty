@@ -11,10 +11,10 @@
 %% can detect many common user-caused problems, and provide precisely-defined help messages.
 %%   Numerous standard LaTeX environments and macros cannot be used in Novelette. Almost all
 %% of them pertain to academic documents or math. If a document attempts to use any of these,
-%% an error results. Some of them have useful custom substitutes, which are suggested.
+%% an error results. Some of them have useful Novelette substitutes, which are suggested.
 
 
-%% ERRORS, WARNINGS, PROBLEMS, ALERTS:
+%% ERRORS, WARNINGS, ALERTS:
 %%   An "error" halts compile, and waits for your response. An error may be thrown driectly by
 %% the compiler, or by Novelette.
 %%   If the error is thrown directly by the compiler, then it may or may not provide useful help.
@@ -33,7 +33,7 @@
 %% The most common overfull box is a line that extends into the right margin, because the
 %% typesetter could not find a suitable line break. The only solution is to edit that text,
 %% by adding or removing words to make the paragraph shorter or longer.
-%%   Novelette treats errors, warnings, and overfull boxes as "problems". They must be fixed,
+%%   Novelette treats errors, warnings, and overfull boxes as problems that must be fixed,
 %% before you can successfully compile your document in preview or final mode. Often, problems
 %% do not prevent PDF creation. But a PDF with problems will have its internal metadata flagged;
 %% then, the problem PDF can be distinguished from a good PDF.
@@ -41,8 +41,7 @@
 %% and final modes, because they may be perfectly acceptable, even intentional. But Novelette
 %% was not sure, so it calls these situations to your attention. Ignore them, if desired.
 %%   If you use a GUI such as TeXworks, the Novelette methods may cause its console to summarize
-%% errors, warnings and overfull boxes as being errors. This is desirable.
-%%   References to Error Code and Warning Code are in the Novelette documentation.
+%% all errors, warnings and overfull boxes as being errors. This is desirable.
 \newif\ifnvt@didprint %% Becomes true when all printable material has been printed.
 \def\@ehc{^^JSome situations that throw this error:^^J%% This re-writes a standard LaTeX message.
   1. Left brace without matching right brace.^^J%%
@@ -69,53 +68,55 @@
     \fi%%
   \fi%%
 }%%
-\def\nvt@saywhat{%% Prompts user. Default exit.
+\long\def\nvt@saywhat{%% Prompts user. Default exit.
   \typein[\YourResponse]{> Respond c<return> to continue, or just <return> to exit (better).}%%
   \def\nvt@tmpyr{c}\ifx\YourResponse\nvt@tmpyr%%
     \typeout{Continuing... Beware!}%%
-    \directlua{nvt.good = false}%%
   \else%%
     \typeout{Will exit now ...}%%
     \batchmode \read-1 to \sorry%%
   \fi%%
 }%%
-\long\gdef\nvt@err#1{%%
-  \typeout{^^J! Problem. \nvt@where}%%
+\long\def\nvt@err#1{%%
+  \directlua{nvt.good = false ; nvt.nvterr = nvt.nvterr + 1}%%
+  \typeout{^^J! Error. \nvt@where}%%
   \typeout{\spii #1^^J}\nvt@saywhat%%
 }%%
 %% Novelette treats warnings as errors, except that the compiler is not halted.
-\long\gdef\nvt@warn#1{%%
-  \directlua{nvt.good = false}%%
-  \typeout{^^J! Problem. \nvt@where}%%
+\long\def\nvt@warn#1{%%
+  \directlua{nvt.good = false ; nvt.nvtwarn = nvt.nvtwarn + 1}%%
+  \typeout{^^J! Warning. \nvt@where}%%
   \def\tmptest{#1}\ifx\tmptest\@empty\else\typeout{\spii #1^^J}\fi%%
 }%%
-\long\gdef\PackageError#1#2#3{%%
+\long\def\PackageError#1#2#3{%%
+  \directlua{nvt.good = false ; nvt.ltxerr = nvt.ltxerr + 1}%%
   \typeout{^^J! Package '#1' Error. \nvt@where}%%
   \typeout{\spii #2^^J#3^^J}\nvt@saywhat%%
 }%%
-\long\gdef\@latex@error#1#2{%%
+\long\def\@latex@error#1#2{%%
+  \directlua{nvt.good = false ; nvt.ltxerr = nvt.ltxerr + 1}%%
   \typeout{^^J! LaTeX Error. \nvt@where}%%
   \typeout{\spii #1^^J#2^^J}\nvt@saywhat%%
 }%%
-\global\let\@latexerr\@latex@error
-\long\gdef\PackageWarning#1#2{%%
-  \directlua{nvt.good = false}%%
+\let\@latexerr\@latex@error
+\long\def\PackageWarning#1#2{%%
+  \directlua{nvt.good = false ; nvt.ltxwarn = nvt.ltxwarn + 1}%%
   \typeout{^^J! Package '#1' Warning. \nvt@where}%%
   \typeout{\spii #2^^J}%%
 }%%
 \let\PackageWarningNoLine\PackageWarning\relax
-\long\gdef\@latex@warning#1{%%
+\long\def\@latex@warning#1{%%
   \def\tmpsaysfloats{0}%%
   \directlua{nvt.saysfloats('\luaescapestring{#1}')}%%
   \ifnum\tmpsaysfloats=0\relax%%
-    \directlua{nvt.good = false}%%
+    \directlua{nvt.good = false ; nvt.ltxwarn = nvt.ltxwarn + 1}%%
     \typeout{^^J! LaTeX Warning. \nvt@where}%%
     \typeout{\spii #1^^J}%%
   \fi%%
 }%%
-\global\let\@warning\@latex@warning\relax
+\let\@warning\@latex@warning\relax
 \let\@latex@warning@no@line\@latex@warning\relax
-\gdef\@notprerr#1{\@latex@error{You wrote a Preamble-only command in the document body.}}
+\def\@notprerr#1{\@latex@error{You wrote a Preamble-only command in the document body.}}
 %%
 
 

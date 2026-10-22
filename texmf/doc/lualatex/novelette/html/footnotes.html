@@ -43,8 +43,10 @@ or if they must be numbered, or if they are lengthy, then Novelette is not for y
 <p class="toplink"><a href="#top">^TOP</a></p>
 
 
-<a id="where"></a>
-<h4>Where Footnotes Allowed</h4>
+<p><a id="where"></a>&nbsp;</p>
+<h4 class="section">Where Footnotes Are Allowed</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>You may not write a footnote anywhere in frontmatter or backmatter. You may not write
 a footnote in a component with the <code>[single]</code> or <code>[legal]</code> option.
 And (obviously) you may not write a footnote in page headers, or nest one footnote
@@ -56,8 +58,10 @@ the footnote text appears at page bottom (or the bottom of a following page).</p
 <p class="toplink"><a href="#top">^TOP</a></p>
 
 
-<a id="markers"></a>
-<h4>Markers and Labels</h4>
+<p><a id="markers"></a>&nbsp;</p>
+<h4 class="section">Markers and Labels</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The <i>marker</i> is a raised symbol that is placed in the text. Different nations have
 different typographic rules, regarding how the marker is placed relative to punctuation.
 Novelette does not know or care; it places the marker where you write the <code>\footnote</code>
@@ -79,8 +83,10 @@ is reset (asterisk).</p>
 <p class="toplink"><a href="#top">^TOP</a></p>
 
 
-<a id="style"></a>
-<h4>\footnotestyle{setting}</h4>
+<p><a id="style"></a>&nbsp;</p>
+<h4 class="section">Footnote Style</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The text of a footnote may contain more than one paragraph. You have a choice of how to print
 the start of the footnote, where is label appears. This is a global setting, without local
 modification. If the footnote contains more than one paragraph, each additional paragraph
@@ -88,20 +94,33 @@ is indented as usual.</p>
 <p>In Preamble, you may write this command:</p>
 <div class="code"><code>\footnotestyle{indent=<i>I</i>}</code></div>
 <p>Choices for <i>I</i> are: <code>near away both none</code> (default is <code>near</code>).</p>
-<ul>
-<li><p><code>near</code> starts the first line of footnote text at the indent, with its
-label and space just before it (sitting within the indent).</p></li>
-<li><p><code>away</code> starts the first line of footnote text at the indent, but with
-its label at the left margin (then the space is larger).</p></li>
-<li><p><code>both</code> places the label at the indent, then space, then text.</p></li>
-<li><p><code>none</code> places the label at left margin, then space, then text. This is
-not quite the same as <code>away</code>.</p></li>
-</ul>
+<ul><li>
+  <p><code>near</code> starts the first line of footnote text at the indent, with its
+     label and space just before it (sitting within the indent).</p>
+</li><li>
+  <p><code>away</code> starts the first line of footnote text at the indent, but with
+     its label at the left margin (then the space is larger).</p>
+</li><li>
+  <p><code>both</code> places the label at the indent, then space, then text.
+     This is not quite the same as <code>near</code>.</p>
+</li><li>
+  <p><code>none</code> places the label at left margin, then space, then text. This is
+     not quite the same as <code>away</code>.</p>
+</li><li>
+  <p>Like this:</p>
+  <p>margin|&nbsp;&nbsp;&nbsp;&nbsp;<span style="visibility:hidden">*</span>|indent</p>
+  <p>margin|&nbsp;&nbsp;&nbsp;*&nbsp;|near.</p>
+  <p>margin|*&nbsp;&nbsp;&nbsp;&nbsp;|away.</p>
+  <p>margin|&nbsp;&nbsp;&nbsp;&nbsp;<span style="visibility:hidden">*</span>|*&nbsp;both.</p>
+  <p>margin|*&nbsp;none.</p>
+</li></ul>
 <p class="toplink"><a href="#top">^TOP</a></p>
 
 
-<a id="footnote"></a>
-<h4>Creating a Footnote: \footnote{text}</h4>
+<p><a id="footnote"></a>&nbsp;</p>
+<h4 class="section">Creating a Footnote</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
 <p>The text of a footnote may contain one or more paragraphs, separated by <code>\par</code>.
 You do not need <code>\par</code> at the end.</p>
 <p>The text may contain Italics. But it may not contain small caps, or other text styles.</p>
@@ -112,14 +131,28 @@ If you write an option, it will be silently ignored.</p>
 <p class="toplink"><a href="#top">^TOP</a></p>
 
 
-<a id="endnote"></a>
-<h4>End Notes</h4>
-<p>Novelette has no provision for end notes. If your book must have them, write footnotes
-that say “See endnote 5” or something similar. Then design your own end notes, and place them
-wherever you wish. Novelette does not know, and does not care.</p>
+<p><a id="endnote"></a>&nbsp;</p>
+<h4 class="section">End Notes</h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/> TOP</a></h4>
+<p>Support for designing end notes can be <a href="backmatter.html#endnote">found here</a>.</p>
+<p>Novelette does not have automatic end notes. If your book must have them, write footnotes
+that say “See endnote 5” or something similar. Then design your own end notes.</p>
+<p>The Novelette developer has read a recent well-known popular nonfiction book, which had
+many end notes, none of which were mentioned in the text. Apparently the general reader
+would be distracted by in-text notes, and the professional reader would know when the text
+ought to have an end note.</p>
 
 
-<p class="toplink"><a href="#top">^TOP</a></p>
+
+<p>&nbsp;</p>
+<h4 class="section"><a href="home.html">Home</a><span class="uptree">&nbsp;</span><!--
+--><a href="tutorial.html">Tutorial</a><span class="uptree">&nbsp;</span><!--
+--><a href="document-body.html">Document Body</a><span class="uptree">&nbsp;</span></h4>
+<h4 class="link"><a href="#top">
+<img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
+<p>&nbsp;</p>
+
 
 </div><!-- end master -->
 </body>
