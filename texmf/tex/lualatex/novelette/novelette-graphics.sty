@@ -43,14 +43,16 @@
   \ifnvt@instyle\def\tmpok{0}\fi%%
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnum\tmpok=0\relax%%
-    \nvt@err{Cannot place graphics in footnote or page header,^^J%%
+    \nvt@err{Cannot place \string\image\space in footnote or page header,^^J%%
       \spii or in \string\styleN\space (N=0-9), \string\scene, or block environment.}%%
     {\char"FFFD}%%
+    \directlua{nvt.adderr('\\image in disallowed location.')}%%
   \fi%%
   \ifnvt@inimage%%
     \nvt@err{Do not write \string\image\space within \string\sceneimage.^^J%%
       \spii The \string\sceneimage\space command already knows that its argument is an image.}%%
     {\char"FFFD}\def\tmpok{0}%%
+    \directlua{nvt.adderr('\\image disallowed within \\sceneimage.')}%%
   \fi%%
   \nvt@inimagetrue%%
   \ifnum\tmpok=1\relax%%
@@ -78,6 +80,7 @@
         \spix down ->  Bottom of image at baseline of lowest displaced line.^^J%%
         \spix up -> Top at accented uppercase height of highest displaced line.^^J%%
         \spix mid -> Splits padding above/below image.}%%
+      \directlua{nvt.adderr('Bad \\image option.')}%%
     \fi%%
     \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
     \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
@@ -86,6 +89,7 @@
     \ifnum\tmplines=0\relax%%
       \nvt@err{\string\image\space requires [lines=L] option, integer 1<=L<=(lines per page).}%%
       \def\tmplines{3}%% Placeholder backup. Almost always an incorrect value.
+      \directlua{nvt.adderr('\\image requires option [lines=L].')}%%
     \fi%%
     \ifnum\tmpisfile<1\relax\def\imgfake{1}\else\def\imgfake{0}\fi%%
     \ifnum\tmpisfile=1\relax%%
@@ -96,6 +100,7 @@
           \spii The path and filename have correct format, but the file is not there.^^J%%
           \spii Either you mis-spelled the path or filename, or no such file.}%%
         \def\imgfake{1}%%
+        \directlua{nvt.adderr('Missing \\image file.')}%%
       }%%
     \fi%%
     \ifnum\tmpisfile=-1\relax%%
@@ -110,6 +115,7 @@
         \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\imgfake{1}%%
+      \directlua{nvt.adderr('Bad \\image path or filename.')}%%
     \fi%%
     \ifnum\tmpfloat=0\relax\def\fps@figure{}\fi%%
     \ifnum\tmpfloat=1\relax\def\fps@figure{!ht}\fi%%
@@ -154,14 +160,16 @@
   \ifnvt@inblock\def\tmpok{0}\fi%%
   \ifnvt@inscene\def\tmpok{0}\fi%%
   \ifnum\tmpok=0\relax%%
-    \nvt@err{Cannot place graphics in footnote or page header,^^J%%
+    \nvt@err{Cannot place \string\sceneimage\space in footnote or page header,^^J%%
       \spii or in \string\styleN\space (N=0-9), or \string\scene, or block environment.}%%
     {\char"FFFD}%%
+    \directlua{nvt.adderr('\\sceneimage in disallowed location.')}%%
   \fi%%
   \ifnvt@insceneimage%%
     \nvt@err{Do not write \string\image\space within \string\sceneimage.^^J%%
       \spii The \string\sceneimage\space command already knows that its argument is an image.}%%
     {\char"FFFD}\def\tmpok{0}%%
+    \directlua{nvt.adderr('Do not write \\image within \\sceneimage.')}%%
   \fi%%
   \nvt@insceneimagetrue%%
   \ifnum\tmpok=1\relax%%
@@ -177,6 +185,7 @@
         \spii Format: [align=A]^^J%%
         \spiv A -> left right center. Default from \string\scenestyle, or center.^^J%%
         \spiv \string\sceneimage\space does not have [lines=L] or other options.}%%
+      \directlua{nvt.adderr('Bad \\sceneimage option.')}%%
     \fi%%
     \ifnum\tmpalign=-1\relax\def\imgleft{\nvt@sceneleft}\def\imgright{\nvt@sceneright}\fi%%
     \ifnum\tmpalign=0\relax\def\imgleft{\hfill}\def\imgright{\hfill}\fi%%
@@ -191,6 +200,7 @@
           \spii The path and filename have correct format, but the file is not there.^^J%%
           \spii Either you mis-spelled the path or filename, or no such file.}%%
         \def\imgfake{1}%%
+        \directlua{nvt.adderr('Missing \\sceneimage file.')}%%
       }%%
     \fi%%
     \ifnum\tmpisfile=-1\relax%%
@@ -205,6 +215,7 @@
         \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\imgfake{1}%%
+      \directlua{nvt.adderr('Bad \\sceneimage path or filename.')}%%
     \fi%%
     \vspace{\nvt@bls}%%
     \def\fps@figure{}%%
@@ -317,22 +328,25 @@
   \ifnum\tmpok=1\relax%%
     \def\fps@figure{}\def\tmpvalidate{0}%%
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
-    \IfBooleanTF{#1}%%
-      {\directlua{nvt.parselogo('star','\luaescapestring{#2}')}}%%
-      {\directlua{nvt.parselogo('','\luaescapestring{#2}')}}%%
-      \ifnum\tmpisfile<1\relax\def\logofake{1}\else\def\logofake{0}\fi%%
-      \ifnum\tmpisfile=1\relax%%
-        \IfFileExists{#2}{%%
-          \def\logofake{0}%%
-        }{%%
-          \nvt@err{Missing \string\logo\space file #2.^^J%%
-            \spii The path and filename have correct format, but the file is not there.^^J%%
-            \spii Either you mis-spelled the path or filename, or no such file.}%%
-          \def\logofake{1}%%
-        }%%
-      \fi%%
-      \ifnum\tmpisfile=-1\relax%%
-        \nvt@err{Bad \string\logo\space argument: {#2}.^^J%%
+    \IfBooleanTF{#1}{%%
+      \directlua{nvt.parselogo('star','\luaescapestring{#2}')}%%
+    }{%%
+      \directlua{nvt.parselogo('','\luaescapestring{#2}')}%%
+    }%%
+    \ifnum\tmpisfile<1\relax\def\logofake{1}\else\def\logofake{0}\fi%%
+    \ifnum\tmpisfile=1\relax%%
+      \IfFileExists{#2}{%%
+        \def\logofake{0}%%
+      }{%%
+        \nvt@err{Missing \string\logo\space file #2.^^J%%
+          \spii The path and filename have correct format, but the file is not there.^^J%%
+          \spii Either you mis-spelled the path or filename, or no such file.}%%
+        \def\logofake{1}%%
+        \directlua{nvt.adderr('Missing \\logo file.')}%%
+      }%%
+    \fi%%
+    \ifnum\tmpisfile=-1\relax%%
+      \nvt@err{Bad \string\logo\space argument: {#2}.^^J%%
         \spii There are several possibilities:^^J%%
         \spiv 1. Image filename does not have .png file extension.^^J%%
         \spiv 2. Path to image file is not relative to main document.^^J%%
@@ -343,6 +357,7 @@
         \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\logofake{1}%%
+      \directlua{nvt.adderr('Bad \\logo path or filename.')}%%
     \fi%%
   \fi%%
   \ifnum\tmplogo=1\relax%% \tmplogo is provided by \styleN.
@@ -358,6 +373,7 @@
         \spiv 4. Path or filename has forbidden characters. Among them:^^J%%
         \spix You may use hyphen or underscore, but not space or tilde.}%%
       \def\logofake{1}%%
+      \directlua{nvt.adderr('Bad \\logo path or filename.')}%%
     \fi%%
     \ifnum\logofake=0\relax%%
       \nvt@reallogo{#2}%%
@@ -369,6 +385,7 @@
   \else%%
     \nvt@err{\string\logo\space may only be placed within \string\styleN, with [logo] option.}%%
     \strut\makebox[3\nvt@em]{\hfill\char"FFFD\hfill}%%
+    \directlua{nvt.adderr('\\logo in disallowed location.')}%%
   \fi%%
   \endgroup%%
 }%%

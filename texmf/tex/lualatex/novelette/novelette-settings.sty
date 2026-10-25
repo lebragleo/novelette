@@ -103,6 +103,7 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\docdate\space in Preamble.^^J%%
       \spii Format: \string\docdate{yyyy/mm/dd} or empty.}
+    \directlua{nvt.adderr, 'Bad \\docdate.'}%%
     \def\thedocdate{}
   \else
     \edef\thedocdate{\tmpdocdate}
@@ -248,6 +249,7 @@
   \ifnum\tmpreturn=0\relax
     \nvt@err{Bad setting for \string\pdfx{choice}.^^J%%
       \spii Choose one of: fogra swop off. Default fogra or swop, depending on \string\lang.}
+    \directlua{nvt.adderr('Bad \\pdfx.')}
   \fi
 }%%
 \@onlypreamble\pdfx
@@ -285,6 +287,7 @@
       \spii Normally, do not set the option.^^J%%
       \spii If [local] in preamble, permits [local] for components.^^J%%
       \spii Do not use [local] unless you know what you are doing.}%%
+    \directlua{nvt.adderr('Bad \\vrheadtext option.')}%%
   \fi%%
   \ifnum\tmpreturn=2\relax%%
     \ifnvt@inpreamble\global\nvt@allowvrchangetrue\else\nvt@allowvrchangetrue\fi%%
@@ -342,6 +345,7 @@
       \spix smcp -> Lowercase letters become small caps.^^J%%
       \spix onum -> Numerals become oldstyle.^^J%%
       \spix smon -> Combines smcp and onum.}%%
+    \directlua{nvt.adderr('Bad \\setstyleN.')}%%
   \fi
 }%%
 \setstyle0{font=main,scale=1,track=0,align=center,case=none} %% developer test.
@@ -356,7 +360,7 @@
     \nvt@err{Bad setting for \string\headstyle.^^J%%
       \spii Format: \headstyle{font=F,scale=S,track=T,deco=D,case=C}^^J%%
       \spiv F -> One of the Novelette 'font codes'. Default main.^^J%%
-      \spix Default main.^^J%%
+      \spix Only choose from: main thin dark gero.^^J%%
       \spiv S -> Decimal number 0.83-1. Default 0.93.^^J%%
       \spiv T -> Integer 0-9. Tracking, from tight to very loose. Default 2.^^J%%
       \spiv D -> bar bullet square lozenge dash none. Default none.^^J%%
@@ -368,6 +372,7 @@
       \spix onum -> Numerals become oldstyle.^^J%%
       \spix smon -> Combines smcp and onum.^^J%%
       \spix none -> No changes.}%%
+    \directlua{nvt.adderr('Bad \\headstyle.')}%%
   \fi
 }%%
 \headstyle{font=main,scale=0.93,track=2,deco=bar,case=dflt}
@@ -382,6 +387,7 @@
     \nvt@err{Bad setting for \string\scenestyle.^^J%%
       \spii Format: \string\scenestyle{align=A}^^J%%
       \spiv A -> left right center. Default center.}%%
+    \directlua{nvt.adderr('Bad \\scenestyle.')}
   \fi
 }%%
 \scenestyle{align=center} %% Default
@@ -400,6 +406,7 @@
       \spix away -> Label at margin, big space, text at indent.^^J%%
       \spix both -> Label at indent, space, text.^^J%%
       \spix none -> Label at margin, space, text.}%%
+    \directlua{nvt.adderr('Bad \\footnotestyle.')}
   \fi
 }%%
 \footnotestyle{indent=near} %% Default.
@@ -434,6 +441,7 @@
       \spii Novelette only supports some of the major Western European languages.^^J%%
       \spii See Novelette docs for list of available language codes.}
     \def\nvt@lang{en}
+    \directlua{nvt.adderr('Bad \\lang.')}
   \else
     \edef\nvt@lang{\tmplang}
   \fi
@@ -469,6 +477,7 @@
       \spiv Choices: britq xmp guide=G^^J%%
       \spix G is an integer from 0 (no guide) to lines per page.^^J%%
       \spix If you \string\disable{guide}, it over-rides this value.}%%
+    \directlua{nvt.adderr('Bad \\enable.)}
   \fi
   \ifnum\tmpbritq=1\relax\global\nvt@britqtrue\fi
   \ifnum\tmpxmp=1\relax\global\nvt@xmptrue\fi
@@ -511,6 +520,7 @@
       \spii Format: \string\disable{comma,separated,choices}.^^J%%
       \spiv Choices: blankend renumber pageflip autodeco metasub guide^^J%%
       \spix If you \string\disable{guide}, it over-rides \string\enable{guide=G}.}%%
+    \directlua{nvt.adderr('Bad \\disable.')}
   \fi
   \ifnum\tmpnoblankend=1\relax\global\nvt@noblankendtrue\fi
   \ifnum\tmpnorenumber=1\relax\global\nvt@norenumbertrue\fi

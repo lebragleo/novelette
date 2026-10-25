@@ -54,13 +54,16 @@ nvt.header = false
 nvt.footer = true
 nvt.lines = 35
 nvt.misschars = 0 -- Counts number of missing characters.
-nvt.nvterr = 0 -- Counts Novelette errors.
-nvt.nvtwarn = 0 -- Counts Novelette warnings.
+nvt.errcount = 0 -- Counts Novelette errors.
+nvt.warncount = 0 -- Counts Novelette warnings.
+nvt.errlist = {} -- Accumulates brief Novelette error messages.
+nvt.warnlist = {} -- Accumulates brief Novelette warning messages.
 nvt.ltxerr = 0 -- Counts non-Novelette errors.
 nvt.ltxwarn = 0 -- Counts non-Novelette warnings. 
 nvt.misslist = '' -- List of missing characters, by Unicode.
 nvt.ewlist = '' -- Accumulates some of Novelette's own errors and warnings.
 nvt.nodia = '' -- Accumulates bad diacritical messages.
+nvt.nojacute = false -- Becomes true if \J or \j or \'J or \'j attempted.
 nvt.overfull = 0 -- Counts overfull hboxes.
 nvt.underfull = 0 -- Counts underfull hboxes.
 nvt.trimwidth = 5.5*nvt.inch -- Default finished book interior page width,
@@ -142,8 +145,10 @@ nvt.didheadstyle = false
 nvt.didscenestyle = false
 nvt.didfootnotestyle = false
 nvt.sumbuffer = {} -- Will contain summary and other info.
-nvt.entry = {} -- For \entry: nvt.entry[id] = 'bookpage in table'
-nvt.actual = {} -- Actual location of component: nvt.actual[id] = 'actual bookpage'
+nvt.entry = {} -- For toc: nvt.entry[i] = 'id,tocpage;bookpage'
+nvt.entrylist = '' -- Accumulates bad entry/actual info.
+nvt.eid = ',' -- Accumulates comma-separated entry id.
+nvt.cid = ',' -- Accumulates comma-separated component id.
 local GLYPH = node.id('glyph')
 local GLUE = node.id('glue')
 local HLIST = node.id('hlist')
@@ -171,50 +176,89 @@ end
 --
 
 
+--
+nvt.adderr = function(s)
+  table.insert(nvt.errlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+end
+nvt.addwarn = function(s)
+  table.insert(nvt.warnlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+end
+--
+
+
+
 -- Parse \entry option:
 nvt.parseentry = function (s)
-  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, a, id, p, l, ll
-  a = string.gsub(s, '%a', '') ; a = string.gsub(a, '%d', '')
-  a = string.gsub(a, ',', '') ; a = string.gsub(a, '=', '') ; a = string.gsub(a, '%.', '')
-  if a ~= '' then -- the option contains forbidden characters
-    tex.sprint('\\def\\tmpreturn{-1}') ; nvt.good = false
-  else
-    if string.find(s, 'id=') then
-      id, n = string.gsub(s, '.*id=', '') ; id = string.gsub(id, ',.*', '')
-      if n == 1 then
-        if string.len(id) <= 8 then
-          s = string.gsub(s, 'id=' .. id, '') ; tex.sprint('\\def\\tmpentryid{' .. id .. '}')
-        end
-      end
-    end
-    if string.find(s, 'page=') then
-      p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
-      if n == 1 then
-        s = string.gsub(s, 'page=' .. p, '') ; tex.sprint('\\def\\tmpentrypage{' .. p .. '}')
-        if id and nvt.thisdoc == '' then nvt.entry[id] = p end
-      end
-    end
-   if string.find(s, 'lead=') then
-      l, n = string.gsub(s, '.*lead=', '') ; l = string.gsub(l, ',.*', '')
-      l = string.gsub(l, '%.', '') -- No decimal lead numbers!
-      if n == 1 then
-        ll = tonumber(l)
-        if ll and ll >= 0 and ll <= 99 then
-          s = string.gsub(s, 'lead=' .. l, '') ; tex.sprint('\\def\\tmpentrylead{' .. l .. '}')
-          if ll == 0 then tex.sprint('\\def\\tmplead{0}') else tex.sprint('\\def\\tmplead{1}') end
-        end
-      end
-    end
-    s = string.gsub(s, ',', '')
-    if s == '' then
-      if id == '' and p ~= '' then
-        tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  local n, l, ll, p, pp, a, idp
+  local gotp = false ; local gotid = false
+  local lok = true ; local pok = true ; local idok = true
+  s = string.gsub(s, ' ', '') ; s = s .. ','
+  if string.find(s, 'lead=') then
+    l, n = string.gsub(s, '.*lead=', '') ; l = string.gsub(l, ',.*', '')
+    if n == 1 then
+      ll = tonumber(l)
+      if ll and ll == math.floor(ll) and ll >= 0 and ll <= 99 then
+        s = string.gsub(s, 'lead=' .. l, '') ; tex.sprint('\\def\\tmplead{' .. l .. '}')
       else
-        tex.sprint('\\def\\tmpreturn{1}')
+        lok = false
       end
     else
-      tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+      lok = false
     end
+  end
+  if lok == false then tex.sprint('\\def\\tmplead{\\char"FFFD}') end
+  if string.find(s, 'page=') then
+    gotp = true
+    p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
+    if n == 1 then
+      pp = tonumber(p)
+      a = string.gsub(p, 'x', '') ; a = string.gsub(a, 'v', '') ; a = string.gsub(a, 'i', '')
+      if pp and pp == math.floor(p) and pp >= 0 and pp <= 999 then
+        tex.sprint('\\def\\tmppage{' .. p .. '}') ; s = string.gsub(s, 'page=' .. p, '')
+      elseif not pp and a == '' then
+        tex.sprint('\\def\\tmppage{' .. p .. '}') ; s = string.gsub(s, 'page=' .. p, '')
+      else
+        pok = false
+      end
+    else
+      pok = false
+    end
+    if pok == false then tex.sprint('\\def\\tmppage{\\char"FFFD}') end
+  end
+  if string.find(s, 'id=') then
+    gotid = true
+    id, n = string.gsub(s, '.*id=', '') ; id = string.gsub(id, ',.*', '')
+    if n == 1 then
+      a = string.gsub(id, '%a', '') ; a = string.gsub(a, '%d', '')
+      if a == '' and string.len(id) <= 8 then
+        if not string.find(nvt.eid, ',' .. id .. ',') then
+          tex.sprint('\\def\\tmpid{' .. id .. '}') ; s = string.gsub(s, 'id=' .. id, '')
+          nvt.eid = nvt.eid .. id .. ','
+        else
+          idok = false
+        end
+      else
+        idok = false
+      end
+    else
+      idok = false
+    end
+    if idok == false then tex.sprint('\\def\\tmpid{??}') end
+  end
+  s = string.gsub(s, ',', '')
+  if (gotp == true and gotid == false) or (gotp == false and gotid == true) then
+    table.insert(nvt.entry, '<bad entry in table>')
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  elseif lok == false or pok == false or idok == false then
+    table.insert(nvt.entry, '<bad entry in table>')
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+  elseif gotp == true and gotid == true then
+    idp = id .. ',' .. p ; table.insert(nvt.entry, idp) ; tex.sprint('\\def\\tmpreturn{1}')
+  elseif s == '' and lok == true and idok == true and pok == true then
+    tex.sprint('\\def\\tmpreturn{1}')
+  else
+    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    table.insert(nvt.entry, '<bad entry in table>')
   end
 end
 --
@@ -573,7 +617,7 @@ nvt.parseheadstyle = function (s)  ---- need to add check for multiple use
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
     f = string.gsub(f, ',', '')
     if n == 1 then
-      if string.find(nvt.allfonts, f) then
+      if string.find('main,thin,dark,gero', f) then
         s = string.gsub(s, 'font=' .. f, '')
         tex.sprint('\\gdef\\nvt@headfont{\\nvt@' .. f .. '}' ) ; nvt.headfont = f
         tex.sprint('\\global\\nvt@use' .. f .. 'true')
@@ -1146,7 +1190,7 @@ end
 
 -- Parse option of component environment:
 function nvt.parsecomponent (s,p) -- option,bookpage
-  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, g, gg, id, z, c, f, r
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, g, gg, id, idp, z, c, f, r
   tex.sprint('\\def\\tmpguide{' .. nvt.guide .. '}')
   if string.find(s, 'guide=') then
     g, n = string.gsub(s, '.*guide=', '') ; g = string.gsub(g, ',.*', '')
@@ -1157,14 +1201,21 @@ function nvt.parsecomponent (s,p) -- option,bookpage
   end
   if string.find(s, 'id=') then
     id, n = string.gsub(s, '.*id=', '') ; id = string.gsub(id, ',.*', '')
-    if n == 1 and id ~= '' and string.len(id) <= 8 then
-      s = string.gsub(s, 'id=' .. id, '')
-      z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
-      if z == '' and nvt.thisdoc == '' and not nvt.actual[id] then
-        nvt.actual[id] = p ; s = string.gsub(s, 'id=' .. id, '')
-        texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. p .. '\n')
+    if id ~= '' and not string.find(nvt.cid, ',' .. id .. ',') then
+      if n == 1 and id ~= '' and string.len(id) <= 8 then
+        s = string.gsub(s, 'id=' .. id, '')
+        z = string.gsub(id, '%a', '') ; z = string.gsub(z, '%d', '')
+        if z == '' and nvt.thisdoc == '' then
+          s = string.gsub(s, 'id=' .. id, '')
+          texio.write_nl('Info: component id=' .. id .. ' begins on bookpage ' .. p .. '\n')
+          for i = 1, #nvt.entry do
+            local eid = string.gsub(nvt.entry[i], ',.*', '')
+            if id == eid then nvt.entry[i] = nvt.entry[i] .. ';' .. p end
+          end
+        end
       end
     end
+    nvt.cid = nvt.cid .. id .. ','
   end
   if string.find(s, 'class=') then
     c, n = string.gsub(s, '.*class=', '') ; c = string.gsub(c, ',.*', '')
@@ -1362,7 +1413,6 @@ function nvt.flagbad()
     os.exit()
   end
   if les ~= '' and les ~= 'Emergency stop' then texio.write_nl(lec .. '\n') end
-  nvt.luaerr = false
 end
 luatexbase.add_to_callback('show_error_hook',nvt.flagbad,'catch_errors')
 luatexbase.add_to_callback('show_lua_error_hook',
@@ -1405,8 +1455,7 @@ luatexbase.add_to_callback('hpack_quality',nvt.overunderfull,'overunder_full')
 -- the resulting error message would be hard to understand. This hacks TU so that when a macro
 -- calls for an accented character not in Novelette, the error is clearer. 
 function nvt.getcharaccent (a,c) -- accent, base character
-  local n = 0 ; local d = 'unknown diacritical' ; local fd, fc, e
-  local lc = string.len(c) ; local em2 = ''
+  local d = 'unknown diacritical' ; local lc = string.len(c) ; local fd, fc, em
   if a == '"0300' then d = 'grave' end
   if a == '"0301' then d = 'acute' end
   if a == '"0302' then d = 'circumflex' end
@@ -1423,35 +1472,34 @@ function nvt.getcharaccent (a,c) -- accent, base character
   if a == '"0327' then d = 'cedilla' end
   if a == '"0328' then d = 'ogonek' end
   if lc == 0 then
-    if d == 'tilde' then tex.sprint('\\asciitilde{}') ; n = 2 end
-    if d == 'circumflex' then tex.sprint('\\asciicircumflex{}') ; n = 2 end
-    if n == 0 then
-      em2 = 'Only diacriticals \\~{} and \\^{} allow empty braces.'
-      n = 3 ; nvt.good = false
+    if d == 'tilde' then tex.sprint('\\def\\tmpreturn{2}')
+    elseif d == 'circumflex' then tex.sprint('\\def\\tmpreturn{3}')
+    else
+      em = 'Only diacriticals \\~{} and \\^{} allow empty braces.'
+      tex.sprint('\\def\\tmpem{' .. em .. '}\\def\\tmpreturn{0}') ; nvt.good = false
     end
   elseif lc == 1 then
     fd = string.find('grave',d) or string.find('acute',d)
     fd = fd or string.find('circumflex',d) or string.find('dieresis',d)
     fc = string.find('AEIOUWYaeiouwy',c)
-    if fd and fc then n = 1 end
-    if (d == 'ring above') and string.find('Aa',c) then n = 1 end
-    if (d == 'cedilla') and string.find('Cc',c) then n = 1 end
-    if (d == 'tilde') and string.find('ANOano',c) then n = 1 end
-    if (d == 'macron') and string.find('AEIOUaeiou',c) then n = 1 end
+    if fd and fc then
+      if ((d == 'ring above') and string.find('Aa',c))
+        or ((d == 'cedilla') and string.find('Cc',c))
+        or ((d == 'tilde') and string.find('ANOano',c))
+        or ((d == 'macron') and string.find('AEIOUaeiou',c))
+      then
+        tex.sprint('\\def\\tmpreturn{1}')
+      else
+        em = 'No ' .. c .. ' with ' .. d .. ' diacritical.'
+        tex.sprint('\\def\\tmpem{' .. em .. '}\\def\\tmpreturn{0}') ; nvt.good = false
+      end
+    end
     if (d == 'acute') and string.find('Jj',c) then
-      e = 'Unavailable as single character: J or j with acute.\n'
-      e = e .. '\\spii For IJ or ij with both acute: \\string\\IJacute, or \\string\\ijacute.'
-      em2 = e ; n = 4 ; nvt.good = false
+      em = "No \\string\\'J or \\string\\'j. "
+        .. "Maybe use \\string\\IJacute, \\string\\ijacute.\n" ; nvt.nojacute = true
+      tex.sprint('\\def\\tmpem{' .. em .. '}\\def\\tmpreturn{0}') ; nvt.good = false
     end
   end
-  if n == 0 then
-    tex.sprint('\\def\\tmpreturn{0}' .. c) ; nvt.good = false
-    em2 = 'No ' .. c .. ' with ' .. d .. ' diacritical.'
-    nvt.nodia = nvt.nodia .. '  ' .. em2 .. '\n'
-  else
-    tex.sprint('\\def\\tmpreturn{1}')
-  end
-  tex.sprint('\\def\\emtwo{' .. em2 .. '}')
 end
 --
 
@@ -1911,6 +1959,36 @@ nvt.finalize = function ()
   if nvt.countnext ~= 0 then
     if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
   end
+  -- toc info:
+  local tocok = true
+  for i = 1, #nvt.entry do
+    local id, ep, bp
+    id = string.gsub(nvt.entry[i], ',.*', '')
+    ep = string.gsub(nvt.entry[i], '.*,', '') ; ep = string.gsub(ep, ';.*', '')
+    if ep == '' then ep = '0' end
+    if string.find(nvt.entry[i], ';') then
+      bp = string.gsub(nvt.entry[i], '.*;', '') ; if bp == '' then bp = 'unknown' end
+    else
+      bp = 'unknown'
+    end
+    if nvt.thisdoc == '' then
+      if string.find(id, '<') then
+        nvt.entrylist = nvt.entrylist .. id .. '\n'
+      else
+        if ep ~= bp then
+          tocok = false ; if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
+          nvt.entrylist = nvt.entrylist .. 'entryid=' .. id .. ', tocpage=' .. ep
+            .. ', bookpage=' .. bp .. '\n'
+        end
+      end
+    end
+  end
+  if tocok == false then
+    local wm = "Component page disagrees with table of contents."
+    nvt.addwarn(wm)
+    tex.sprint('\\begingroup\\makeatletter\\nvt@warn{' .. wm .. '}\\endgroup')
+  end
+  --
   luatexbase.add_to_callback('wrapup_run', function ()
   table.insert(nvt.sumbuffer, '\n\n********************************** '
     .. 'SUMMARY **********************************\n')
@@ -1990,51 +2068,55 @@ nvt.finalize = function ()
     table.insert(nvt.sumbuffer, 'Compiled subdoc, so mode cannot be preview or final.\n')
   end
   table.insert(nvt.sumbuffer, 
-      '******************************** END SUMMARY ********************************\n\n\n')
+      '******************************** END SUMMARY ********************************\n\n')
   for i = 1, #nvt.sumbuffer do
     texio.write_nl(nvt.sumbuffer[i])
   end
   if nvt.overfull > 0 then
     nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.overfull .. ' overfull line(s) '
       .. 'extending into margin.\n'
---    nvt.nvtwarn = nvt.nvtwarn + 1
+--    nvt.warncount = nvt.warncount + 1
   end
   if nvt.qq > 0 then
     nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.qq .. ' printable " character(s). '
       .. 'Edit to left/right curly, or \\real{"}.\n'
---    nvt.nvtwarn = nvt.nvtwarn + 1
+--    nvt.warncount = nvt.warncount + 1
   end
   if nvt.todo > 0 then
     nvt.ewlist = nvt.ewlist .. 'Found ' .. nvt.todo .. ' \\todo symbol(s).\n'
---    nvt.nvtwarn = nvt.nvtwarn + 1
+--    nvt.warncount = nvt.warncount + 1
   end
   if nvt.misschars ~= 0 then
     nvt.ewlist = nvt.ewlist .. 'Missing character(s), not in fonts. List by Unicode:\n'
        .. ' ' .. nvt.misslist .. '\n'
---    nvt.nvtwarn = nvt.nvtwarn + 1
+--    nvt.warncount = nvt.warncount + 1
   end
   if nvt.nodia ~= '' then
     nvt.ewlist = nvt.ewlist .. 'Bad character composition using diacritical macro:\n'
        ..  nvt.nodia .. '\n'
---    nvt.nvtwarn = nvt.nvtwarn + 1
+--    nvt.warncount = nvt.warncount + 1
+  end
+  if nvt.nojacute == true then
+    nvt.ewlist = nvt.ewlist .. "No \\'J or \\'j. Maybe use \\IJacute, \\ijacute.\n"
   end
 ----- more problems
   if nvt.ltxerr > 0 then
-    nvt.ewlist = nvt.ewlist .. 'LuaLaTeX issued ' .. nvt.ltxerr .. ' error(s).\n'
+    table.insert(nvt.sumbuffer, '\n! LuaLaTeX issued ' .. nvt.ltxerr .. ' error(s).\n')
   end
   if nvt.ltxwarn > 0 then
-    nvt.ewlist = nvt.ewlist .. 'LuaLaTeX issued ' .. nvt.ltxwarn .. ' warning(s).\n'
+    table.insert(nvt.sumbuffer, '\n! LuaLaTeX issued ' .. nvt.ltxwarn .. ' warning(s).\n')
   end
-  if nvt.nvterr > 0 then
-    nvt.ewlist = nvt.ewlist .. 'Novelette issued ' .. nvt.nvterr .. ' error(s).\n'
+  if nvt.errcount > 0 then
+    table.insert(nvt.sumbuffer, '\n! Novelette issued these error(s), listed by PDFpage:\n')
+    for i = 1, #nvt.errlist do
+      table.insert(nvt.sumbuffer, nvt.errlist[i] .. '\n')
+    end
   end
-  if nvt.nvtwarn > 0 then
-    nvt.ewlist = nvt.ewlist .. 'Novelette issued ' .. nvt.nvtwarn .. ' warning(s).\n'
-  end
------ other Novelette warnings and errors.
-  if nvt.ewlist ~= '' then
-    nvt.ewlist = '********** Problems that must be fixed:\n' .. nvt.ewlist .. '\n\n'
-    table.insert(nvt.sumbuffer, nvt.ewlist)
+  if nvt.warncount > 0 then
+    table.insert(nvt.sumbuffer, '\n! Novelette issued these warning(s), listed by PDFpage:\n')
+    for i = 1, #nvt.warnlist do
+      table.insert(nvt.sumbuffer, nvt.warnlist[i] .. '\n')
+    end
   end
   local alertlist = ''
   if nvt.em < 11.04 then
@@ -2047,10 +2129,21 @@ nvt.finalize = function ()
       .. 'If not intentional, edit text.\n'
   end
   if alertlist ~= '' then
-    alertlist = '********** Alerts that may be fixed or ignored:\n' .. alertlist .. '\n\n'
+    alertlist = '\nAlerts that may be fixed or ignored:\n' .. alertlist .. '\n'
     table.insert(nvt.sumbuffer, alertlist)
   end
 ----- more alerts
+  if nvt.thisdoc ~= '' then
+    table.insert(nvt.sumbuffer,
+      '\n\nTable of contents (if used) is not checked when compiling subdoc.\n')
+  else
+    if nvt.entrylist ~= '' then
+      table.insert(nvt.sumbuffer, '\n\n! Bad table of contents entries, or wrong pages:\n')
+      table.insert(nvt.sumbuffer, nvt.entrylist)
+    end
+  end
+  table.insert(nvt.sumbuffer, '\n\n')
+-- need to flag if mismatch, earlier than wrapup
   local fileout = './' .. tex.jobname .. '.sum'
   local out = io.open(fileout,"w+")
   for i = 1, #nvt.sumbuffer do

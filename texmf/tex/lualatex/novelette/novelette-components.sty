@@ -104,6 +104,7 @@
     \spix recto -> Warning if page is not recto.^^J%%
     \spix single+recto -> Both of the above.^^J%%
     \spix legal -> Special formats for copyright page. See Novelette docs.}%%
+    \directlua{nvt.adderr('Bad \\component option.')}%%
   \fi%%
   \ifnum\tmplegal=1\relax%%
     \def\maintext{}\setlength\parindent{0pt}%%
@@ -203,6 +204,7 @@
       \nvt@err{\string\maintext\space appears in wrong location.^^J%%
          \spii Must be within a component, but not within \string\styleN (N=1,2,3,4),^^J%%
          \spii \string\footnote, page header, or block environment.}%%
+      \directlua{nvt.adderr('\\maintext in wrong location.')}%%
     \fi%%
   \fi%%
   \global\nvt@indisplayfalse\nvt@didmaintexttrue%%

@@ -35,18 +35,18 @@
 
 <h4>Overview</h4>
 <p>A minimal Preamble contains nothing but <code>\title{Book Title}</code> and
-<code>\author{Author Name}</code>. In draft mode (default), you do not even need those!
-Novelette will use defaults for a book in English, with trim width
-5.5in and trim height 8.5in.</p>
+   <code>\author{Author Name}</code>. In draft mode (default), you do not even need those!
+   Novelette will use defaults for a book in English, with trim width
+   5.5in and trim height 8.5in.</p>
 <p>If your language is English, better results will be obtained if you choose either
-<code>en&#8209;US</code> or <code>en&#8209;UK</code>.
-If not English, then you must set the language, or hyphenation will be wrong.</p>
+   <code>en&#8209;US</code> or <code>en&#8209;UK</code>.
+   If not English, then you must set the language, or hyphenation will be wrong.</p>
 
 
 <p><a id="all"></a>&nbsp;</p>
 <h4>All Possible Settings</h4>
 <p>Even a large Preamble will not contain many lines. Click on a command to see its syntax and
-possible settings:</p>
+   possible settings:</p>
 
 <p class="noindent code" style="margin-left:2rem">
 <a href="#documentclass">\documentclass{novelette}</a><br/>
@@ -60,11 +60,11 @@ possible settings:</p>
 <a href="#trimsize">\trimsize{width=<i>W</i>,height=<i>H</i>}</a><br/>
 <a href="#layout">\layout{lines=<i>L</i>,pagestyle=<i>P</i>,glue=<i>G</i>,cpl=<i>C</i>}</a></br>
 <a href="#styles">\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->deco=<i>D</i>,case=<i>C</i>}</a><br/>
+   -->deco=<i>D</i>,case=<i>C</i>}</a><br/>
 <a href="#vrhead">\vrheadtext[<i>option</i>]{<i>verso</i>}{<i>recto</i>}</a><br/>
 % For <i>N</i> = 0 to 9 :<br/>
 <a href="#styles">\setstyle<i>N</i>{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
--->align=<i>A</i>,case=<i>C</i>}</a><br/>
+   -->align=<i>A</i>,case=<i>C</i>}</a><br/>
 <a href="#styles">\scenestyle{align=<i>A</i>}</a><br/>
 <a href="#styles">\footnotestyle{indent=<i>I</i>}</a><br/>
 <a href="#pdfx">\pdfx{<i>choice</i>}</a><br/>
@@ -93,7 +93,7 @@ possible settings:</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Choices: <code>draft preview final</code>. Default <code>draft</code>.</p>
 <p>The purpose of modes is to allow faster compiling while you are writing and editing your book,
-and avoid confusion between good and bad results.</p>
+   and avoid confusion between good and bad results.</p>
 <ul><li>
   <p>Whichever mode you choose, the typesetting (line breaks, page breaks)
      will be the same.</p>
@@ -163,14 +163,14 @@ and avoid confusion between good and bad results.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Each PDF contains two ID hash strings. In principle, the <i>uniqueID</i>
-identifies the document, and remains unchanged with minor edits. The <i>instanceID</i>
-is changed with each significant revision. This is useful for version control.</p>
+   identifies the document, and remains unchanged with minor edits. The <i>instanceID</i>
+   is changed with each significant revision. This is useful for version control.</p>
 <p>Standard LaTeX does not obey those rules: The hash strings are changed, every time the
-document is compiled, whether or not any changes were made. Useless for version control.</p>
+   document is compiled, whether or not any changes were made. Useless for version control.</p>
 <p>Novelette can help. The uniqueID is hashed from title, subtitle, author, and two
-special settings: <code>\docdate</code> and <code>\version</code>. When all of them are
-unchanged, the uniqueID remains fixed. The instanceID will still change with each compile,
-whether or not anything is changed.</p>
+   special settings: <code>\docdate</code> and <code>\version</code>. When all of them are
+   unchanged, the uniqueID remains fixed. The instanceID will still change with each compile,
+   whether or not anything is changed.</p>
 <ul><li>
   <p><code>\docdate</code> and <code>\version</code> are optional. Default empty.</p>
 </li><li>
@@ -225,8 +225,8 @@ whether or not anything is changed.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Trim size is the physical, finished size of book interior pages. Print&#8209;on&#8209;demand
-softcover uses the "Prefect Print" process, which exactly fits the cover to the interior.
-Traditional hardcover binding uses a slightly larger cover.</p>
+   softcover uses the "Prefect Print" process, which exactly fits the cover to the interior.
+   Traditional hardcover binding uses a slightly larger cover.</p>
 <ul><li>
   <p>The width and height are measured with units of inches or millimeters. The same units
      must be used for both. Use <code>in</code> for inches, <code>mm</code> for millimeters.</p>
@@ -267,7 +267,7 @@ Traditional hardcover binding uses a slightly larger cover.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>This determines the general layout of page headers/footers and main text. Novelette
-automatically sets the margins and main font size; you cannot set them manually.</p>
+   automatically sets the margins and main font size; you cannot set them manually.</p>
 <ul><li>
   <p><code><i>L</i></code> is an integer from 28 to 35. Default <code>35</code>.</p>
   <p>This sets the lines per page, in main textblock (not including header/footer).</p>
@@ -297,12 +297,14 @@ automatically sets the margins and main font size; you cannot set them manually.
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The <code>\layout</code> setting determines whether or not there are page headers
-and/or footers. The <code>\headstyle</code> command determines how they appear. This is a global
-setting with no local over-ride.</p>
+   and/or footers. The <code>\headstyle</code> command determines how they appear. This is
+   a global setting with no local over-ride.</p>
 <p><code>\headstyle{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
    -->deco=<i>D</i>,case=<i>C</i>}</code></p>
 <ul><li>
   <p><i>F</i> is a <a href="">font code</a>. Default <code>main</code>.</p>
+  <p>Only choose from: <code>main think dark gero</code>. Other fonts are too heavy
+     or too fancy for use in page headers.</p>
 </li><li>
   <p><i>S</i> is a decimal number 0.88 - 1. Default <code>0.94</code>.</p>
 </li><li>
@@ -337,8 +339,8 @@ setting with no local over-ride.</p>
   </li></ul>
 </li></ul>
 <p class="noindent">Although it is not popular nowadays, some books use page headers with
-the author's name Italic, and the book title Regular. This is only possible if you choose
-font=main, and <i>do not</i> choose case=dflt or case=titl.</p>
+   the author's name Italic, and the book title Regular. This is only possible if you choose
+   font=main, and <i>do not</i> choose case=dflt or case=titl.</p>
 
 
 <p><a id="vrhead"></a>&nbsp;</p>
@@ -346,7 +348,7 @@ font=main, and <i>do not</i> choose case=dflt or case=titl.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>If your layout uses page headers, this command sets the text that appears in the
-verso and recto page headers:</p>
+   verso and recto page headers:</p>
 <p><code>\vrheadtext[<i>option</i>]{<i>verso</i>}{<i>recto</i>}</code></p>
 <ul><li>
   <p>The texts do not include page numbers; those are placed automatically.</p>
@@ -365,12 +367,12 @@ verso and recto page headers:</p>
 </li><li>
 </ul>
 <p class="noindent">Print-on-demand normally requires that the book title and author be the same
-wherever they appear. That includes page headers (except on pages where no header prints).</p>
+   wherever they appear. That includes page headers (except on pages where no header prints).</p>
 <p>Without option, the <code>\vrheadtext</code> is global, and cannot be changed. This is best
-for most users.</p>
+   for most users.</p>
 <p>With option <code>[local]</code>, the verso and/or recto text can be locally changed.
-See the <a href="components.html">components page</a> for details. That may be useful,
-but many print-on-demand services will not allow it.</p>
+   See the <a href="components.html">components page</a> for details. That may be useful,
+   but many print-on-demand services will not allow it.</p>
 
 
 <p><a id="styles"></a>&nbsp;</p>
@@ -378,9 +380,9 @@ but many print-on-demand services will not allow it.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The <code>\styleN</code> commands (N=0-9) are one way to style text,
-in <a href="components.html#display">display zones</a>.
-This sets the default appearance. You may locally over-ride any of these, by
-per-instance option of the related <code>\styleN</code> command.</p>
+   in <a href="components.html#display">display zones</a>.
+   This sets the default appearance. You may locally over-ride any of these, by
+   per-instance option of the related <code>\styleN</code> command.</p>
 <p><code>\setstyleN{font=<i>F</i>,scale=<i>S</i>,track=<i>T</i>,<!--
    -->align=<i>A</i>,case=<i>C</i>}</code></p>
 <ul><li>
@@ -425,7 +427,7 @@ per-instance option of the related <code>\styleN</code> command.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>This sets the global alignment of the <code>\scene</code> command. There is no
-local over-ride.</p>
+   local over-ride.</p>
 <p><code>\scenestyle{align=<i>A</i>}</code>.</p>
 <ul><li>
   <p><code><i>A</i></code> is one of <code>left right center</code>.
@@ -438,7 +440,7 @@ local over-ride.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>This sets the appearance at the start of each footnote. If a footnote has more than
-one paragraph, the additional paragraphs are indented normally.</p>
+   one paragraph, the additional paragraphs are indented normally.</p>
 <p><code>\footnotestyle{indent=<i>I</i>}</code></p>
 <ul><li>
   <p><code><i>I</i></code> is one of <code>near away both none.</code>
@@ -464,7 +466,7 @@ one paragraph, the additional paragraphs are indented normally.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette has built-in capability for PDF/X-1a:2001 format. This is preferred by many
-print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
+   print-on-demand services. It is the closest to "digital paper" that PDF can provide.</p>
 <ul><li>
   <p>The <i>choice</i> is one of <code>fogra swop off</code>, known as
      <i>Output Intent</i>.</p>
@@ -580,11 +582,11 @@ print-on-demand services. It is the closest to "digital paper" that PDF can prov
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>The wonderful <i>lua-typo</i> code, by Daniel Flipo, can inspect each PDF page after it has
-been typeset, looking for <i>typographic flaws</i>. Those are not errors. They are places where
-something is not as good-looking is it should be.</p>
+   been typeset, looking for <i>typographic flaws</i>. Those are not errors. They are places where
+   something is not as good-looking is it should be.</p>
 <p>Novelette has a modified version of that code. This capability is off, by default. You may
-turn it on with <code>\examine{1}</code>. Details of what it does, and why you should care,
-are <a href="typo-flaws.html">described here</a>.</p>
+   turn it on with <code>\examine{1}</code>. Details of what it does, and why you should care,
+   are <a href="typo-flaws.html">described here</a>.</p>
 
 
 <p><a id="margins"></a>&nbsp;</p>
@@ -592,14 +594,14 @@ are <a href="typo-flaws.html">described here</a>.</p>
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>There are no settings for margins or font size! Novelette automatically calculates them,
-for best appearance with your chosen (or deful) trim size and page layout.</p>
+   for best appearance with your chosen (or deful) trim size and page layout.</p>
 <p>The smallest available sizes have margins at least 0.375in (10mm) plus 0.125in (3.2mm)
-extra at the spine, for glue. The medium to large trim sizes increase the margins to at least
-0.5in (13mm), plus spine glue. These values are acceptable to nearly all print services.</p>
+   extra at the spine, for glue. The medium to large trim sizes increase the margins to at least
+   0.5in (13mm), plus spine glue. These values are acceptable to nearly all print services.</p>
 <p>If your book must have at least 0.5in margins (plus spine glue), then choose a trim size
-that is at least US 5.5in wide, 8.5in high, or British Demy 138mm wide, 216mm high.</p>
+   that is at least US 5.5in wide, 8.5in high, or British Demy 138mm wide, 216mm high.</p>
 <p>The calculated main font size will vary with trim size, layout, and possibly some other
-settings.</p>
+   settings.</p>
 
 
 <p><a id="packages"></a>&nbsp;</p>
@@ -608,9 +610,9 @@ settings.</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette is self-contained. You cannot add any packages.</p>
 <p>There is a close interaction between Novelette LaTeX code, its Lua support, and its fonts.
-Anything else is likely to cause problems.</p>
+   Anything else is likely to cause problems.</p>
 <p>Novelette does what you need to do, for its intended genres. It is for writers,
-not programmers.</p>
+   not programmers.</p>
 
 
 <p><a id="begindocument"></a>&nbsp;</p>
@@ -619,12 +621,12 @@ not programmers.</p>
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Novelette does many things with this command.</p>
 <p>When you write various settings in Preamble, most of them have no immediate effect.
-Your typing is checked for syntax and sanity, then the values are stored.</p>
+   Your typing is checked for syntax and sanity, then the values are stored.</p>
 <p>When the document body begins, Novelette calculates margins and font sizes, based on
-your settings and defaults. It loads the fonts. It sets a number of internal variables
-that will be needed later.</p>
+   your settings and defaults. It loads the fonts. It sets a number of internal variables
+   that will be needed later.</p>
 <p>This behavior differs from other LaTeX document classes, which read many settings
-as a class option, and uses packages to load fonts.</p>
+   as a class option, and uses packages to load fonts.</p>
 
 
 <p>&nbsp;</p>

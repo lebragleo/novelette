@@ -318,7 +318,7 @@
 \def\ijacute{{\nvt@aff{RawFeature={+ss16}}ij}}
 \def\j{%%
   \nvt@warn{\string\j\space is undefined in Novelette. Did you need \string\ijacute\space ?}%%
-  {j}%%
+  {\char"FFFD}%%
 }%%
 %%
 
@@ -334,8 +334,10 @@
 \let\nvt@addunicodeaccent\add@unicode@accent\relax
 \def\add@unicode@accent#1#2{%%
   \directlua{nvt.getcharaccent('\luaescapestring{#1}','\luaescapestring{#2}')}%%
+  \ifnum\tmpreturn=3\relax\asciicircumflex\fi%%
+  \ifnum\tmpreturn=2\relax\asciitilde\fi%%
   \ifnum\tmpreturn=1\relax\nvt@addunicodeaccent{#1}{#2}\fi%%
-  \ifx\emtwo\@empty\else\nvt@warn{\emtwo}\fi%%
+  \ifnum\tmpreturn=0\relax\char"FFFD\nvt@warn{\tmpem}\fi%%
 }%%
 %%
 
@@ -437,7 +439,10 @@
 %% \todo prints a placeholder glyph:
 \def\todo{\char"FFFC}
 \let\ToDo\todo\relax\let\TODO\todo\relax\let\Todo\todo\relax
-\def\text{\nvt@err{There is no \string\text\space command. Did you mean \string\maintext\space?}}
+\def\text{%%
+  \nvt@err{There is no \string\text\space command. Did you mean \string\maintext\space?}%%
+  \directlua{nvt.adderr('No \\text, possibly meant to use \\maintext.')}%%
+}%%
 %% The \kern macro is hard to read, and unfortunately allows absolute lengths.
 %% Typical vertical stem width is about .08em. \sk{number} kerns that number of typical stems.
 %% Value of the number is likely to be in the range -.5 to .5 without units.

@@ -145,12 +145,14 @@
   \IfBooleanTF{#1}{%%
     \nvt@err{\string\frontmatter* (with asterisk) not used in Novelette.^^J%%
       \spii Perhaps Preamble \string\disable{renumber} does what you intended.}%%
+    \directlua{nvt.adderr('\\frontmatter* with asterisk is disallowed.')}%%
   }{}%%
   \clearpage%%
   \@nameuse{ps@empty}%%
   \ifnum\c@page>1\relax%%
     \ifnvt@infrontmatter\else%%
-      \nvt@err{Printable material cannote precede \string\frontmatter.}%%
+      \nvt@err{Printable material cannot precede \string\frontmatter.}%%
+      \directlua{nvt.adderr('Printable material cannot precede \\frontmatter.')}%%
     \fi%%
   \fi%%
   \global\nvt@infrontmattertrue\global\nvt@inmainmatterfalse%%
@@ -165,6 +167,7 @@
   \IfBooleanTF{#1}{%%
     \nvt@err{\string\mainmatter* (with asterisk) not used in Novelette.^^J%%
       \spii Perhaps Preamble \string\disable{renumber} does what you intended.}%%
+    \directlua{nvt.adderr('\\mainmatter* with asterisk is disallowed.')}%%
   }{}%%
   \ifodd\c@page%%
     \edef\tmpexpect{\arabic{nvt@expectpage}}\ifnum\tmpexpect>1\relax%%

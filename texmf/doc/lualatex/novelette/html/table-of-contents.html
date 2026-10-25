@@ -69,6 +69,11 @@
 </li><li>
   <p>Page numbers are not automatic: When your book is (nearly) finished, you must edit the table,
      and provide the numbers. Novelette's only assistance is to warn you when they are wrong.</p>
+  <p>If the document contains a table of contents, the table will be inspected for syntax
+     errors.</p>
+  <p>If the document is the main document, then the table's page numbers will be compared
+     to actual page numbers, and reported if they disagree. But if the document is a sub-document,
+     page numbers are meaningless, so this check is not performed.</p>
 </li></ul>
 
 
@@ -113,9 +118,9 @@
 <p><code>\end{toc}</code></p>
 <ul><li>
   <p><code><i>F</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     Either <code>center</code> or number <i>N</i>. Selects whether
+     Either <code>center</code> or number <i>N</i>. Default center. Selects whether
      the table has <a href="#center">centered entries</a>, or is a
-     <a href="#vertical">vertical block</a>block with offsets <code><i>N</i></code>.</p>
+     <a href="#vertical">vertical block</a> with offsets <code><i>N</i></code>.</p>
 </li><li>
   <p><code><i>P</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      Number 0<=<i>P</i><=1. Default 0. Applies padding above each
@@ -124,7 +129,7 @@
 </li><li>
   <p><code><i>D</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      0 or 1. Ignored by center format. Default 0, means no dots connect entry name to its page
-     number. Value 1 means dot fill connect name to page number.</p>
+     number. Value 1 means dot fill connects name to page number.</p>
 </li><li>
   <p><code><i>S</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      normal or small. Default normal. Size of text in <code>\subentry</code> commands.
@@ -150,26 +155,8 @@
    table with excessive side offsets.</p>
 <p>Although the command always uses the same syntax, the typeset result will look different
    in the center and vertical table formats.</p>
-<p><code>\entry[id=<i>I</i>,page=<i>P</i>,lead=<i>L</i>}{<i>name</i>}</code></p>
+<p><code>\entry[lead=<i>L</i>,id=<i>I</i>,page=<i>P</i>}{<i>name</i>}</code></p>
 <ul><li>
-  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     Refers to a subsequent <a href="components.html#id">component id</a>. Default empty.</p>
-  <p>If an entry has empty <code>id</code>, but nonempty <code>page</code>,
-     you will be warned.</p>
-</li><li>
-  <p><code><i>P</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     The page number seen in print (bookpage). May be italic or arabic.
-     Usually not the same as the PDF page number.</p>
-  <p>Default <code>P</code> is empty: the table will not show a page number for this entry.
-     This is appropriate for an entry such as <code>PART I</code>, which
-     merely serves to separate other entries.</p>
-  <p>When an entry will have a page number, but you do not know it, set <code>page=0</code>.
-     That will format the entry for future insertion of the correct page number.</p> 
-  <p>Some pages do not print their numbers. In this case, <code><i>P</i></code>
-     is the number that you would see, if it printed.</p>
-  <p>Novelette does not have automatic page numbering. If you set the wrong <code><i>P</i></code>
-     for its <code><i>I</i></code>, you will be warned when compiling the whole document.</p>
-</li><li>
   <p><code><i>L</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      May be a one or two digit arabic integer, 0&ndash;99.
      Default empty. Note that <code>0</code> is not the same as empty.</p>
@@ -192,6 +179,26 @@
        and follow it with a subentry that has the actual chapter name. Or, if the names are short,
        you may write <span class="nowrap"><code>Chapter R. Chapter Name</code></span>.</p>
   </li></ul>
+</li><li>
+  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     Refers to a subsequent <a href="components.html#id">component id</a>. Default empty.</p>
+  <p>You may not use the same <code>id</code> for more than one entry.</p>
+</li><li>
+  <p><code><i>P</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     The page number seen in print (bookpage). Default empty. May be italic or arabic.
+     Usually not the same as the PDF page number.</p>
+  <p>When an entry will have a page number, but you do not know it, set <code>page=0</code>.
+     That will format the entry for future insertion of the correct page number.</p> 
+  <p>Some pages do not print their numbers. In this case, <code><i>P</i></code>
+     is the number that you would see, if it printed.</p>
+  <p>Novelette does not have automatic page numbering. If you set the wrong <code><i>P</i></code>
+     for its <code><i>I</i></code>, you will be warned when compiling the whole document.</p>
+</li><li>
+  <p>The <code>id</code> and <code>page</code> may both be empty (default). This prints the
+     entry name as an ordinary line of text, possibly preceded by its lead. It is suitable for
+     something such as <code>PART I</code>, which does not use a page number.</p>
+  <p>If either <code>id</code> or <code>page</code> is non&#8209;empty, then the other must also
+     be non&#8209;empty.</p>
 </li><li>
   <p><code>{<i>name</i>}</code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      Is the chapter name, or short story name, or other things

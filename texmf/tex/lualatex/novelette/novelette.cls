@@ -239,7 +239,10 @@
   \fi
   \let\input\nvt@input\relax\let\RequirePackage\nvt@RequirePackage\relax
   \RequirePackage{luahyphenrules}\HyphenRules{\nvt@lang}%% Load after \normalsize.
-  \def\HyphenRules#1{\nvt@err{Only one \string\HyphenRules\space is allowed.}} %%%%%
+  \def\HyphenRules#1{%% %%%%%
+    \nvt@err{Command \string\HyphenRules\space is disallowed.}%%
+    \directlua{nvt.adderr('Command \\HyphenRules is disallowed.')}%%
+  }%%
   \ifx\nvt@TrimBox\@empty\else
     \begingroup\edef\nvt@AddTrimBox{\endgroup\pdfpageattr{\nvt@TrimBox}}\nvt@AddTrimBox
   \fi

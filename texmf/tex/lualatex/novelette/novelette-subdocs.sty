@@ -125,6 +125,7 @@
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Now in \nvt@currentmatter, but \string\def\string\thisdoc, in file^^J%%
         \spii #1 claims that it should be in \tmpm.}%%
+      \directlua{nvt.adderr('Sub-document expects wrong front|main|backmatter.')}%%
     \fi%%
   \fi%%
   \gdef\thisdoc{}\gdef\nvt@nowcompiling{}\nvt@insubdocfalse%%

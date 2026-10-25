@@ -78,13 +78,13 @@
   \fi%%
 }%%
 \long\def\nvt@err#1{%%
-  \directlua{nvt.good = false ; nvt.nvterr = nvt.nvterr + 1}%%
+  \directlua{nvt.good = false ; nvt.errcount = nvt.errcount + 1}%%
   \typeout{^^J! Error. \nvt@where}%%
   \typeout{\spii #1^^J}\nvt@saywhat%%
 }%%
 %% Novelette treats warnings as errors, except that the compiler is not halted.
 \long\def\nvt@warn#1{%%
-  \directlua{nvt.good = false ; nvt.nvtwarn = nvt.nvtwarn + 1}%%
+  \directlua{nvt.good = false ; nvt.warncount = nvt.warncount + 1}%%
   \typeout{^^J! Warning. \nvt@where}%%
   \def\tmptest{#1}\ifx\tmptest\@empty\else\typeout{\spii #1^^J}\fi%%
 }%%

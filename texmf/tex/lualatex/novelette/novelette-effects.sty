@@ -73,6 +73,7 @@
 \def\nvt@keyerr{%%
   \nvt@err{Bad \string\key. Only one line: no wrap or \noexpand\\ or \string\par.}%%
   \global\nvt@goodkeyfalse%%
+  \directlua{nvt.adderr('Bad \\key content.')}%%
 }%%
 \def\nvt@keytext{} %% Default empty.
 \DeclareDocumentCommand\key{+m}{%% +m converted to m within definition.
@@ -89,6 +90,7 @@
     \nvt@err{Cannot set \string\key\space there. The setting cannot be within a block,^^J%%
       \spii footnote, page header, or any type of styling command.}%%
     \global\nvt@goodkeyfalse%%
+    \directlua{nvt.adderr('\\key in wrong location.')}%%
   \fi%%
 }%%
 %%
@@ -124,6 +126,7 @@
     \nvt@err{Cannot nest a block environment within another block.^^J%%
     \spii How to fix: Use separate blocks, each with its own options.}%%
     \strut\char"FFFD \smcp{bad nested block environment} \char"FFFD\par%%
+    \directlua{nvt.adderr('Cannot nest blocks.')}%%
   \else%%
     \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
     \def\indent{\strut\hspace{\nvt@parindent}}%% Substitute.
@@ -162,6 +165,7 @@
         \spix Only display zone allows size=small.^^J%%
         \spiv F -> normal italic. Default normal. Applies to entire block.}%%
       \strut\char"FFFD \smcp{bad option for block environment} \char"FFFD\par%%
+      \directlua{nvt.adderr('Bad option for block environment.')}%%
     \else%%
       \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
       \ifnum\tmpital=1\relax\itshape\fi%%
@@ -290,6 +294,7 @@
   \ifnvt@inblock%%
     \nvt@err{Cannot nest a toc environment within another toc, or within a block.}%%
     \strut\char"FFFD \smcp{bad nested toc environment} \char"FFFD\par%%
+    \directlua{nvt.adderr('Cannot nest toc within toc or block.')}%%
   \else%%
     \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
     \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}\def\tmpmaxlead{0}%%
@@ -307,6 +312,7 @@
         \spiv S -> small normal. Default text size for subentries.^^J%%
         \spiv I -> 0 1. Default subentry indent. Only when vertical format.}%%
       \strut\char"FFFD \smcp{bad option for toc environment} \char"FFFD\par%%
+      \directlua{nvt.adderr('Bad option for toc environment.')}%%
     \else%%
       \nvt@intoctrue\nvt@inblocktrue%%
 %%      \hyphenpenalty 10000\relax\exhyphenpenalty 10000\relax%%
@@ -337,23 +343,15 @@
 %%
 
 
-%% \entry[id=I,page=P,lead=L]{name}
-%%   I -> Matches id of a subsequent component. Only ascii letters and numerals.
-%%        Max 8 characters. Default empty.
-%%   P -> Bookpage number (as printed). Usually not same as PDFpage number.
-%%        Default empty, means entry does not show a page number.
-%%        If P is nonempty, then I is required.
-%%        Use page=0 for page numbers that will be shown, but you do not yet know them.
-%%   L -> May be one or two arabic digits, or empty. Default empty.
-%%        If empty, does not create space in front of entry name.
-%%        If 0 and toc format=N, creates empty space in front of entry name. Ignored if center.
-%%        If number 1-99, creates space in front of entry name. In the space, prints
-%%        right-aligned number, followed by period and space. Right-aligned
-%%   name -> Must fit on one line, allowing for table width, numbers.
+%% \entry[lead=L,id=I,page=P]{name}
+%%   These are the toc entries. Usually they will show a chapter name (possibly preceded by lead)
+%% then its page number. The name and number may be linked by dots, depending on toc option.
+%% But an entry can be the name alone; that would be useful for partitions such as PART I.
+%%   If an entry sets id, then it must also set page, and vice-versa. May use 0 for unknown page.
 \DeclareDocumentCommand\entry{O{}m}{%%
   \par%%
   \ifnvt@intoc%%
-    \def\tmpentryid{}\def\tmpentrypage{}\def\tmpentrylead{}\def\tmplead{-1}%%
+    \def\tmppage{}\def\tmplead{-1}%%
     \directlua{nvt.parseentry('\luaescapestring{#1}')}%%
     \vspace*{\tmpentrypad}%%
     \ifnum\tmpreturn=1\relax%%
@@ -365,41 +363,55 @@
       \else%%
         \ifnum\tmplead=-1\relax\def\tmpleadbox{}\fi%%
         \ifnum\tmplead=0\relax\def\tmpleadbox{\makebox[1.5\nvt@em]{}}\fi%% Digit width = 0.5em.
-        \ifnum\tmplead=1\relax%%
+        \ifnum\tmplead>0\relax%%
           \def\tmpleadbox{\makebox[1.5\nvt@em][r]{%%
-            \tmpentrylead{\nvt@aff{RawFeature={+cv45,+cv43}}.\space}%%
+            \tmplead{\nvt@aff{RawFeature={+cv45,+cv43}}.\space}%%
           }}%%
         \fi%%
         \sbox1{\tmpleadbox}%%
         \edef\tmpwhat{\fpeval{\linewidth-\wd0-\wd1-.5em*floor((\linewidth-\wd0-\wd1)/.5em)}pt}%%
         \ifnum\tmptocformat=0\relax%%
-          \ifx\tmpentrypage\@empty%%
+          \ifx\tmppage\@empty%%
             \strut\tmpleadbox{#2}\par%%
           \else%%
             \ifnum\tmptocdots=1\relax\def\tmpdots{ . . . }\else\def\tmpdots{\spii}\fi%%
-            \sbox0{\tmpentrypage}%%
-            \strut\tmpleadbox{#2}\tmpdots\tmpentrypage\par%%
+            \sbox0{\tmppage}%%
+            \strut\tmpleadbox{#2}\tmpdots\tmppage\par%%
           \fi%%
         \else%%
-          \ifx\tmpentrypage\@empty%%
+          \ifx\tmppage\@empty%%
             \strut\tmpleadbox{#2}\par%%
           \else%%
             \ifnum\tmptocdots=1\relax%%
               \def\tmpdots{\dotfill}%%
-              \sbox0{\tmpentrypage}%%
+              \sbox0{\tmppage}%%
               \edef\tmppnpad{\fpeval{.5*\nvt@em*ceil(\wd0/(.5001*\nvt@em)) - \wd0}pt}%%
             \else%%
               \def\tmpdots{\hfill}%%
               \edef\tmppnpad{0pt}%%
             \fi%%
             \strut\tmpleadbox{#2}%%
-            \makebox[\tmpwhat]{}\tmpdots\kern\tmppnpad\tmpentrypage\par%%
+            \makebox[\tmpwhat]{}\tmpdots\kern\tmppnpad\tmppage\par%%
           \fi%%
         \fi%%
       \fi%%
-    \else%%
-      \nvt@err{Bad \string\entry. See Novelette docs for correct syntax.}%%
+    \fi%%
+    \ifnum\tmpreturn=0\relax%%
+      \nvt@err{Bad \string\entry[lead=L,id=I,page=P]{name}.^^J%%
+        \spiv L -> Default not set, does not create space in front of entry name.^^J%%
+        \spix If lead=0 and toc format=N: empty area in front of entry name.^^J%%
+        \spix If lead=1-99 and toc format=N: area in front of entry name.^^J%%
+        \spxi The area has: right-aligned number, period, and space.^^J%%
+        \spii If either id or page is set, then the other must also be set.^^J%%
+        \spiv I -> Default not set. Matches id of a subsequent component.^^J%%
+        \spix Only ascii letters and numerals. Max 8 characters.^^J%%
+        \spix Cannot use same id in more than one entry.^^J%%
+        \spiv P -> Default not set. Bookpage number. Usually not same as PDFpage.^^J%%
+        \spix May use page=0 as temporary setting for unknown number.^^J%%
+        \spix Number may not exceed roman xxxvix or arabic 999.^^J%%
+        \spiv name -> Must fit on one line, allowing for table width, numbers.}%%
       {\char"FFFD} Bad entry.\par%%
+      \directlua{nvt.adderr('Bad \\entry.')}%%
     \fi%%
   \else%%
     \nvt@warn{Cannot use \string\entry\space outside toc environment.}%%
@@ -451,11 +463,13 @@
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
     \spii inside \string\styleN (N=0-9), or \string\scene, or \string\sceneimage.}%%
+  \directlua{nvt.adderr('Paragraph or linebreak disallowed inside command.')}%%
 }%%
 \def\nvt@badstyle#1{%%
   \nvt@err{Do not write \string\style{N}[option]{text}.^^J%%
     \spii Write \string\styleN[option]{text} with N=0-9.}%%
     \char"FFFD\space%%
+  \directlua{nvt.adderr('\\style{N} should be \\styleN.')}%%
 }%%
 \def\style{\@ifnextchar\bgroup\nvt@badstyle\nvt@stylecmd}
 \newif\ifnvt@instyle %% True within \styleN and \scene commands.
@@ -470,6 +484,7 @@
     \nvt@err{Commands \string\styleN\space (N=0-9) may only be used within display zones.^^J%%
       \spii They may not be nested, or used within block environment.}%%
     \strut\char"FFFD\par%%
+    \directlua{nvt.adderr('\\styleN in disallowed location.')}%%
   \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad \string\styleN[option]{text}.^^J%%
@@ -481,6 +496,7 @@
       \spix That might be useful for your own design purposes.^^J%%
       \spiv [logo] -> Allows use of \string\logo\space within the text.}%%
       \strut\char"FFFD\par%%
+    \directlua{nvt.adderr('Bad \\styleN syntax.')}%%
   \fi%%
   \ifnum\tmpreturn=1\relax%%
     \par\vspace*{-\nvt@bls}\strut\par%%
@@ -507,6 +523,7 @@
         \spii Measured content width is \tmphowmuch\@percentchar\space of max textwidth.^^J%%
         \spii You must reduce content or reduce scale.}%%
       \sbox0{\tmpfont\tmpfeat\spaceskip=\tmpsp{\char"FFFD}}%%
+      \directlua{nvt.adderr('\\styleN content is woo wide.')}%%
     \fi
     \ifnum\tmpinfo=1\relax%%
       \edef\tmpwdz{\fpeval{round(\wd0/\nvt@em,2)}em}%%
@@ -558,6 +575,7 @@
     \nvt@err{Command \string\scene\space cannot be nested in itself,^^J%%
       \spii or used in \string\styleN (N=0-9), \string\image, or block environment.}%%
     {\char"FFFD}%%
+    \directlua{nvt.adderr('\\scene in disallowed location.')}%%
   \fi%%
   \endgroup\nopagebreak\blankline%%
 }%%
@@ -731,10 +749,12 @@
         \spix 0<T<1 promoted to T=1. T>9 demoted to T=9.^^J%%
         \spix T=0 reserves space, but does not print line.}%%
       \strut\tmpleft\char"FFFD Bad \textbackslash\line.\tmpright\strut\par%%
+      \directlua{nvt.adderr('Bad \\line syntax.')}%%
     \fi%%
     \endgroup%%
   \else%%
     \nvt@err{Cannot use \string\line\space outside display zone, or within block}%%
+    \directlua{nvt.adderr('\\line in disallowed location.')}%%
   \fi%%
 }%%
 %%
@@ -777,6 +797,7 @@
   \else%%
     \nvt@err{Command \string\endnote\space may only be used after \string\backmatter.}%%
     \par{\char"FFFD} No \string\endnote\space allowed here.\par%%
+    \directlua{nvt.adderr('\\endnote appears before \\backmatter.')}%%
   \fi%%
 }%%
 %%
