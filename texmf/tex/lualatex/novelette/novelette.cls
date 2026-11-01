@@ -195,13 +195,11 @@
 \newif\ifnvt@usethick
 \newif\ifnvt@useheavy
 \newif\ifnvt@useblack
-\newif\ifnvt@usewide
 \newif\ifnvt@usethin
-\newif\ifnvt@usesrir
 \newif\ifnvt@usegero
 \newif\ifnvt@useplas
-\newif\ifnvt@usecrge
 \newif\ifnvt@uselight
+\newif\ifnvt@useicel
 \let\nvt@par\par\relax %% For local \par tweaks.
 \let\nvt@input\input\relax %% For internal use only, where \input is deactivated.
 \let\nvt@maybestopnow\relax%% Changes when compiling only subdocs.
@@ -374,7 +372,11 @@
     \directlua{%%
       local fileout = './' .. tex.jobname .. '.typo'
       local out = io.open(fileout,"w+")
-      out:write(nvt.typobuffer)
+      if nvt.pagelist == '' then
+        out:write(nvt.noflaws)
+      else
+        out:write(nvt.typobuffer)
+      end
       io.close(out)
     }%%
   \fi

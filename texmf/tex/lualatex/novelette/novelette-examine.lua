@@ -158,11 +158,11 @@ nvt.fromluacolor()
 -- uses only what is necessary, and tightly integrates it with other Novelette code.
 --   Overfull is not reported as typo, because it is always reported as warning.
 -- End-of-line single letter is always prevented by penalty, so no need for typo single letter.
-nvt = nvt or { } -- namespace
-nvt.tbl = { }
-nvt.map = { }
-nvt.pagelist = ' '
-nvt.failedlist = ' '
+nvt = nvt or {} -- namespace
+nvt.tbl = {}
+nvt.map = {}
+nvt.pagelist = ''
+nvt.failedlist = ''
 nvt.buf1 = 'Typographic flaws found in ' .. tex.jobname .. '.pdf.\n'
 nvt.buf2 = 'Compiled ' .. nvt.now .. '.\n'
 nvt.buf3 = 'Only OVERFULL is an error or warning. Rewrite!\n'
@@ -170,8 +170,10 @@ nvt.buf4 = 'WIDOW is a very serious flaw, unless intentional. Rewrite!\n'
 nvt.buf5 = 'Other flaws show places where rewrite may improve appearance.\n'
 nvt.buf6 = 'You decide what is important. No auto-fixes. Only rewrite can fix.\n\n'
 nvt.typobuffer = nvt.buf1 .. nvt.buf2 .. nvt.buf3 .. nvt.buf4 .. nvt.buf5 .. nvt.buf6
+nvt.noflaws = nvt.buf1 .. nvt.buf2 .. 'No flaws found. Amazing!\n'
 
-local char_to_discard = { }
+
+local char_to_discard = {}
 char_to_discard[string.byte(',')] = true
 char_to_discard[string.byte('.')] = true
 char_to_discard[string.byte('!')] = true
@@ -180,7 +182,7 @@ char_to_discard[string.byte(':')] = true
 char_to_discard[string.byte(';')] = true
 char_to_discard[string.byte('-')] = true
 
-local eow_char = { }
+local eow_char = {}
 eow_char[string.byte('.')] = true
 eow_char[string.byte('!')] = true
 eow_char[string.byte('?')] = true
@@ -590,10 +592,10 @@ check_vtop = function (top, colno, vpos)
           hyphcount = 0 ; firstwd = '' ; lastwd = ''
           if not footnote then
             parline = 1
-            if pageline == 1 then
-              local nn = first.next
-              if nn.id == HLIST and nn.subtype == INDENT and nn.width > 0 then pageflag = true end
-            end
+-----            if pageline == 1 then
+-----              local nn = first.next
+-----              if nn.id == HLIST and nn.subtype == INDENT and nn.width > 0 then pageflag = true end
+-----            end
             if body_bottom then orphanflag = true end
           end
           local nn = first.next
@@ -602,7 +604,7 @@ check_vtop = function (top, colno, vpos)
           parline = parline + 1
         end
         local flag = not ListItem and (line > 1)
-      firstwd, flag = check_line_first_word(firstwd, first, line, colno, flag, footnote)
+        firstwd, flag = check_line_first_word(firstwd, first, line, colno, flag, footnote)
         if flag then pageflag = true end
         if pageline == 1 and parline > 1 and check_page_first_word(first, colno, footnote) then
           pageflag = true

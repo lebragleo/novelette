@@ -272,16 +272,10 @@
 
 
 %% TABLE OF CONTENTS ENVIRONMENT:
-%%   \begin{toc}[format=F,pad=P,dots=D,subtext=S,subindent=I]
-%%   ... entries  and subentries ...
-%%   \end{toc}
-%% F -> Either center, or number 0<=F<=8.
-%%   If center, is block [0/0,align=center]. If number, is vertical block [F/F,align=justify].
-%% P -> Number 0<=P<=1. Applies padding above each \entry command. The padding is a multiple
-%%   of normal baselineskip. Thus P=.5 applies half-line padding.
-%% D -> 0 1. Default 1 means three dots for center, fill for vertical. 0 means no dots.
-%% S -> small or normal. Default normal. Text size for \subentry. May locally over-ride.
-%% I -> 0 1. Default 1. Text indent for \subentry. May locally over-ride.
+%%   \begin{toc}[format=F,pad=P,dots=D] ... entries  and subentries ... \end{toc}
+%% The toc is a special block environment. Its format may simply print each entry sentered,
+%% or with aligned vertical sides. Entry name may be connected to their page numbers with dots.
+%% If the table has few entries, each entry may be vertically padded, so that they spread.
 \newif\ifnvt@intoc %% True within toc environment.
 \DeclareDocumentEnvironment{toc}{O{}}{%%
   \par\strut\par\vspace{-\nvt@bls}%% Ensure fresh line.
@@ -292,53 +286,59 @@
       \spii If the toc is in a sub-document, use \string\thisdoc{F: ...} there.}%%
   \fi%%
   \ifnvt@inblock%%
-    \nvt@err{Cannot nest a toc environment within another toc, or within a block.}%%
-    \strut\char"FFFD \smcp{bad nested toc environment} \char"FFFD\par%%
-    \directlua{nvt.adderr('Cannot nest toc within toc or block.')}%%
+    \nvt@fatal{Cannot nest a toc environment within another toc, or within a block.}%%
+  \fi%%
+  \begingroup\setlength\parindent{0pt}\def\tmpbadtoc{0}%%
+  \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}\def\tmptocdots{-1}%%
+%%  \hyphenpenalty 10000\relax\exhyphenpenalty 10000\relax%%
+  \nvt@intoctrue\nvt@inblocktrue%%
+  \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
+  \ifnum\tmpreturn=0\relax%%
+    \nvt@err{Bad option for toc environment.^^J%%
+      \spii Option: [format=F,pad=P,dots=D]^^J%%
+      \spiv F -> Either center, or number 0<=F<=8.^^J%%
+      \spix center -> Table entries are centered. Default.^^J%%
+      \spix number -> Vertical block sides, offset F indents from margins.^^J%%
+      \spiv P -> Number 0<=P<=1. Pads N*baselineskip above each \string\entry.^^J%%
+      \spiv D -> 0 1. Default 1 uses dots. If 0, no dots.}%%
+    \directlua{nvt.adderr('Bad option for toc environment.')}%%
+  \fi%%
+  \edef\tmpentrypad{\fpeval{\tmppad*\nvt@bls}pt}%%
+  \ifnum\tmptocformat=0\relax%%
+    \nvt@center%%
+    \ifnum\tmptocdots=-1\relax\def\tmptocdots{1}\fi%%
   \else%%
-    \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
-    \def\tmptocformat{0}\def\tmptocside{0}\def\tmppad{0}\def\tmpmaxlead{0}%%
-    \def\tmptocsubtext{0}\def\tmptocsubind{1}\def\tmptocdots{-1}%%
-    \directlua{nvt.parsetoc('\luaescapestring{#1}')}%%
-    \ifnum\tmpreturn=0\relax%%
-      \nvt@err{Bad option for toc environment.^^J%%
-        \spii Option: [format=F,pad=P,dots-D,subtext=S,subindent=I]^^J%%
-        \spiv F -> Either center, or number 0<=F<=8.^^J%%
-        \spix center -> Table entries are centered. Default.^^J%%
-        \spix number -> Vertical block sides, offset F indents from margins.^^J%%
-        \spiv P -> Number 0<=P<=1. Pads N*baselineskip above each \string\entry.^^J%%
-        \spiv D -> 0 1. Default 1 uses dots. If 0, no dots.^^J%%
-        \spix Center format demotes fill to some.^^J%%
-        \spiv S -> small normal. Default text size for subentries.^^J%%
-        \spiv I -> 0 1. Default subentry indent. Only when vertical format.}%%
-      \strut\char"FFFD \smcp{bad option for toc environment} \char"FFFD\par%%
-      \directlua{nvt.adderr('Bad option for toc environment.')}%%
-    \else%%
-      \nvt@intoctrue\nvt@inblocktrue%%
-%%      \hyphenpenalty 10000\relax\exhyphenpenalty 10000\relax%%
-      \edef\tmpentrypad{\fpeval{\tmppad*\nvt@bls}pt}%%
-      \ifnum\tmptocformat=0\relax%%
-        \nvt@center%%
-        \ifnum\tmptocdots=-1\relax\def\tmptocdots{1}\fi%%
-      \else%%
-        \ifnum\tmptocdots=-1\relax\def\tmptocdots{2}\fi%%
-        \edef\tmptocoffset{\fpeval{\tmptocside*\nvt@parindent}pt}%%
-        \setlength{\leftmargin}{\tmptocoffset}%%
-        \setlength{\rightmargin}{\tmptocoffset}%%
-        \advance\linewidth -\leftmargin%%
-        \advance\linewidth -\rightmargin%%
-        \advance\@totalleftmargin\leftmargin%%
-        \@setpar{{\@@par}}%%
-        \parshape 1 \@totalleftmargin \linewidth%%
-      \fi%%
-      \ignorespaces%% %%%%%
-    \fi%%
+    \ifnum\tmptocdots=-1\relax\def\tmptocdots{2}\fi%%
+    \edef\tmptocoffset{\fpeval{\tmptocside*\nvt@parindent}pt}%%
+    \setlength{\leftmargin}{\tmptocoffset}%%
+    \setlength{\rightmargin}{\tmptocoffset}%%
+    \advance\linewidth -\leftmargin%%
+    \advance\linewidth -\rightmargin%%
+    \advance\@totalleftmargin\leftmargin%%
+    \@setpar{{\@@par}}%%
+    \parshape 1 \@totalleftmargin \linewidth%%
   \fi%%
 }{%%
-  \ifnvt@intoc%%
-    \par\ifnum\tmptocformat=0\relax\nvt@endcenter\fi%%
-    \endgroup%%
+  \par\ifnum\tmptocformat=0\relax\nvt@endcenter\fi%%
+  \directlua{nvt.tocend()}%%
+  \ifnum\tmpbadtoc>0\relax%%
+    \nvt@err{Found \tmpbadtoc\space instance(s) of bad \string\entry\space %%
+      or bad \string\subentry\space in toc.^^J%%
+      \spii Format: \string\entry[lead=L,id=I,page=P]{name}.^^J%%
+      \spiv L -> Default not set. May leave unset, or L = integer 0-99.^^J%%
+      \spiv If either id or page is set, then the other must also be set.^^J%%
+      \spiv I -> Default not set. ASCII letters and numerals. Max 8 characters.^^J%%
+      \spix Cannot use same id in more than one entry.^^J%%
+      \spiv P -> Default not set. Bookpage number. Usually not same as PDFpage.^^J%%
+      \spix May use page=0 as temporary setting for unknown number.^^J%%
+      \spix Number may not exceed roman xxxvix or arabic 999.^^J%%
+      \spiv name -> Must fit on one line, allowing for table width, numbers.^^J%%
+      \spii Format: \string\subentry[size=S]{subname}^^J%%
+      \spiv S -> normal or small. Default small.^^J%%
+      \spiv Text of subname may wrap to several lines.}%%
+    \directlua{nvt.adderr('Bad content in toc.')}%%
   \fi%%
+  \endgroup%%
 }%%
 %%
 
@@ -397,21 +397,7 @@
       \fi%%
     \fi%%
     \ifnum\tmpreturn=0\relax%%
-      \nvt@err{Bad \string\entry[lead=L,id=I,page=P]{name}.^^J%%
-        \spiv L -> Default not set, does not create space in front of entry name.^^J%%
-        \spix If lead=0 and toc format=N: empty area in front of entry name.^^J%%
-        \spix If lead=1-99 and toc format=N: area in front of entry name.^^J%%
-        \spxi The area has: right-aligned number, period, and space.^^J%%
-        \spii If either id or page is set, then the other must also be set.^^J%%
-        \spiv I -> Default not set. Matches id of a subsequent component.^^J%%
-        \spix Only ascii letters and numerals. Max 8 characters.^^J%%
-        \spix Cannot use same id in more than one entry.^^J%%
-        \spiv P -> Default not set. Bookpage number. Usually not same as PDFpage.^^J%%
-        \spix May use page=0 as temporary setting for unknown number.^^J%%
-        \spix Number may not exceed roman xxxvix or arabic 999.^^J%%
-        \spiv name -> Must fit on one line, allowing for table width, numbers.}%%
       {\char"FFFD} Bad entry.\par%%
-      \directlua{nvt.adderr('Bad \\entry.')}%%
     \fi%%
   \else%%
     \nvt@warn{Cannot use \string\entry\space outside toc environment.}%%
@@ -421,31 +407,32 @@
 %%
 
 
-%% \subentry[text=T,indent=I]{text}
+%% \subentry[size=S]{text}
 %%   This is a method for adding more information beneath an \entry.
-%% T -> 0 or 1. 0=normal. 1=small. Default \tmptocsubtext
-%% I -> 0 1. Text block indent, relative to above entry {name}. Default \tmptocsubind.
+%% S -> normal small. Default small.
 \DeclareDocumentCommand\subentry{O{}+m}{%%
-  \begingroup\edef\tmpsmsub{\tmptocsubtext}\edef\tmpsubind{\tmptocsubind}%%
-  \directlua{nvt.parsesubentry('\luaescapestring{#1}')}%%
-  \ifnum\tmpsmsub=1\relax%%
-    \setlength\baselineskip{.875\nvt@bls}\nvt@aff{Scale=.875}%%
+  \ifnvt@intoc%%
+    \begingroup\edef\tmpsmsub{1}%%
+    \directlua{nvt.parsesubentry('\luaescapestring{#1}')}%%
+    \ifnum\tmpsmsub=1\relax%%
+      \setlength\baselineskip{.875\nvt@bls}\nvt@aff{Scale=.875}%%
+    \fi%%
+    \edef\tmpsuboffsetl{\fpeval{1.5*\nvt@em}pt}%%
+    \edef\tmpsuboffsetr{\fpeval{1.75*\nvt@em}pt}%%
+    \setlength{\leftmargin}{\tmpsuboffsetl}%%
+    \setlength{\rightmargin}{\tmpsuboffsetr}%%
+    \advance\linewidth -\leftmargin%%
+    \advance\linewidth -\rightmargin%%
+    \advance\@totalleftmargin\leftmargin%%
+    \@setpar{{\@@par}}%%
+    \parshape 1 \@totalleftmargin \linewidth%%
+    \ifnum\tmpreturn=1\relax{#2\par}\else{\char"FFFD} Bad subentry.\par\fi%%
+    \ifnum\tmpsmsub=1\relax\vspace{.0375\nvt@bls}\fi%%
+    \endgroup%%
+  \else%%
+    \nvt@warn{Cannot use \string\subentry\space outside toc environment.}%%
+    \par\char"FFFD\space\string\subentry\space cannot be used here.\par%%
   \fi%%
-  \ifnum\tmpsubind=0\relax\def\tmpsuboffsetl{0pt}\fi%%
-  \ifnum\tmpsubind=1\relax\edef\tmpsuboffsetl{\fpeval{1.5*\nvt@em}pt}\fi%%
-  \ifnum\tmpsubind=2\relax\edef\tmpsuboffsetl{\fpeval{2*\nvt@em}pt}\fi%%
-  \edef\tmpsuboffsetr{\fpeval{1.75*\nvt@em}pt}%%
-  \setlength{\leftmargin}{\tmpsuboffsetl}%%
-  \setlength{\rightmargin}{\tmpsuboffsetr}%%
-  \advance\linewidth -\leftmargin%%
-  \advance\linewidth -\rightmargin%%
-  \advance\@totalleftmargin\leftmargin%%
-  \@setpar{{\@@par}}%%
-  \parshape 1 \@totalleftmargin \linewidth%%
-  {#2\par}%%
-  \ifnum\tmpsmsub=1\relax\vspace{.2625\nvt@bls}\fi%%
-  \ifnum\tmpreturn=0\relax\nvt@warn{Bad option for \string\subentry.}\fi%%
-  \endgroup%%
 }%%
 %%
 

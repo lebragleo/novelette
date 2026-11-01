@@ -97,17 +97,17 @@ nvt.pagelist = '' -- Might become nonempty when nvt.examine==true.
 nvt.thisdoc = '' -- Becomes nonempty when compiling only subdoc files.
 nvt.preamble = true -- Becomes false AtBeginDocument.
 nvt.guide = 0 -- Becomes nonzero if guide enabled.
-nvt.allfonts = 'main,dark,heavy,black,wide,thick,thin,light,srir,gero,plas,crge,'
+nvt.allfonts = 'main,dark,heavy,black,thick,thin,light,gero,plas,icel'
 nvt.usefont = {}
 nvt.usefont['main'] = true ; nvt.usefont['dark'] = false ; nvt.usefont['heavy'] = false
-nvt.usefont['black'] = false ; nvt.usefont['wide'] = false ; nvt.usefont['thick'] = false
-nvt.usefont['thin'] = false ; nvt.usefont['srir'] = false ; nvt.usefont['gero'] = false
-nvt.usefont['plas'] = false ; nvt.usefont['crge'] = false ; nvt.usefont['light'] = false
+nvt.usefont['black'] = false ; nvt.usefont['thick'] = false
+nvt.usefont['thin'] = false ; nvt.usefont['gero'] = false
+nvt.usefont['plas'] = false ; nvt.usefont['light'] = false ; nvt.usefont['icel'] = false
 nvt.space = {} -- em width of space character in font
 nvt.space['main'] = 0.21 ; nvt.space['dark'] = 0.21 ; nvt.space['heavy'] = 0.24
-nvt.space['black'] = 0.3 ; nvt.space['wide'] = 0.336 ; nvt.space['thick'] = 0.24
-nvt.space['thin'] = 0.24 ; nvt.space['srir'] = 0.240 ; nvt.space['gero'] = 0.238
-nvt.space['plas'] = 0.426 ; nvt.space['crge'] = 0.264 ; nvt.space['light'] = 0.21
+nvt.space['black'] = 0.3 ; nvt.space['thick'] = 0.24
+nvt.space['thin'] = 0.24 ; nvt.space['gero'] = 0.238
+nvt.space['plas'] = 0.426 ; nvt.space['light'] = 0.21 ; nvt.space['icel'] = 0.26
 nvt.headfont = 'main'
 nvt.headscale = 0.93
 nvt.headfeat = ''
@@ -149,6 +149,7 @@ nvt.entry = {} -- For toc: nvt.entry[i] = 'id,tocpage;bookpage'
 nvt.entrylist = '' -- Accumulates bad entry/actual info.
 nvt.eid = ',' -- Accumulates comma-separated entry id.
 nvt.cid = ',' -- Accumulates comma-separated component id.
+nvt.tocbad = 0 -- Increments for bad toc entry or subentry.
 local GLYPH = node.id('glyph')
 local GLUE = node.id('glue')
 local HLIST = node.id('hlist')
@@ -177,11 +178,19 @@ end
 
 
 --
-nvt.adderr = function(s)
-  table.insert(nvt.errlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+nvt.adderr = function (s, e)
+  if e and e ~= '' then
+    table.insert(nvt.errlist, 'Overall: ' .. s)
+  else
+    table.insert(nvt.errlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+  end
 end
-nvt.addwarn = function(s)
-  table.insert(nvt.warnlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+nvt.addwarn = function (s, e)
+  if e and e ~= '' then
+    table.insert(nvt.warnlist, 'Overall: ' .. s)
+  else
+    table.insert(nvt.warnlist, 'p. ' .. tex.getcount('c@page') .. ': ' .. s)
+  end
 end
 --
 
@@ -248,16 +257,16 @@ nvt.parseentry = function (s)
   s = string.gsub(s, ',', '')
   if (gotp == true and gotid == false) or (gotp == false and gotid == true) then
     table.insert(nvt.entry, '<bad entry in table>')
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    nvt.tocbad = nvt.tocbad + 1 ; tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   elseif lok == false or pok == false or idok == false then
     table.insert(nvt.entry, '<bad entry in table>')
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    nvt.tocbad = nvt.tocbad + 1 ; tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   elseif gotp == true and gotid == true then
     idp = id .. ',' .. p ; table.insert(nvt.entry, idp) ; tex.sprint('\\def\\tmpreturn{1}')
   elseif s == '' and lok == true and idok == true and pok == true then
     tex.sprint('\\def\\tmpreturn{1}')
   else
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    nvt.tocbad = nvt.tocbad + 1 ; tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
     table.insert(nvt.entry, '<bad entry in table>')
   end
 end
@@ -266,23 +275,15 @@ end
 
 -- Parse \subentry option:
 nvt.parsesubentry = function (s)
-  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, t, i
-  if string.find(s, 'text=') then
-    t, n = string.gsub(s, '.*text=', '') ; t = string.gsub(t, ',.*', '')
+  s = string.gsub(s, ' ', '') ; s = s .. ',' ; local n, t
+  if string.find(s, 'size=') then
+    t, n = string.gsub(s, '.*size=', '') ; t = string.gsub(t, ',.*', '')
     if n == 1 then
       if t == 'small' then
-        tex.sprint('\\def\\tmpsmsub{1}') ; s = string.gsub(s, 'text=small', '')
+        tex.sprint('\\def\\tmpsmsub{1}') ; s = string.gsub(s, 'size=small', '')
       end
       if t == 'normal' then
-        tex.sprint('\\def\\tmpsmsub{0}') ; s = string.gsub(s, 'text=normal', '')
-      end
-    end
-  end
-  if string.find(s, 'indent=') then
-    i, n = string.gsub(s, '.*indent=', '') ; i = string.gsub(i, ',.*', '')
-    if n == 1 then
-      if i == '0' or i == '1' or i == '2' then 
-        tex.sprint('\\def\\tmpsmind{' .. i .. '}') ; s = string.gsub(s, 'indent=' .. i, '')
+        tex.sprint('\\def\\tmpsmsub{0}') ; s = string.gsub(s, 'size=normal', '')
       end
     end
   end
@@ -290,7 +291,7 @@ nvt.parsesubentry = function (s)
   if s == '' then
     tex.sprint('\\def\\tmpreturn{1}')
   else
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
+    nvt.tocbad = nvt.tocbad + 1 ; tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
 end
 --
@@ -617,7 +618,7 @@ nvt.parseheadstyle = function (s)  ---- need to add check for multiple use
     f, n = string.gsub(s, '.*font=', '') ; f = string.gsub(f, ',.*', '')
     f = string.gsub(f, ',', '')
     if n == 1 then
-      if string.find('main,thin,dark,gero', f) then
+      if string.find(nvt.allfonts, f) then
         s = string.gsub(s, 'font=' .. f, '')
         tex.sprint('\\gdef\\nvt@headfont{\\nvt@' .. f .. '}' ) ; nvt.headfont = f
         tex.sprint('\\global\\nvt@use' .. f .. 'true')
@@ -1121,18 +1122,18 @@ end
 -- Parse option of toc environment:
 nvt.parsetoc = function (s)
   s = string.gsub(s, ' ', '') ; s = s .. ','
-  local n, y, p, d, t, i, m
+  local n, f, p, d
   if string.find(s, 'format=') then
-    y, n = string.gsub(s, '.*format=', '') ; y = string.gsub(y, ',.*', '')
+    f, n = string.gsub(s, '.*format=', '') ; f = string.gsub(f, ',.*', '')
     if n == 1 then
-      if y == 'center' then
+      if f == 'center' then
         tex.sprint('\\def\\tmptocformat{0}')
         s = string.gsub(s, 'format=center', '')
       else
-        local yy = tonumber(y)
-        if yy and yy >= 0 and yy <= 8 then
-          tex.sprint('\\def\\tmptocformat{1}\\def\\tmptocside{' .. y .. '}')
-          s = string.gsub(s, 'format=' .. y, '')
+        local ff = tonumber(f)
+        if ff and ff >= 0 and ff <= 8 then
+          tex.sprint('\\def\\tmptocformat{1}\\def\\tmptocside{' .. f .. '}')
+          s = string.gsub(s, 'format=' .. f, '')
         end
       end
     end
@@ -1157,33 +1158,20 @@ nvt.parsetoc = function (s)
       tex.sprint('\\def\\tmptocdots{1}') ; s = string.gsub(s, 'dot=1', '')
     end
   end
-  if string.find(s, 'subtext=') then
-    t, n = string.gsub(s, '.*subtext=', '') ; t = string.gsub(t, ',.*', '')
-    if t == 'normal' and n == 1 then
-      tex.sprint('\\def\tmptocsmsub{0}') ; s = string.gsub(s, 'subtext=normal', '')
-    end
-    if t == 'small' and n == 1 then
-      tex.sprint('\\def\tmptocsmsub{1}') ; s = string.gsub(s, 'subtext=small', '')
-    end
-  end
-  if string.find(s, 'subindent=') then
-    i, n = string.gsub(s, '.*subindent=', '') ; i = string.gsub(i, ',.*', '')
-    if i == 'none' and n == 1 then
-      tex.sprint('\\def\tmptocsubind{0}') ; s = string.gsub(s, 'subindent=none', '')
-    end
-    if i == 'some' and n == 1 then
-      tex.sprint('\\def\tmptocsubind{1}') ; s = string.gsub(s, 'subindent=some', '')
-    end
-    if i == 'fill' and n == 1 then
-      tex.sprint('\\def\tmptocsubind{2}') ; s = string.gsub(s, 'subindent=fill', '')
-    end
-  end
   s = string.gsub(s, ',', '')
   if s == '' then
     tex.sprint('\\def\\tmpreturn{1}')
   else
     tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
   end
+end
+--
+
+
+-- Report bad content in toc:
+function nvt.tocend ()
+  if nvt.tocbad > 0 then tex.sprint('\\def\\tmpbadtoc{' .. nvt.tocbad .. '}') end
+  nvt.tocbad = 0
 end
 --
 
@@ -1984,8 +1972,8 @@ nvt.finalize = function ()
     end
   end
   if tocok == false then
-    local wm = "Component page disagrees with table of contents."
-    nvt.addwarn(wm)
+    local wm = "One or more component page disagrees with table of contents."
+    nvt.addwarn(wm, 'end')
     tex.sprint('\\begingroup\\makeatletter\\nvt@warn{' .. wm .. '}\\endgroup')
   end
   --

@@ -112,8 +112,7 @@
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>Except for its title, the table's content must be within a <i>toc</i> environment:</p>
-<p><code>\begin{toc}[format=<i>F</i>,pad=<i>P</i>,dots=<i>D</i>,<!--
-   -->subtext=<i>S</i>,subindent=<i>I</i>]</code></p>
+<p><code>\begin{toc}[format=<i>F</i>,pad=<i>P</i>,dots=<i>D</i>]</code></p>
 <p><i>entries and subentries</i></p>
 <p><code>\end{toc}</code></p>
 <ul><li>
@@ -130,15 +129,6 @@
   <p><code><i>D</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
      0 or 1. Ignored by center format. Default 0, means no dots connect entry name to its page
      number. Value 1 means dot fill connects name to page number.</p>
-</li><li>
-  <p><code><i>S</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     normal or small. Default normal. Size of text in <code>\subentry</code> commands.
-     Each <code>\subentry</code> command may locally over-ride this setting.</p>
-</li><li>
-  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     0 or 1. Ignored by center format. Default 1, means subentries align with name column.
-     Value 0 means subentries align to the lead column.
-     Each <code>\subentry</code> command may locally over-ride this setting.</p>
 </li><li>
   <p>Nothing other than <code>\entry</code>, <code>\subentry</code>, <code>\blankline</code>,
      or <code>\vspace{<i>multiple&#8209;of&#8209;\baselineskip</i>}</code> may be within
@@ -205,8 +195,8 @@
      such as Prologue, etc.</p>
   <p>Example: If chapter <code>3</code> has chapter title <code>The Noise</code>,
      use <code>3</code> as the lead number, and <code>The Noise</code> as name.</p>
-  <p>Example: Since the list numbers cannot be Roman, chapter <code>XV. The Knock</code>
-     would use all of it as the name.
+  <p>Example: Since the lead numbers cannot be Roman, chapter <code>XV. The Knock</code>
+     would use all of it as the name. The lead would be unset.</p>
   <p>If your book contains chapters without names, then you should not be using
      a table of contents!</p>
 </li></ul>
@@ -220,20 +210,14 @@
 <p>For example, if the book is a collection of short stories with different authors, the entry
    would name the story, and the subentry would name its author. Or, a subentry may be a "teaser"
    that briefly describes what the reader will find in that chapter.</p>
-<p>No padding is applied above a subentry. Multi-line text will justify and wrap, unless
-   you manually insert line breaks.</p>
+<p>No padding is applied above a subentry. Multi-line text will justify and wrap, or you
+   msy manually insert line breaks. But only one paragraph.</p>
 <p>Although either table format may use subentries, they are more effective when the format
    is vertical.</p>
-<p>Default values for <i>T</i> and <i>I</i> are set by the <i>toc</i> environment option.
-   The <code>\subentry</code> option provides local, per-instance values.</p>
-<p><code>\subentry[text=<i>T</i>,indent=<i>I</i>]{text}</code></p>
+<p><code>\subentry[size=<i>S</i>]{text}</code></p>
 <ul><li>
-  <p><code><i>T</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     normal or small. Text size.</p>
-</li><li>
-  <p><code><i>I</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
-     0 or 1. No difference if table format is center. But when the table format is vertical,
-     Value 0 aligns subentry with the lead column, value 1 aligns it with the name column.</p>
+  <p><code><i>S</i></code> <img src="images/pointer.svg" height="16" width="16" alt=""/>
+     normal or small. Default small. Text size.</p>
 </li></ul>
 <p class="noindent"><span class="h5">Example:</span> In a table with vertical sides:</p>
 <div class="code"><code>

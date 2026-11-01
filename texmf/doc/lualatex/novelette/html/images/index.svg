@@ -3,6 +3,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="-10 0 1010 1000">
   <g transform="matrix(1 0 0 -1 0 800)">
    <path fill="currentColor"
-d="M260 -170h531v-60h-531v60zM260 30h531v-60h-531v60zM260 230h531v-60h-531v60zM260 430h531v-60h-531v60zM260 630h531v-60h-531v60zM189 720v-840h682v840h-682zM109 800h842v-1000h-842v1000z" />
+    d="M260 30h531v-60h-531v60zM260 230h531v-60h-531v60zM260 430h531v-60h-531v60zM260 630h531v-60h-531v60zM189 720v-840h682v840h-682zM109 800h842v-1000h-842v1000z" />
   </g>
 </svg>
