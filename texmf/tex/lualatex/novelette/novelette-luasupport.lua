@@ -1944,9 +1944,6 @@ nvt.finalize = function ()
     tex.sprint('\\def\\tmpmode{bad}') ; nvt.mode = 'draft'
   end
   tex.sprint('\\def\\tmpmode{' .. nvt.mode .. '}')
-  if nvt.countnext ~= 0 then
-    if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
-  end
   -- toc info:
   local tocok = true
   for i = 1, #nvt.entry do
