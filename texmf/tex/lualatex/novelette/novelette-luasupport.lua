@@ -1961,9 +1961,11 @@ nvt.finalize = function ()
         nvt.entrylist = nvt.entrylist .. id .. '\n'
       else
         if ep ~= bp then
-          tocok = false ; if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
-          nvt.entrylist = nvt.entrylist .. 'entryid=' .. id .. ', tocpage=' .. ep
-            .. ', bookpage=' .. bp .. '\n'
+          if nvt.startmode ~= 'draft' or ep ~= '0' then
+            tocok = false ; if nvt.mode ~= 'bad' then nvt.mode = 'draft' end
+            nvt.entrylist = nvt.entrylist .. 'entryid=' .. id .. ', tocpage=' .. ep
+              .. ', bookpage=' .. bp .. '\n'
+          end
         end
       end
     end
