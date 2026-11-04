@@ -178,7 +178,10 @@
      The page number seen in print (bookpage). Default empty. May be italic or arabic.
      Usually not the same as the PDF page number.</p>
   <p>When an entry will have a page number, but you do not know it, set <code>page=0</code>.
-     That will format the entry for future insertion of the correct page number.</p> 
+     That will format the entry for future insertion of the correct page number. In draft mode,
+     any <code>page=0</code> is not a problem, because Novelette knows that you intend
+     to change it later. But if the number is not <code>0</code> then it must be correct
+     (if compiling the whole document).</p> 
   <p>Some pages do not print their numbers. In this case, <code><i>P</i></code>
      is the number that you would see, if it printed.</p>
   <p>Novelette does not have automatic page numbering. If you set the wrong <code><i>P</i></code>
