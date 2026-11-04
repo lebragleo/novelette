@@ -5,7 +5,10 @@ body {font-family:serif; background:#cccccc url(images/cbkg.png); line-height:1.
 
 div.showme {width:80%; margin:.5rem auto .5rem auto; text-align:center;}
 div.showme img {width:100%}
-
+div.layout {
+  width:100%; font-size:.88rem; background:#ffffff none; font-family: sans-serif;
+  margin-top:.5rem; margin-bottom:1rem;}
+div.layout p {font-family:serif; font-size:1rem;}
 
 img {vertical-align:middle;}
 img.warning {vertical-align:baseline; hiehgt:1rem;}

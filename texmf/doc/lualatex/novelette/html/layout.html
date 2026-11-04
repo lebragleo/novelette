@@ -99,44 +99,87 @@ the <a href="#headstyle">font style of the text and numbers,</a> and the
   <ul>
   <li style="margin-top:12px">
     <p><code>pagestyle=marcen</code> is the default. It provides header,
-    no footer. Page number is at outside margin. Decoration, if used, appears near page number.
-    Text of header is centered.</p>
-    <p class="center" style="margin:6px;">
-    <img src="images/layout-marcen-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-marcen-recto.jpg" width="46%" alt=""/><br/>
-    <small><i>textblock below header</i></small></p></li>
+    no footer. Page number is at outside margin. Text of header is centered.</p>
+    <p>Default decoration is <code>bar</code>. If decoration is used, it appears near
+    page number.</p>
+    <div class="layout">
+      <div style="width:20%;float:left;">234 &nbsp; |</div>
+      <div style="width:80%;float:right;">
+        <div style="width:75%;float:left;text-align:center;">Verso Head Text</div>
+        <div style="width:25%;float:right;">&nbsp;</div>
+      </div>
+      <p class="center">&nbsp;<br/><i>text on verso page</i></p>
+      <div style="clear:both"></div>
+    </div>
+    <div class="layout">
+      <div style="width:80%;float:left;">
+        <div style="width:25%;float:left;">&nbsp;</div>
+        <div style="width:75%;float:right;text-align:center;">Recto Head Text</div>
+      </div>
+      <div style="width:20%;float:right;text-align:right;">| &nbsp; 235</div>
+      <p class="center">&nbsp;<br/><i>text on recto page</i></p>
+      <div style="clear:both"></div>
+    </div>
+  </li>
   <li style="margin-top:12px">
     <p><code>pagestyle=plain</code> provides footer, no header. Page number is centered
-    in the footer. Decoration, if used, appears on both sides of page number.</p>
-    <p class="center" style="margin:6px;">
-    <small><i>textblock above footer</i></small><br>
-    <img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+    in the footer.<p>
+    <p>Default decoration is <code>none</code>. If decoration is used, it appears on both sides
+    of the page number.</p>
+    <div class="layout">
+      <p class="center"><i>text on verso page</i><br/>&nbsp;</p>
+      <div style="text-align:center">234</div>
+    </div>
+    <div class="layout">
+      <p class="center"><i>text on recto page</i><br/>&nbsp;</p>
+      <div style="text-align:center">235</div>
+    </div>
   <li style="margin-top:12px">
     <p><code>pagestyle=split</code> provides header and footer. Centered text in header.
-    Centered page number in footer. Decoration, if used, appears on both sides of page number</p>
-    <p class="center" style="margin:6px;">
-    <img src="images/layout-split-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-split-recto.jpg" width="46%" alt=""/></p>
-    <p class="center"><small><i>textblock between header and footer</i></small></p>
-    <p class="center" style="margin:6px;">
-    <img src="images/layout-footer-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-footer-recto.jpg" width="46%" alt=""/></p></li>
+    Centered page number in footer.</p>
+    <p>Default decoration is <code>none</code>. If decoration is used, it appears on both sides
+    of the page number.</p>
+    <div class="layout">
+      <div style="text-align:center">Verso Head Text</div>
+      <p class="center">&nbsp;<br/><i>text on verso page</i><br/>&nbsp;</p>
+      <div style="text-align:center">234</div>
+    </div>
+    <div class="layout">
+      <div style="text-align:center">Recto Head Text</div>
+      <p class="center">&nbsp;<br/><i>text on recto page</i><br/>&nbsp;</p>
+      <div style="text-align:center">235</div>
+    </div>
   <li style="margin-top:12px">
-    <p><code>pagestyle=center</code> provides header, no footer. Text, decoration (if used),
-    and page number are centered in the header. Page number closest to outside.
-    Note: If no decoration, a slash will separate text from page number.</p>
-    <p class="center" style="margin:6px;">
-    <img src="images/layout-center-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-center-recto.jpg" width="46%" alt=""/><br/>
-    <small><i>textblock below header</i></small></p></li>
+    <p><code>pagestyle=center</code> provides header, no footer. Header text and page number
+    are centered, with page number closer to the outside margin.</p>
+    <p>Default decoration is <code>none</code>, but in this special case, a slash separates
+    the header text from the page number. Otherwise, the decoration prints between the header text
+    and page number.</p>
+    <div class="layout" style="text-align:center;">
+      <div>234 / Verso Head Text</div>
+      <p class="center">&nbsp;<br/><i>text on verso page</i></p>
+      <div style="clear:both"></div>
+    </div>
+    <div class="layout" style="text-align:center;">
+      <div>Recto Head Text / 235</div>
+      <p class="center">&nbsp;<br/><i>text on recto page</i></p>
+      <div style="clear:both"></div>
+    </div>
   <li style="margin-top:12px">
-    <p><code>pagestyle=margin</code> provides header, no footer. Page number at outside margin,
-    decoration (if used), text of header. Mirrored verso/recto.</p>
-    <p class="center" style="margin:6px;">
-    <img src="images/layout-margin-verso.jpg" width="46%" style="margin-right:6px" alt=""/>
-    <img src="images/layout-margin-recto.jpg" width="46%" alt=""/><br/>
-    <small><i>textblock below header</i></small></p></li>
+    <p><code>pagestyle=margin</code> provides header, no footer. Page number at outside margin.</p>
+    <p>Default decoration is <code>bar</code>. If decoration is used, it appears near page number.
+    The header text prints near the page number (or decoration).</p>
+    <div class="layout" style="text-align:left;">
+      <div>234 &nbsp; | &nbsp; Verso Head Text</div>
+      <p class="center">&nbsp;<br/><i>text on verso page</i></p>
+      <div style="clear:both"></div>
+    </div>
+    <div class="layout" style="text-align:right;">
+      <div>Recto Head Text &nbsp; | &nbsp; 235</div>
+      <p class="center">&nbsp;<br/><i>text on recto page</i></p>
+      <div style="clear:both"></div>
+    </div>
+  </li>
   </ul></li>
 </ul>
 <p class="toplink"><a href="#top">^TOP</a></p>
