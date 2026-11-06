@@ -38,7 +38,6 @@
 }%%
 %%
 \RequirePackage{novelette-fontloader} %% Custom substitute for 'fontspec' package.
-\nvt@defaultfontfeatures{RawFeature={-tlig,kern}}
 %%
 
 
@@ -62,19 +61,19 @@
 %% likelihood of error when files are exchanged, (emdash hyphen) is reduced to emdash. 
 
 
-
 %% Define the fonts, with default features:
 %% 'ccmp' breaks single-character IJ and ij into their two characters.
 %% 'ccmp' breaks single-character ff fi fl ffi ffi st into their two characters.
 %% 'liga' corrects possible problems with hyphens/dashes. It does not apply ff-style ligatures.
-%% 'ss03' changes whether ``` and ''' and ,,, are interpreted as American or British outer quotes.
+%% 'cv13' changes whether ``` and ''' and ,,, are interpreted as American or British outer quotes.
 \adjustspacing=2 \protrudechars=2
 \emergencystretch=.5em
 %% LaTeX protrusion is supposed to make the margins appear straighter, by leaking glyphs into
 %% the margins. Bah! Never seen in popular fiction. Instead, the goal of Novelette is to prevent
 %% glyphs from leaking into the margins. Thus, negative protrusion for a few glyphs.
+\nvt@defaultfontfeatures{RawFeature={-tlig,kern}}
 \ifnvt@britq
-  \def\tmpfeat{RawFeature={ccmp,rlig,calt,dlig,ss03}}
+  \def\tmpfeat{RawFeature={ccmp,rlig,calt,dlig,cv13}}
 \else
   \def\tmpfeat{RawFeature={ccmp,rlig,calt,dlig}}
 \fi
@@ -191,44 +190,34 @@
 %% These fonts are only used in certain locations.
 %% They do not need expansion or protrusion. The macros that use them, kern the text with uni200D.
 \ifnvt@usedark\nvt@newfontface\nvt@dark{NoveletteSans-Dark}\fi
+\def\nvt@darkprot{} %% Does not need protrusion.
 \ifnvt@usethick\nvt@newfontface\nvt@thick{NoveletteSans-Thick}\fi
+\def\nvt@thickprot{}
 \ifnvt@useheavy\nvt@newfontface\nvt@heavy{NoveletteSans-Heavy}\fi
+\def\nvt@heavyprot{}
 \ifnvt@useblack\nvt@newfontface\nvt@black{NoveletteSans-Black}\fi
-\ifnvt@usethin\nvt@newfontface\nvt@thin{NoveletteSans-Thin}\fi
-\ifnvt@uselight\nvt@newfontface\nvt@light{NoveletteSerif24}\fi
+\def\nvt@blackprot{}
+\ifnvt@usethin\nvt@newfontface\nvt@thin{NoveletteDeco-Thin}\fi
+\def\nvt@thinprot{}
+\ifnvt@useplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
+\def\nvt@plasprot{}
+\ifnvt@useicel\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}\fi
+\def\nvt@icelprot{}
 %%
 \ifnvt@usegero\nvt@newfontface\nvt@gero{NoveletteDeco-Gero}\fi
-\ifnvt@useplas\nvt@newfontface\nvt@plas{NoveletteDeco-Plas}\fi
-\ifnvt@useicel\nvt@newfontface\nvt@icel{NoveletteDeco-Icel}\fi
-%%
-\def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
-%%
-
-
-%% HANDLE \char"HHHH CODES:
-%%   Some decorative characters are only in NoveletteSerif12-Regular. When these are requested,
-%% this adapted definition automatically switches the font.
-\let\nvt@tmpchar\char\relax
-\def\char#1#2#3#4#5{%%
-  \begingroup%%
-    \def\tmpcode{#2#3#4#5}%%
-    \def\tmptest{2605}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2606}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2639}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{263A}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2660}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2661}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2662}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2663}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{266A}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{273D}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2740}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{2749}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{274B}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \def\tmptest{FFFC}\ifx\tmpcode\tmptest\upshape\normalfont\fi%%
-    \nvt@tmpchar"\tmpcode\relax%%
-  \endgroup%%
+\def\nvt@geroprot{%% Local protrusion when using \nvt@gero.
+  \rpcode\the\font 102=-17\relax%% f
+  \lpcode\the\font 106=-101\relax%% j
+  \rpcode\the\font 383=-17\relax%% longs
+  \lpcode\the\font 567=-101\relax%% dotlessj
 }%%
+
+\ifnvt@uselight\nvt@newfontface\nvt@light{NoveletteDeco-Light}\fi
+%%
+\def\nvt@lightprot{%% Local protrusion when using \nvt@light.
+  %%\rpcode\the\font 102=-40\relax%%
+}%%
+\def\setmathfont{\nvt@fatal{EEEK! You cannot \string\setmathfont. Novelette cannot do math.}}
 %%
 
 
@@ -312,8 +301,8 @@
 %% Dutch (applies in any language):
 %%   IJ and ij are split to their two letters, directly by the fonts (ccmp feature).
 %% In print, \IJacute and \ijacute place acute (not dot) over both letters. Also smcp.
-\def\IJacute{{\nvt@aff{RawFeature={+ss16}}IJ}}
-\def\ijacute{{\nvt@aff{RawFeature={+ss16}}ij}}
+\def\IJacute{{\nvt@aff{RawFeature={+cv38}}IJ}}
+\def\ijacute{{\nvt@aff{RawFeature={+cv38}}ij}}
 \def\j{%%
   \nvt@warn{\string\j\space is undefined in Novelette. Did you need \string\ijacute\space ?}%%
   {\char"FFFD}%%
@@ -342,9 +331,9 @@
 
 %% Other corrections:
 \def\@enc@info#1{} %% Silence unnecessary info.
-\DeclareUnicodeCommand\textquotesingle{{\nvt@aff{RawFeature={+ss19}}'}}
-\DeclareUnicodeCommand\textasciigrave{{\nvt@aff{RawFeature={+ss19}}`}}
-\DeclareUnicodeCommand\textquotedbl{{\nvt@aff{RawFEature={+ss19}}"}}
+\DeclareUnicodeCommand\textquotesingle{{\nvt@aff{RawFeature={+ssty}}'}}
+\DeclareUnicodeCommand\textasciigrave{{\nvt@aff{RawFeature={+ssty}}`}}
+\DeclareUnicodeCommand\textquotedbl{{\nvt@aff{RawFEature={+ssty}}"}}
 \DeclareUnicodeCommand{\textnonbreakinghyphen}{\char"2011}
 \DeclareUnicodeCommand{\textfiguredash}{\char"2012}
 \DeclareUnicodeCommand{\texthorizontalbar}{\char"2015}

@@ -1977,6 +1977,7 @@ nvt.finalize = function ()
   end
   --
   luatexbase.add_to_callback('wrapup_run', function ()
+  if nvt.mode == 'final' then table.insert(nvt.sumbuffer, 'Approved as final.') end
   table.insert(nvt.sumbuffer, '\n\n********************************** '
     .. 'SUMMARY **********************************\n')
   table.insert(nvt.sumbuffer, 'File: ' .. tex.jobname .. '.tex. Compiled ' .. nvt.now .. '\n')

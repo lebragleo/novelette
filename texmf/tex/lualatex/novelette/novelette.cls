@@ -108,25 +108,29 @@
 \def\spix{\spiv\spiv\space}\def\spxi{\spix\spii}
 \def\nvt@misschars{}
 \ifdefined\directlua
-  \IfFileExists{\jobname.typo}{%%
-    \directlua{%%
-      local fileout = tex.jobname .. '.typo'
-      local out = io.open(fileout,"w+")
-      out:write('This file has been cleared by compiling without \\examine{1}.')
-      io.close(out)
-    }%%
-  }{}%%
   \directlua{%%
     nvt = nvt or { }
     nvt.now = '\luaescapestring{\nvt@now}'
     require 'novelette-luasupport'
     nvt.parseclass('\luaescapestring{\@classoptionslist}')
-    local fileout = tex.jobname .. '.sum'
-    local out = io.open(fileout,"w+")
-    out:write('This file is cleared at start of compile.')
-    out:write('You see this message because compile was interrupted.')
-    io.close(out)
   }%%
+  \IfFileExists{\jobname.typo}{%%
+    \directlua{%%
+      local typofile = tex.jobname .. '.typo'
+      local typoout = io.open(typofile,"w+")
+      typoout:write('This file has been cleared by compiling without \\examine{1}.')
+      io.close(typoout)
+    }%%
+  }{}%%
+  \IfFileExists{\jobname.sum}{%%
+    \directlua{%%
+      local sumfile = tex.jobname .. '.sum'
+      local sumout = io.open(sumfile,"w+")
+      sumout:write('This file is cleared at start of compile.')
+      sumout:write('You see this message because compile was interrupted.')
+      io.close(sumout)
+    }%%
+  }{}%%
   \ifnum\tmpreturn=0\relax
     \nvt@fatal{Unknown class option(s). Novelette uses settings in Preamble.^^J}
   \fi
@@ -155,6 +159,7 @@
 \def\nvt@zrule{\rule{0pt}{0pt}} %% Provides anchor point for various fill commands.
 \newif\ifnvt@inpreamble\nvt@inpreambletrue %% Becomes false later.
 \newif\ifnvt@indisplay %% Locally true at \begin{component}, until \maintext or \end{component}.
+\newif\ifnvt@honkingbigdev %% Developer over-die for some macros. Don't do it!
 %%
 
 
@@ -229,6 +234,7 @@
     \IfFileExists{./\jobname.typo}{%%
       \directlua{%%
         local fileout = './' .. tex.jobname .. '.typo'
+local in = io.open(fileout,"r+")
         local out = io.open(fileout,"w+")
         out:write('Previous typo file has been cleared by compiling without examine.')
         io.close(out)

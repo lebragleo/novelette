@@ -79,7 +79,11 @@
     \fi%%
   \def\temptest{drop}%%
     \ifx\tmpfps\tmptest%%
-      \ifnvt@hasfooter\nvt@thispagestyle{plain}\else\nvt@thispagestyle{empty}\nvt@fakefooter\fi%%
+      \ifnvt@hasfooter%%
+        \nvt@thispagestyle{plain}%%
+      \else
+        \nvt@thispagestyle{empty}\nvt@fakefooter%%
+      \fi%%
     \fi%%
   \ifnum\tmpreturn=0\relax%%
     \nvt@err{Bad component [option]. Format: [id=I,guide=G,first=F,rest=R,class=C]^^J%%
@@ -167,7 +171,7 @@
 %%   Warning if duplicate \maintext within a component.
 \newif\ifnvt@didmaintext %% True when \maintext appears, until next component.
 \newif\ifnvt@allowinit %% \init is ineffective,unless this is true.
-\ifdefined\honkingbigdev\nvt@allowinittrue\fi %% Don't ask.
+\ifnvt@honkingbigdev\nvt@allowinittrue\fi %% Developer over-ride. Don't do it.
 \def\maintext{%%
   \par%%
   \global\nvt@didvrheadtexttrue%%
@@ -194,7 +198,7 @@
           \if@nobreak%%
             \@nobreakfalse\clubpenalty\@M%%
             \if@afterindent\else{\setbox\z@\lastbox}\fi%%
-            \ifdefined\honkingbigdev\else\global\nvt@allowinitfalse\fi%%
+            \ifnvt@honkingbigdev\else\global\nvt@allowinitfalse\fi%% Developer over-ride.
           \else%%
             \clubpenalty\@clubpenalty\everypar{}%%
           \fi%%
