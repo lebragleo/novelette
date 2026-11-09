@@ -115,7 +115,6 @@
     \setlength\parskip{\nvt@bls}\nvt@aff{RawFeature={+ss19}}%%
     \hyphenpenalty=10000\relax\exhyphenpenalty=10000\relax%%
     \char"0020\char"00A0\par\vfil%% Some machine-readers like to know space advance width.
-    \begin{nvt@center}%%
   \else%%
     \ifnvt@preview\def\tmpok{0}\else\def\tmpok{1}\fi%%
     \ifnvt@final\def\tmpok{0}\fi%%
@@ -144,7 +143,6 @@
   \fi%%
 }{%%
   \par%%
-  \ifnum\tmplegal=1\relax\end{nvt@center}\fi%%
   \clearpage%%
   \setcounter{nvt@expectpage}{\the\c@page}%%
   \ifnvt@compsingle%% End page, check fit.

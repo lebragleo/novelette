@@ -96,6 +96,7 @@ nvt.metric = false -- Becomes true if trimsize uses mm units. Once true, remains
 nvt.pagelist = '' -- Might become nonempty when nvt.examine==true.
 nvt.thisdoc = '' -- Becomes nonempty when compiling only subdoc files.
 nvt.preamble = true -- Becomes false AtBeginDocument.
+nvt.didyada = false -- Becomes true if \yada used.
 nvt.guide = 0 -- Becomes nonzero if guide enabled.
 nvt.allfonts = 'main,dark,heavy,black,thick,thin,light,gero,plas,icel'
 nvt.usefont = {}
@@ -194,6 +195,57 @@ nvt.addwarn = function (s, e)
 end
 --
 
+
+-- Generate dummy text:
+nvt.dummytext = function (p)
+  nvt.didyada = true
+  if p == '' then p = 0 end ; p = tonumber(p)
+  if p and p >= 0 and p <= 9 and nvt.startmode ~= 'preview' and nvt.startmode ~= 'final' then
+    local Syl = {'Lor', 'Ips', 'Dol', 'Sit', 'Acc', 'Cons', 'Adip', 'El', 'Susp', 'Vest',
+      'Pulg', 'Null', 'Tell', 'Magn', 'Grav'}
+    local syl1 = {'lor', 'ips', 'dol', 'sit', 'acc', 'cons', 'adip', 'el', 'susp', 'vest',
+      'pulg', 'null', 'tell', 'magn', 'grav', 'et'}
+    local syl2 = {'ent', 'ibus', 'ibulum', 'em', 'um', 'or', 'etur', 'ae', 'us', 'a',
+      'is', 'am', 'as', 'ur', 'que'}
+    if p == 0 then
+      local sent = {}
+      local word = Syl[math.random(#Syl)] .. syl2[math.random(#syl2)]
+      table.insert(sent, word)
+      for i = 1, 2 do
+        local word1 = syl1[math.random(#syl1)] ; local word2 = syl2[math.random(#syl2)]
+        if word1 == 'sit' or word1 == 'et' then word2 = '' end
+        word = word1 .. word2
+        table.insert(sent, word)
+      end
+      local d = table.concat(sent, ' ')
+      d = string.gsub(d, ' $', '') ; d = d .. '.'
+      tex.sprint('\\par{}' .. d .. '\\par{}')
+    else
+      local par = {}
+      for n = 1, p do
+        local sent = {}
+        local word = Syl[math.random(#Syl)] .. syl2[math.random(#syl2)] 
+        table.insert(sent, word)
+        for i = 1, math.random(5) + 4 do
+          local word1 = syl1[math.random(#syl1)] ; local word2 = syl2[math.random(#syl2)]
+          if word1 == 'sit' or word1 == 'et' then word2 = '' end
+          word = word1 .. word2
+          table.insert(sent, word)
+        end
+        local d = table.concat(sent, ' ')
+        d = string.gsub(d, ' $', '') ; d = d .. '.'
+        table.insert(par, d)
+      end
+      local d = table.concat(par, ' ')
+      d = string.gsub(d, ' $', '')
+      tex.sprint('\\par{}' .. d .. '\\par{}')
+    end
+    tex.sprint{'\\def\\tmpreturn{1}'}
+  else
+    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
+  end
+end
+--
 
 
 -- Parse \entry option:
@@ -1026,12 +1078,28 @@ end, 'miss_chars')
 
 -- Validate image file:
 function nvt.validateimage (s)
-  local ok = true
 -----
-  if ok == true then
-    tex.sprint('\\def\\tmpvalid{1}')
+  local img = assert(io.open(s, 'rb'))
+  if img then
+    local r = img:read(24) ; local ok = true
+    local csb = '' -- comma-separated decimal codes for bytes
+    local sep = ''
+    for decbyte,_ in string.bytes(r) do ----- what is the _ is it index number?
+      csb = csb .. sep .. decbyte
+      sep = ","
+    end
+    local cm = '' ----- color model string.bytesat
+    local cd = '' ----- color depth
+    local cr = '' ----- resolution
+    local ch = '' ----- chunk starting data
+-----
+    if ok == true then
+      tex.sprint('\\def\\tmpvalid{1}')
+    else
+      nvt.good = false ; tex.sprint('\\def\\tmpvalid{0}')
+    end
   else
-    nvt.good = false ; tex.sprint('\\def\\tmpvalid{0}')
+    nvt.good = false ; tex.sprint('\\def\\tmpvalid{-1}')
   end
 end
 --
@@ -2087,6 +2155,9 @@ nvt.finalize = function ()
   if nvt.nojacute == true then
     nvt.ewlist = nvt.ewlist .. "No \\'J or \\'j. Maybe use \\IJacute, \\ijacute.\n"
   end
+  if (nvt.startmode == 'preview' or nvt.startmode == 'final') and nvt.didyada == true then
+    nvt.ewlist = nvt.ewlist .. 'Cannot use \\yada in preview or final mode.\n'
+  end 
 ----- more problems
   if nvt.ltxerr > 0 then
     table.insert(nvt.sumbuffer, '\n! LuaLaTeX issued ' .. nvt.ltxerr .. ' error(s).\n')

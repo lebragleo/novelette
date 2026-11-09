@@ -11,6 +11,39 @@
 %% or warning, and the effect will be ignored.
 
 
+%% DUMMY TEXT: Novelette does not load the 'lipsum' package.
+\DeclareDocumentCommand\lipsum{sO{}O{}}{%%
+  \nvt@warn{Novelette does not use \string\lipsum. Use \string\yada{} instead.}%%
+  \par\char"FFFD (no lipsum) \char"FFFD\par%%
+}%%
+%% Command \yada{integer} for integer 0-9 provides a paragraph of lipsum-like dummy text.
+%% Value 0 prints just three words, so it will always fit on one line, even in a narrow block.
+%% Values 1-9 print increasing amounts of words in the paragraph. Note that the paragraph
+%% does not occupy any particular number of lines.
+\newif\ifnvt@didyada
+\DeclareDocumentCommand\yada{m}{%% Default m=0.
+  \ifnvt@infootnote\def\tmpok{0}\else\def\tmpok{1}\fi%%
+  \ifnvt@inheader\def\tmpok{0}\fi%%
+  \ifnum\tmpok=1\relax%%
+    \def\nvt@yada{\directlua{nvt.dummytext('\luaescapestring{#1}')}}%%
+    \ifnum\tmpreturn=1\relax%%
+      \nvt@yada%%
+    \else%%
+      \nvt@err{Bad \string\yada{n} command.^^J%%
+        \spii Argument n is integer 0-9. Empty=0.^^J%%
+        \spii Or, you attempted to use \string\yada\space in preview or final mode.}%%
+      \directlua{nvt.adderr('Bad \\yada{n}, or attempted use in preview or final mode.')}%%
+      \par\char"FFFD(no yada)\char"FFFD\par%%
+    \fi%%
+  \else%%
+    \nvt@err{Attempted \string\yada{n} in disallowed location.}%%
+    \directlua{nvt.adderr('Attempted \\yada{n} in disallowed location.')}%%
+  \fi%%
+  \global\nvt@didyadatrue%%
+}%%
+%%
+
+
 %% BLANK PAGE: Never inserted automatically. For your own use, but only if necessary.
 \newcommand\blankpage{%%
   \clearpage\nvt@thispagestyle{empty}\null\clearpage\stepcounter{nvt@expectpage}%%
@@ -793,7 +826,7 @@
 %% UNAVAILABLE COMMANDS:
 %%   Novelette does not use many standard LaTeX commands, but instead uses other methods.
 \def\nvt@nocmd#1{%%
-  \nvt@warn{Novelette has no command #1.^^J%%
+  \nvt@err{Novelette has no command #1.^^J%%
     \spii See these commands: \string\setstyleN and \string\styleN for N=0-9,^^J%%
     \spii\string\headstyle, and options for block environment.}
 }%%
