@@ -595,6 +595,7 @@
 %% orphans are common. Widows are considered to be a problem.
 \widowpenalty 150\relax %% widow -> Last line of paragraph at start of page.
 \clubpenalty 150\relax %% orphan -> First line of paragraph at end of page.
+\brokenpenalty 10000\relax %% Avoid hyphen at end of page, if possible.
 %% The low, med, and high penalties usually apply to situations that are not seen in Novelette:
 \@lowpenalty   51\relax
 \@medpenalty  151\relax
@@ -602,8 +603,8 @@
 %% Hyphenation is discouraged, especially when consecutive, or just prior to paragraph end:
 \hyphenpenalty 1000\relax
 \exhyphenpenalty 1000\relax
-\doublehyphendemerits 10000\relax
-\finalhyphendemerits 10000\relax
+\doublehyphendemerits 100000\relax
+\finalhyphendemerits 100000\relax
 \setcounter{topnumber}{2} %% Maximum number of floats allowed there.
 \setcounter{bottomnumber}{1} %% And there.
 \setcounter{totalnumber}{2} %% And all together.

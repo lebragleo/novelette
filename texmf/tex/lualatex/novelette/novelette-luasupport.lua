@@ -196,53 +196,76 @@ end
 --
 
 
--- Generate dummy text:
+-- Generate \yada pseudo-lipsum dummy text:
 nvt.dummytext = function (p)
   nvt.didyada = true
   if p == '' then p = 0 end ; p = tonumber(p)
   if p and p >= 0 and p <= 9 and nvt.startmode ~= 'preview' and nvt.startmode ~= 'final' then
-    local Syl = {'Lor', 'Ips', 'Dol', 'Sit', 'Acc', 'Cons', 'Adip', 'El', 'Susp', 'Vest',
-      'Pulg', 'Null', 'Tell', 'Magn', 'Grav'}
-    local syl1 = {'lor', 'ips', 'dol', 'sit', 'acc', 'cons', 'adip', 'el', 'susp', 'vest',
-      'pulg', 'null', 'tell', 'magn', 'grav', 'et'}
-    local syl2 = {'ent', 'ibus', 'ibulum', 'em', 'um', 'or', 'etur', 'ae', 'us', 'a',
-      'is', 'am', 'as', 'ur', 'que'}
+    local bword = {'Ante', 'Amet', 'Cras', 'Diam', 'Eget', 'Elit', 'Erat', 'Nunc',
+      'Orci', 'Quis', 'Augue', 'Dolor', 'Etiam', 'Felis', 'Justo', 'Lorem', 'Ipsum',
+      'Magna', 'Nulla', 'Risus', 'Vitae', 'Auctor', 'Libero', 'Ligula', 'Luctus',
+      'Primis', 'Rutrum', 'Sapien', 'Semper', 'Tellus', 'Turpis'}
+    local sword = {'a', 'ab', 'ac', 'ad', 'at', 'et', 'eu', 'in', 'se', 'si', 'ut',
+      'dis', 'est', 'hic', 'hoc', 'quo', 'nam', 'nec', 'non', 'sed', 'sin', 'sit', 'vel'}
+    local mword = {'ante', 'amet', 'cras', 'diam', 'eget', 'elit', 'erat', 'nunc',
+      'orci', 'quis', 'augue', 'dolor', 'etiam', 'felis', 'justo', 'lorem', 'ipsum',
+      'magna', 'nulla', 'risus', 'vitae', 'auctor', 'libero', 'ligula', 'luctus',
+      'primis', 'rutrum', 'sapien', 'semper', 'tellus', 'turpis'}
+    local lword = {'aliquet', 'cubilia', 'egestas', 'gravida', 'iaculis', 'natoque',
+      'posuere', 'pretium', 'quisque', 'solales', 'viverra', 'accumsan', 'admissum',
+      'faucibus', 'legendus', 'litteras', 'maecenas', 'nascetur', 'profecto', 'pulvinar',
+      'praesent', 'suscipit', 'ultrices'}
+    local bstart = math.random(31)
+    local bjump = math.random(30)
+    local sstart = math.random(23)
+    local sjump = math.random(22)
+    local mstart = bstart + 1 ; if mstart > 31 then mstart = 1 end
+    local mjump = math.random(30)
+    local lstart = math.random(23)
+    local ljump = math.random(22)
     if p == 0 then
-      local sent = {}
-      local word = Syl[math.random(#Syl)] .. syl2[math.random(#syl2)]
-      table.insert(sent, word)
-      for i = 1, 2 do
-        local word1 = syl1[math.random(#syl1)] ; local word2 = syl2[math.random(#syl2)]
-        if word1 == 'sit' or word1 == 'et' then word2 = '' end
-        word = word1 .. word2
-        table.insert(sent, word)
-      end
-      local d = table.concat(sent, ' ')
+      local sentence = {}
+      table.insert(sentence, bword[bstart])
+      table.insert(sentence, sword[sstart])
+      table.insert(sentence, lword[lstart])
+      local d = table.concat(sentence, ' ')
       d = string.gsub(d, ' $', '') ; d = d .. '.'
       tex.sprint('\\par{}' .. d .. '\\par{}')
     else
-      local par = {}
+      local paragraph = {} ; local w = 0
       for n = 1, p do
-        local sent = {}
-        local word = Syl[math.random(#Syl)] .. syl2[math.random(#syl2)] 
-        table.insert(sent, word)
-        for i = 1, math.random(5) + 4 do
-          local word1 = syl1[math.random(#syl1)] ; local word2 = syl2[math.random(#syl2)]
-          if word1 == 'sit' or word1 == 'et' then word2 = '' end
-          word = word1 .. word2
-          table.insert(sent, word)
+        local sentence = {} ; local comma = math.random(2)
+        local sentlen = math.random(4) + 5
+        local bthis = math.mod(bstart + (w * bjump), 31) + 1
+        table.insert(sentence, bword[bthis])
+        for i = 1, sentlen - 1 do
+          local sthis = math.mod(sstart + (w * sjump), 23) + 1
+          local mthis = math.mod(mstart + (w * mjump), 31) + 1
+          if mthis == bthis then
+            if mthis < 23 then mthis = mthis + 1 else mthis = 1 end
+          end 
+          local lthis = math.mod(lstart + (w * ljump), 23) + 1
+          if w == 0 or w == 3 or w == 6 then
+            table.insert(sentence, sword[sthis])
+          elseif w == 1 or w == 4 or w == 7 then
+            table.insert(sentence, lword[lthis])
+          else
+            if comma == 2 and sentlen >= 5 then
+              table.insert(sentence, mword[mthis] .. ',')
+            else
+              table.insert(sentence, mword[mthis])
+            end
+          end
+          comma = 1 ; w = w + 1
         end
-        local d = table.concat(sent, ' ')
+        local d = table.concat(sentence, ' ')
         d = string.gsub(d, ' $', '') ; d = d .. '.'
-        table.insert(par, d)
+        table.insert(paragraph, d)
       end
-      local d = table.concat(par, ' ')
+      local d = table.concat(paragraph, ' ')
       d = string.gsub(d, ' $', '')
       tex.sprint('\\par{}' .. d .. '\\par{}')
     end
-    tex.sprint{'\\def\\tmpreturn{1}'}
-  else
-    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
   end
 end
 --
