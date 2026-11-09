@@ -105,18 +105,17 @@ not know. It is your responsibility. Suggestions:</p>
 <li><p>Use the <code>[legal]</code> option for the component environment. This applies
 some formats that are specifically designed for this page:</p>
 <ul>
-<li><p>Text is horizontally centered. Be sure to use manual line breaks <code>\\</code>
-to ensure that line do not wrap or span the full textblock width.</p></li>
-<li><p>The block of text appears slightly below the vertical center of the page.</p></li>
+<li><p>You may use one or more block environments. The simplest copyright page may look good
+within a centered block.</p>
+<li><p>The text appears slightly below the vertical center of the page.</p></li>
 <li><p>Hyphenation is disabled. Oldstyle numerals are disabled.</p></li>
 <li><p>You may use Italics and small caps. But you may not use <code>\styleN</code>
 (N=0-9) or any other styling commands.</p></li>
-<li><p>You may not use the <a href="block-env.html">block environment</a>, because the page
-already is within a block.</p></li>
 <li><p>Paragraphs are not indented, and there is a line gap between paragraphs.</p></li>
 </ul></li>
-<li><p>Write the title, subtitle, and author.<br>
-Format <code>Title : Subtitle / Author</code>.<br>
+<li><p>Even though the title, subtitle, and author appear on the title page, you should write them
+in ordinary text on the copyright page:</p>
+<p>Format <code>Title : Subtitle / Author</code>.<br>
 You may use more than one line.</p></li>
 <li><p>If you use a pseudonym as author, use your real name as copyright holder.</p></li>
 <li><p>You may paste the copyright symbol, or write <code>{\copyright}</code>. It is not
@@ -125,6 +124,7 @@ enough to write <code>(c)</code> there.</p></li>
 <p>Sample copyright page, which is very minimal:</p>
 <div class="code"><code><!-- do not copy this from its html source text -->
 \begin{component}[legal]<br>
+\begin{block}[align=center]<br>
 The Conspiracy Manifesto : London\\<br>
 / Jack DeRipper\par<br>
 Copyright ©2026 Penelope Withers.\\<br>
@@ -133,6 +133,7 @@ Published by Indescribably Bad Press,\\<br>
 Honking, New Zealand.\\<br>
 https://indescribablybadpress.com\par<br>
 ISBN 978-0-00-000000-0\par<br>
+\end{block}<br>
 \end{component}
 </code></div>
 

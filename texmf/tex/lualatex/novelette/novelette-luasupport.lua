@@ -1137,12 +1137,6 @@ function nvt.parseblock (s,d)
   else
     tex.sprint('\\def\\tmpblocksize{0}')
   end
-  font, n = string.gsub(s, '.*font=', '') ; font = string.gsub(font, ',.*', '')
-  if n == 1 then
-    if string.find(font, 'tal') or font == 'normal' then -- Allows Ital, ital, italic, italics.
-      tex.sprint('\\def\\tmpital{1}') ; s = string.gsub(s, 'font=' .. font, '')
-    end
-  end
   a, n = string.gsub(s, '.*align=', '') ; a = string.gsub(a, ',.*', '')
   if n == 1 then
     if a == 'justify' then

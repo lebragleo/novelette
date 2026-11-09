@@ -164,7 +164,7 @@
     \begingroup\setlength\parindent{0pt}%% Use \indent wherever necessary.
     \def\indent{\strut\hspace{\nvt@parindent}}%% Substitute.
     \def\tmpblockalign{0}\def\tmpblockleft{0}\def\tmpblockright{0}%%
-    \def\tmpkeyleft{0}\def\tmpkeyright{0}\def\tmpital{0}\def\tmphalfkeydiff{}%%
+    \def\tmpkeyleft{0}\def\tmpkeyright{0}\def\tmphalfkeydiff{}%%
     \ifnvt@indisplay%%
       \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
     \else%%
@@ -181,27 +181,26 @@
     \ifnum\tmpreturn=0\relax%%
       \nvt@err{Bad option for block. Unknown settings or bad side margins.^^J%%
         \spii Note: If block content begins with [ character, use \string\[ there.^^J%%]]
-        \spii Option format: [L/R,align=A,size=S,font=F]^^J%%
+        \spii Option format: [L/R,align=A,size=S].^^J%%
+        \spii Default [0/0,align=justify,size=normal].^^J%%
         \spiv L and/or R -> left/right block side offsets, relative to margins.^^J%%
         \spix Numerical values may be decimal, but integers strongly preferred.^^J%%
         \spxi Value is multiple of normal paragraph indent.^^J%%
-        \spxi Limits: 0<=L<=8, 0<=R<=8, (L+R)<=12. Default 0/0.^^J%%
+        \spxi Limits: 0<=L<=8, 0<=R<=8, (L+R)<=12.^^J%%
         \spix Alternative: The letter k may be used for L and/or R.^^J%%
         \spxi The value of k is calculated, based on prior \string\key{text}.^^J%%
         \spxi Limits: Width of key text must be^^J%%
         \spxi\spiv (4*parindent)<=keywidth<=textwidth.^^J%%
-        \spiv A -> center left right justify. Default justify.^^J%%
+        \spiv A -> center left right justify.^^J%%
         \spix Text alignment within block, relative to block offsets.^^J%%
         \spix If justify (or not set), normal hyphenation and paragraph indent.^^J%%
         \spix If not justify, hyphenation disabled and no paragraph indent.^^J%%
-        \spiv S -> normal small. Default normal. Text size and baselineskip.^^J%%
-        \spix Only display zone allows size=small.^^J%%
-        \spiv F -> normal italic. Default normal. Applies to entire block.}%%
+        \spiv S -> normal small. Text size and baselineskip.^^J%%
+        \spix Only display zone allows size=small.}%%
       \strut\char"FFFD \smcp{bad option for block environment} \char"FFFD\par%%
       \directlua{nvt.adderr('Bad option for block environment.')}%%
     \else%%
       \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
-      \ifnum\tmpital=1\relax\itshape\fi%%
 %%%%%
       \ifnum\tmpkeyleft=1\relax\def\tmptestkey{1}\else\def\tmptestkey{0}\fi%%
       \ifnum\tmpkeyright=1\relax\def\tmptestkey{1}\fi%%

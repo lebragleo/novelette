@@ -37,7 +37,11 @@ free for commercial use. If someone else creates fonts with base name Novelette,
 they are unrelated, and may have a different license.</p>
 <p>Although you may use these fonts in a word processor or other LaTeX document class,
 that is not a good idea, because you will not have the benefit of font-Novelette interaction.</p>
-<p>Fonts are always subset-embedded in your PDF.</p>
+<p>Fonts are always subset-embedded in your PDF. This is a LaTeX standard, and is required for
+commercial publishing.</p>
+<p><img src="images/tech-info.svg" width="16" height="16" alt="gear"/> If you are a developer
+or maintainer who needs to know internal details of the fonts,
+<a href="developer-notes.html#fonts">look here</a>. Not for ordinary users!</p>
 
 
 <a id="size"></a>
@@ -102,6 +106,8 @@ at 8.1pt, or Adobe Garamond Pro at 9.5pt.</p></li>
 only in certain locations. Novelette does not load any of these fonts unless
 they are requested by \headstyle or \setstyleN in preamble.</p></li>
 <li><p>Font samples:</p>
+<p class="center"><img width="50%" src="images/serif-main.png" alt=""/></p>
+<p class="center"><img width="50%" src="images/deco-light.png" alt=""/></p>
 <p class="center"><img width="50%" src="images/sans-thin.png" alt=""/></p>
 <p class="center"><img width="50%" src="images/sans-dark.png" alt=""/></p>
 <p class="center"><img width="50%" src="images/sans-heavy.png" alt=""/></p>
@@ -109,19 +115,20 @@ they are requested by \headstyle or \setstyleN in preamble.</p></li>
 <p class="center"><img width="50%" src="images/sans-black.png" alt=""/></p>
 <p class="center"><img width="50%" src="images/deco-gero.png" alt=""/></p>
 <p class="center"><img width="50%" src="images/deco-plas.png" alt=""/></p>
+<p class="center"><img width="50%" src="images/deco-icel.png" alt=""/></p>
 </li>
-<li><p>There are no Italics.  Numerals are
-always lining. Most of these fonts do not have lowercase letters
-(if you type lowercase, you see uppercase).</p></li>
+<li><p>The Sans and Deco fonts do not have Italics or small caps.  Numerals are always lining.
+    Most of them have only uppercase letters (if you type lowercase, you see uppercase).</p></li>
 <li><p>These fonts may be used in page header/footer, and the <code>\styleN</code> (N=0-9)
-commands. They may not be used anywhere else.</p></li>
+    commands. They may not be used anywhere else.</p></li>
 <li><p>If you need different decorative fonts, you cannot use them in Novelette.
-But you can create <i>png</i> raster images, using any fonts that are licensed for
-your purpose.</p></li>
-<li><p>The Sans fonts are original designs. The Deco fonts are modified from fonts designed
-by others, using the Open Font License.</p></li>
-<li><p>These fonts do not contain characters, even in ASCII and Latin-1, that would not
-normally be used in places such as chapter titles and page headers.</p></li>
+    But you can create <i>png</i> raster images, using any fonts that are licensed for
+    your purpose.</p></li>
+<li><p>The Sans fonts, and some of the Deco fonts, are original designs. Some Deco fonts
+    are modified from fonts designed by others, using the Open Font License; attribution is
+    within the font metadata.</p></li>
+<li><p>These fonts do not contain characters, even in Latin-1, that would not
+    normally be used in places such as chapter titles and page headers.</p></li>
 </ul>
 
 

@@ -81,23 +81,53 @@ But he did not write murder mysteries. He did read them, so if I were you, I'd s
 <h4 class="link"><a href="#top">
 <img src="images/top.svg" width="16" height="16" alt=""/>TOP</a></h4>
 <p>All fonts were edited using FontForge. They are OpenType format with PostScript (cubic)
-outlines at 1000 grid units per em. If you need to edit the fonts, any good font editor
-should be able to do it.</p>
-<p>The maximum height of any glyph cannot exceeed 840 grid units above baseline. The maximum
-glyph depth cannot be beneath 230 units below baseline. Exception: If it is a decorative glyph
-that would never be used in metadata, it can extend 260 grid units below baseline.</p>
-<p>Observe that the weight of glyphs is slightly heavier than commonly seen in other fonts.
-This is especially noticeable where the shapes are thin. Modern digital printing, especially
-with print-on-demand, tends to produce lighter text than users expect from offset presses.
-The fonts are designed to account for this.</p>
-<p>Novelette fonts have features that interact with its LaTeX code. If you add or edit characters,
-be sure that they are included in whichever OpenType features are appropriate.</p>
+   outlines at 1000 grid units per em. If you need to edit the fonts, any good font editor
+   should be able to do it. <i>Do not</i> change the fonts to TrueType or Type1.</p>
 <p>If you modify any font, remove the "Manufacturer" font info. Its default is "tlbrnvt" for
-the original fonts. You may change it to your own setting. The purpose is to (hopefully) ensure
-that original fonts are not confused with modified substitutes.</p>
-<p>NoveletteSerif12-Regular may be used in some places where other fonts cannot be used.
-It has several font features that serve special purposes:</p>
+   the original fonts. You may change it to your own setting. The purpose is to (hopefully) ensure
+   that original fonts are not confused with modified substitutes.</p>
+<p>Observe that the weight of glyphs is slightly heavier than commonly seen in other fonts.
+   This is especially noticeable where the shapes are thin. Modern digital printing, especially
+   with print-on-demand, tends to produce lighter text than users expect from offset presses.
+   The fonts are designed to account for this.</p>
+<p>The maximum height of any glyph cannot exceeed 840 grid units above baseline. The maximum
+   glyph depth cannot be beneath 230 units below baseline. Exception: If it is a decorative
+   glyph that would never be used in metadata, it can extend 260 grid units below baseline.</p>
+<p>Novelette fonts have features that interact with its LaTeX code. If you add or edit characters,
+   be sure that they are included in whichever OpenType features are appropriate.</p>
+<p>The standard <code>tlig</code> (TeX ligatures) feature is not used by Novelette! Instead,
+   substitute ligatures are built into the fonts themselves. This solves some problems that can
+   occur if the writer exchanges files with a human editor: TeX ligatures are not compatible
+   with the ligatures and smart quotes applied by word processors. In particular, the
+   ambiguous double quote <code>&quot;</code> is disallowed by default!</p>
 <ul><li>
+  <p><code>ccmp 1</code> <img src="images/pointer.svg" width="16" height="16" alt=""/>
+   Glyph composition.
+   This is the built-in equivalent of TeX ligatures, except that <code>&quot;</code> is not
+   converted to curly form. Also, the substitutions are staged in a sequence that avoids
+   some problems caused by write-editor file exchange.</p> 
+</li><li>
+  <p><code>ccmp 2</code> <img src="images/pointer.svg" width="16" height="16" alt=""/>
+   Glyph decomposition.
+   This converts some multi-character glyphs (such as <code>IJ</code>) into their individual
+   characters. That provides better tracking.</p>
+<li></li>
+smcp
+c2sc
+rlig Resolves triple quotes
+calt 1-1 Ldot, 1-2 case
+hlig bad meta ligatures
+dlig degrees
+lnum
+titl
+onum
+unic bad meta characters
+cv01 footnote markers
+cv02 ???
+
+</li></ul>
+</li><li>
+
   <p><code>cvNN</code> is used for <code>\init</code> characters, if the glyph needs a short
      descender or reduced-size punctuation.</p>
   <p><code>cvNN</code> is like the above, but for <code>\dcap</code>.</p>

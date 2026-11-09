@@ -45,7 +45,7 @@ and <code>\centering</code> command.</p>
     <i>block</i> must be the <i>component</i> environment, before or after
     <code>\maintext</code>.</p>
 </li><li>
-  <p>You may <i>not</i> use <i>block</i> in a legal component, or in footnotes.</p>
+  <p>You may <i>not</i> use <i>block</i> in footnotes.</p>
 </li><li>
   <p>You may <i>not</i> nest one <i>block</i> within another. If you need that effect, end one
     <i>block</i> before beginning a new <i>block</i>.</p>
@@ -54,7 +54,7 @@ and <code>\centering</code> command.</p>
 (relative to margin), the alignment of text within the block, and whether the text size is
 normal or small.</p>
 <p>Format: <code>[<i>L</i>/<i>R</i>,align=<i>A</i>,size=<i>S</i>,font=<i>F</i>]</code></p> 
-<p>Default: <code>[0/0,align=justify,size=normal,font=normal]</code></p>
+<p>Default: <code>[0/0,align=justify,size=normal]</code></p>
 <ul><li>
   <p>Alternative: <i>L</i> and <i>R</i> are both numbers (prefer integers).</p>
   <ul><li>
@@ -101,16 +101,10 @@ normal or small.</p>
   <p>Only display zones allow small. If small, font size and baselineskip are reduced
      to the size of footnotes.</p>
 </li><li>
-  <p><code><i>F</i></code> is either normal or italic. Default normal.</p>
-  <ul><li>
-    <p><code>[font=italic]</code> prints all block content in Italics.</p>
-  </li><li>
-    <p>For only a few words in Italics, use <code>\textit{<i>text</i>}</code>
-       as usual. It cannot cross paragraphs.</p>
-  </li><li>
-    <p>Unlike the <code>\style<i>N</i></code> commands, you cannot choose
-       a font other than the main font.</p>
-  </li></ul>
+  <p>If the entire block will be in Italics, write <code>\itshape</code> prior to the start
+     of its text.</p>
+  <p>Otherwise, use <code>\textit(<i>some text</i>}</code> for local Italics. This command cannot
+     span paragraphs.</p>
 </li></ul>
 
 
@@ -150,7 +144,7 @@ uses <code>[k/k]</code> or <code>[k/<i>R</i>]</code> or <code>[<i>L</i>/k]</code
 </li><li>
   <p>The text will be right-justified, and preceded by an em dash.</p>
 </li><li>
-  <p>Whether or not the block uses <code>[font=italic]</code>, the attribution is not
+  <p>Whether or not the block uses <code>\itshape</code> for all Italics, the attribution is not
      in Italics, unless you use <code>\textit</code> for all or some of it.</p>
 </li><li>
   <p>If the block uses <code>[size=small]</code> then the attribution will
