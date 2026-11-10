@@ -91,7 +91,7 @@
   \ifnvt@hasfooter
     \setlength\footskip{2\nvt@bls}
   \else
-\setlength\footskip{0pt} %%%%%
+\setlength\footskip{0pt}
   \fi
   \edef\tmpa{\fpeval{1.3\nvt@bls}pt plus \fpeval{.2*\nvt@bls}pt minus \fpeval{.8*\nvt@bls}pt}
   \skip\footins=\tmpa\relax%% This is for footnotes, not footer.
@@ -172,7 +172,7 @@
   \ifodd\c@page%%
     \edef\tmpexpect{\arabic{nvt@expectpage}}\ifnum\tmpexpect>1\relax%%
       \begin{component}[class=single,guide=0,first=empty]\vfil\strut\hfill%%
-        {\normalfont\upshape\nvt@aff{Scale=4,RawFeature={+cv59}}\char"2756}%% %%%%% 2756 ?
+        {\normalfont\upshape\nvt@aff{Scale=4,RawFeature={+cv59}}\char"2756}%%
       \hfill\strut\par\null\end{component}%%
     \fi%%
   \fi%%
@@ -180,7 +180,7 @@
   \@nameuse{ps@\nvt@pagestyle}%%
   \ifnvt@norenumber\else%%
     \setcounter{nvt@pageoffset}{-\c@page}%%
-    \addtocounter{nvt@pageoffset}{1}%% %%%%% but component moves to new page?
+    \addtocounter{nvt@pageoffset}{1}%%
   \fi%%
   \let\mainmatter\relax%%
 }%%
@@ -233,14 +233,14 @@
   \let\@mkboth\@gobbletwo%%
   \setcounter{nvt@bookpage}{\c@page}\addtocounter{nvt@bookpage}{\value{nvt@pageoffset}}%%
   \ifnvt@infrontmatter%%
-    \ifdefined\nvt@thisdoc%%
-      \def\nvt@thispage{zzz}%% %%%%%
+    \ifdefined\nvt@thisdocfile%%
+      \def\nvt@thispage{zzz}%%
     \else%%
       \def\nvt@thispage{\roman{nvt@bookpage}}%%
     \fi%%
   \else%%
-    \ifdefined\nvt@thisdoc%%
-      \def\nvt@thispage{000}%% %%%%%
+    \ifdefined\nvt@thisdocfile%%
+      \def\nvt@thispage{000}%%
     \else%%
       \def\nvt@thispage{\arabic{nvt@bookpage}}%%
     \fi%%
@@ -404,8 +404,6 @@
 \setcounter{footnote}{0}%% Resets to 0 at each \begin{component}.
 \newif\ifnvt@infootnote %% True within footnote.
 \dimen\footins=3in %% Maximum height per page, for all footnotes on that page.
-%% Some printers recommend line widths at least 0.75pt:
-%% \def\footnoterule{\kern-3\p@ \hrule \@width 2in \kern 2.6\p@} % the \hrule is .4pt high %%%%%
 \def\footnoterule{\kern-3\p@ \hrule \@width 1.5in \@height .75pt \kern 2.25\p@}
 \DeclareDocumentCommand\footnote{O{}+m}{%% Ignore optional argument.
   \unskip\nvt@infootnotetrue%%

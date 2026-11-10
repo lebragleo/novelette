@@ -212,12 +212,6 @@
   { \__nvt_main_newfontfamily:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
 \NewDocumentCommand \nvt@newfontface { m O{} m O{} }
   { \__nvt_main_newfontface:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
-\ifnvt@imagedoc
-  \NewDocumentCommand \nvt@newfontfamily { m O{} m O{} }
-    { \__nvt_main_newfontfamily:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
-  \NewDocumentCommand \nvt@newfontface { m O{} m O{} }
-    { \__nvt_main_newfontface:NnnN #1 {#2,#4} {#3} \NewDocumentCommand }
-\fi
 \NewDocumentCommand \nvt@defaultfontfeatures { t+ o m }
   {
     \IfNoValueTF {#2}
@@ -227,12 +221,6 @@
   }
 \NewDocumentCommand \nvt@aff {m}
   { \__nvt_main_addfontfeatures:n {#1} }
-\ifnvt@imagedoc
-  \NewDocumentCommand \addfontfeature {m}
-  { \__nvt_main_addfontfeatures:n {#1} }
-  \NewDocumentCommand \addfontfeatures {m}
-  { \__nvt_main_addfontfeatures:n {#1} }
-\fi
 \NewDocumentCommand \IfFontFeatureActiveTF {mmm}
   { \__nvt_main_IfFontFeatureActiveTF:nnn {#1} {#2} {#3} }
 \long\def\oldstylenums#1{%%

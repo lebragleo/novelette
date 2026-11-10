@@ -1,7 +1,7 @@
 # novelette
 LuaLaTeX document class for printed popular fiction
 
-This material is currently in pre-release version 0.1. Do not use for production.
+This material is currently in pre-release. Do not use for production.
 
 While you are waiting...
 
@@ -22,13 +22,10 @@ is not for you. It does less!
 
 It comes with its own fonts, optimized for close agreement with the LuaLaTeX code.
 
-Be patient... The developer has much more material (including documentation) that
+Be patient... The developer has much more material (mostly documentation) that
 has not yet been uploaded.
 
-UPDATE 24-SEP-2026 : Continued development. Moved some code from LaTeX to Lua.
-Font kerning not yet complete. Partial documentation. Eventually will add utilities
-and gallery.
-
-UPDATE 02-OCT-2026 : At the suggestion of a non-programmer tester, some of the
-command names and syntax have been changed, for better user experience.
- 
+UPDATE November 10, 2026: At this point, the LaTeX and Lua codes are functional,
+and the fonts are defined. Some of the documentation is there, but it is not finished.
+Fonts do not yet have kerning tables. Lua support needs a few lines changed to
+use its utf8 library.

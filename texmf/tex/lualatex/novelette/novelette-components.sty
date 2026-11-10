@@ -44,7 +44,7 @@
   \fi%%
   \ifnvt@incomponent\nvt@fatal{Cannot nest a component within another, page \thepage.}\fi%%
   \clearpage%%
-  \vspace*{-2\nvt@bls}\null%% %%%%%
+  \vspace*{-2\nvt@bls}\null%%
   \edef\nvt@compstart{\the\c@page}\edef\tmpexpect{\arabic{nvt@expectpage}}%%
   \edef\tmppp{\fpeval{\nvt@compstart=\tmpexpect}}%% Sometimes we expect too much!
   \ifnum\tmppp=1\relax\else%%
@@ -102,11 +102,11 @@
     \spiv R -> obey force empty plain. Default obey.^^J%%
     \spix Like F, but applies to rest of component (not first page).^^J%%
     \spix Note that all=drop is not available.^^J%%
-    \spiv C -> normal single recto single+recto legal. Default normal.^^J%%
+    \spiv C -> normal single recto singlerecto legal. Default normal.^^J%%
     \spix normal -> No special warnings.^^J%%
     \spix single -> Warning if entire component does not fit on one page.^^J%%
     \spix recto -> Warning if page is not recto.^^J%%
-    \spix single+recto -> Both of the above.^^J%%
+    \spix singlerecto -> Both of the above.^^J%%
     \spix legal -> Special formats for copyright page. See Novelette docs.}%%
     \directlua{nvt.adderr('Bad \\component option.')}%%
   \fi%%
@@ -240,7 +240,7 @@
     \else%%
       \xdef\tmphw{\fpeval{1in+.5*\pagewidth-.5*\nvt@glue-.5\wd0}pt}%%
     \fi%%
-   \put(\tmphw,-\tmpva){\smash{\usebox0}}%% %%%%%
+   \put(\tmphw,-\tmpva){\smash{\usebox0}}%%
   }%%
 }%%
 %%

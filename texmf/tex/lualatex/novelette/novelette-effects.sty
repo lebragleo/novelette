@@ -168,7 +168,7 @@
     \ifnvt@indisplay%%
       \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
     \else%%
-      \ifnvt@inbackmatter%% %%%%%
+      \ifnvt@inbackmatter%%
         \directlua{nvt.parseblock('\luaescapestring{#1}','D')}%%
       \else%%
         \directlua{nvt.parseblock('\luaescapestring{#1}','M')}%%
@@ -201,7 +201,6 @@
       \directlua{nvt.adderr('Bad option for block environment.')}%%
     \else%%
       \ifnum\tmpblocksize=1\relax\nvt@small\nvt@smallblocktrue\vspace{\tmpsmtop}\fi%% headroom
-%%%%%
       \ifnum\tmpkeyleft=1\relax\def\tmptestkey{1}\else\def\tmptestkey{0}\fi%%
       \ifnum\tmpkeyright=1\relax\def\tmptestkey{1}\fi%%
       \ifnum\tmptestkey=1\relax%%
@@ -217,7 +216,6 @@
           \nvt@warn{Did not set good \string\key\space before block option [k,R].}%%
         \fi%%
       \fi%%
-%%%%%
       \ifnum\tmpkeyleft=1\relax%% [k/N] or [k/k]
         \ifx\tmphalfkeydiff\@empty%%
           \edef\tmpblockoffsetleft{\fpeval{2*\nvt@parindent}pt}%%
@@ -227,7 +225,6 @@
       \else%%
         \edef\tmpblockoffsetleft{\fpeval{\tmpblockleft*\nvt@parindent}pt}%%
       \fi%%
-%%%%%
       \ifnum\tmpkeyright=1\relax%% [N/k] or [k/k]
         \ifx\tmphalfkeydiff\@empty%%
           \def\tmpblockoffsetright{0pt}%%
@@ -237,8 +234,6 @@
       \else%%
         \edef\tmpblockoffsetright{\fpeval{\tmpblockright*\nvt@parindent}pt}%%
       \fi%%
-%%%%%
-%%%%%
       \nvt@inblocktrue%%
       \setlength{\leftmargin}{\tmpblockoffsetleft}%%
       \setlength{\rightmargin}{\tmpblockoffsetright}%%
@@ -253,7 +248,7 @@
       \ifnum\tmpblockalign=1\relax\nvt@center\fi%%
       \ifnum\tmpblockalign=2\relax\nvt@raggedright\fi%%
       \ifnum\tmpblockalign=3\relax\nvt@raggedleft\fi%%
-      \ignorespaces%% %%%%%
+      \ignorespaces%%
     \fi%%
   \fi%%
 }{%%
@@ -520,9 +515,9 @@
   \ifnum\tmpreturn=1\relax%%
     \par\vspace*{-\nvt@bls}\strut\par%%
     \setlength\parindent{0pt}%%
-    \def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}%% %%%%%
-    \edef\tmpsp{\fpeval{(\tmpscale*\tmpspace + .02*\tmptrack)*\nvt@em}pt}%% %%%%%
-    \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%% %%%%%
+    \def\tmpstrut{\rule[-\tmpd]{0pt}{\tmph}}%%
+    \edef\tmpsp{\fpeval{(\tmpscale*\tmpspace + .02*\tmptrack)*\nvt@em}pt}%%
+    \def\tmpfeat{\nvt@aff{\tmpraw,Scale=\tmpscale,LetterSpace=\tmptrack}}%%
     \def\par{\nvt@noparthere}\def\\{\nvt@noparthere}\def\linebreak{\nvt@noparthere}%%
     \begingroup%%
       \DeclareDocumentCommand\logo{sm}{}%% Measure without logo.
@@ -690,7 +685,7 @@
     \edef\tmpscale{\fpeval{(\nvt@bls+.856\nvt@em)/(.65*\nvt@em)}}%%
     \edef\tmpstretch{\fpeval{3.17/\tmpscale}}%%
 \edef\tmpback{\fpeval{((\tmpscale-1)*\tmpstretch*.044em)+.1\nvt@em}pt}%% for O
-\def\tmpback{.1\nvt@em}%% %%%%%
+\def\tmpback{.1\nvt@em}%%
     \sbox0{%%
       \hspace{-\tmpback}%%
       \nvt@aff{RawFeature={-smcp,-c2sc,+cv49},Scale=\tmpscale,FakeStretch=\tmpstretch}%%
@@ -699,11 +694,9 @@
     \xdef\tmpwd{\fpeval{\wd0 + .1\nvt@em}pt}%%
     \xdef\tmplw{\fpeval{\textwidth - \tmpwd}pt}%%
     \parshape=3 \tmpwd \tmplw \tmpwd \tmplw 0pt \the\textwidth\relax%% No inner group here.
-%%    \strut\smash{\llap{\raisebox{-\nvt@bls}{\usebox0}}}%%
-\edef\tmpdn{\fpeval{-\nvt@bls-.206*\nvt@em}pt}%%
-%%\strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
-\strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
-    \IfBooleanTF{#1}{\hspace{-.1\nvt@em}}{}%% %%%%%
+    \edef\tmpdn{\fpeval{-\nvt@bls-.206*\nvt@em}pt}%%
+    \strut\smash{\llap{\raisebox{\tmpdn}{\usebox0}}}%%
+    \IfBooleanTF{#1}{\hspace{-.1\nvt@em}}{}%%
   \else%%
     \nvt@warn{\string\init, or \string\dcap, only allowed at start of paragraph.^^J%%
       \spii Do not use \string\indent, or \string\noindent\space there.}%%
@@ -723,7 +716,7 @@
     \hspace{-\wd0}%%
     \edef\tmpdrop{\fpeval{.3*\nvt@em + .76}pt}%%
     \smash{\rule[-\tmpdrop]{\wd0}{0.76pt}}%%
-    \vspace{.3\nvt@em}%% %%%%%
+    \vspace{.3\nvt@em}%%
     \endgroup%%
   \else%%
     \nvt@warn{\string\underline\space only available in display zone.}%%

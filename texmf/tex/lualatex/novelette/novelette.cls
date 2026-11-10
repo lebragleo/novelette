@@ -154,7 +154,7 @@
 \protected\edef\pdfpageattr{\pdfvariable pageattr} %% Compatibility.
 \nofiles %% *.aux not needed, since double-compile not used.
 \newif\ifcolors@ %% Always false. Possible compatibility.
-\def\nvt@filepath{./} %% Re-defined when compiling subdoc.
+\def\nvt@filepath{.} %% Re-defined when compiling subdoc.
 \def\nvt@nowcompiling{} %% Empty for main doc, nonempty for \subdoc.
 \def\nvt@zrule{\rule{0pt}{0pt}} %% Provides anchor point for various fill commands.
 \newif\ifnvt@inpreamble\nvt@inpreambletrue %% Becomes false later.
@@ -243,7 +243,7 @@ local in = io.open(fileout,"r+")
   \fi
   \let\input\nvt@input\relax\let\RequirePackage\nvt@RequirePackage\relax
   \RequirePackage{luahyphenrules}\HyphenRules{\nvt@lang}%% Load after \normalsize.
-  \def\HyphenRules#1{%% %%%%%
+  \def\HyphenRules#1{%%
     \nvt@err{Command \string\HyphenRules\space is disallowed.}%%
     \directlua{nvt.adderr('Command \\HyphenRules is disallowed.')}%%
   }%%
@@ -302,7 +302,7 @@ local in = io.open(fileout,"r+")
   %% that is not in the allowed metadata set. The metadata is boxed, and the box is measured:
   \typeout{Info: Now creating test page (will be discarded).}%% Checks your metadata text.
   \DiscardShipoutBox
-  \ifdefined\nvt@thisdoc\else
+  \ifdefined\nvt@thisdocfile\else
     \begingroup\makeatletter
     \nvt@aff{RawFeature={-calt,-liga,-dlig,+hlig,+unic},Scale=.1}
     \sbox0{\thetitle\space\theauthor\space\thesubtitle\space\theversion}
@@ -340,9 +340,9 @@ local in = io.open(fileout,"r+")
   \fi
   \global\nvt@inpreamblefalse%%
   \directlua{nvt.preamble=false}
-  \ifdefined\nvt@thisdoc
+  \ifdefined\nvt@thisdocfile
     \typeout{Info: Now beginning the subdoc.^^J}
-    \nvt@input{\nvt@filepath\nvt@thisdocpath/\nvt@thisdoc}
+    \nvt@input{\nvt@filepath/\nvt@thisdocpath/\nvt@thisdocfile}
     \let\nvt@maybestopnow\enddocument%% Prints only subdoc and its own subdocs.
   \else
     \typeout{Info: Now beginning the document body.^^J}
@@ -364,7 +364,7 @@ local in = io.open(fileout,"r+")
   \let\input\nvt@input\relax
   \nvt@didprinttrue
   \ifnum\currentgrouplevel>\z@\relax\directlua{nvt.good = false}\fi
-  \ifdefined\nvt@thisdoc
+  \ifdefined\nvt@thisdocfile
     \typeout{Info: Omitted text beyond subdoc, skipped to end of document body.}
   \else
     \typeout{Info: Reached end of the document body.}
@@ -372,8 +372,6 @@ local in = io.open(fileout,"r+")
   \directlua{nvt.finalize()}
   \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
   \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
-%%%%%  \def\tmptest{bad}\ifx\tmpmode\tmptest\def\nvt@titleprefix{BAD: }\fi
-%%%%%  \def\tmptest{final}\ifx\tmpmode\tmptest\else\nvt@pdfxfalse\def\nvt@oi{none}\nvt@xmpfalse\fi
   \ifnvt@examine
     \directlua{%%
       local fileout = './' .. tex.jobname .. '.typo'

@@ -61,7 +61,7 @@
     \ifnvt@indisplay\def\tmpfloat{0}\else\def\tmpfloat{1}\fi%%
     \ifnvt@infrontmatter\def\tmpfloat{0}\fi%%
     \ifnvt@inbackmatter\def\tmpfloat{0}\fi%%
-    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
+    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph.
     \catcode`\~=12\relax\def\tmpopt{#2}%% Otherwise, ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
       {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}',0)}}%%
@@ -175,7 +175,7 @@
   \ifnum\tmpok=1\relax%%
     \ifnvt@dev\def\nvt@imgrulewd{2pt}\fi%%
     \def\tmpalign{0}\def\tmpvalidate{0}%%
-    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph. %%%%% \null ?
+    \par\vspace*{-\nvt@bls}\null\setlength\parindent{0pt}%% Begin paragraph.
     \catcode`\~=12\relax\def\tmpopt{lines=2,#2}%% Else ~ in file path would be undetected here.
     \IfBooleanTF{#1}%%
       {\directlua{nvt.parseimage('star','\luaescapestring{\tmpopt}','\luaescapestring{#3}',1)}}%%
@@ -292,7 +292,7 @@
 \def\nvt@printimage{%%
   \ifnvt@insceneimage%%
     \edef\imgruleht{\fpeval{\nvt@bls}pt}%%
-    \edef\tmppad{\fpeval{-.5*\ht0}pt}%% %%%%%
+    \edef\tmppad{\fpeval{-.5*\ht0}pt}%%
   \else%%
     \edef\imgruleht{\fpeval{\tmplines*\nvt@bls}pt}%%
     \ifnum\tmptweak=0\relax\edef\tmppad{%%

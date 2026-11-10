@@ -359,16 +359,9 @@
 \let\case\up %% Alias.
 \long\def\dn#1{{\nvt@aff{RawFeature={-case}}#1}}
 \let\down\dn %% Alias.
-\newif\ifnvt@initalic %% True within \textit. %%%%%
-\let\nvt@origtextit\textit
-\long\def\textit#1{\nvt@origtextit{#1\nvt@initalictrue}}
 \let\it\textit %% Alias.
-\def\em{%%
-  \nvt@warn{No \string\em. Try \string\textit{text} or \string\it{text}.}%%
-}%%
-\def\strong{%%
-  \nvt@warn{Novelette does not use \string\strong. No bold!}%%
-}
+\def\em{\nvt@warn{No \string\em. Try \string\textit{text} or \string\it{text}.}}%%
+\def\strong{\nvt@warn{Novelette does not use \string\strong. No bold!}}
 %%
 
 

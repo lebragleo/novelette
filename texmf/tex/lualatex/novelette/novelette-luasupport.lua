@@ -294,13 +294,15 @@ nvt.parseentry = function (s)
   if string.find(s, 'page=') then
     gotp = true
     p, n = string.gsub(s, '.*page=', '') ; p = string.gsub(p, ',.*', '')
-    if n == 1 then
-      pp = tonumber(p)
+    if n == 1 then 
+     pp = tonumber(p)
       a = string.gsub(p, 'x', '') ; a = string.gsub(a, 'v', '') ; a = string.gsub(a, 'i', '')
       if pp and pp == math.floor(p) and pp >= 0 and pp <= 999 then
         tex.sprint('\\def\\tmppage{' .. p .. '}') ; s = string.gsub(s, 'page=' .. p, '')
       elseif not pp and a == '' then
         tex.sprint('\\def\\tmppage{' .. p .. '}') ; s = string.gsub(s, 'page=' .. p, '')
+      elseif nvt.startmode == 'draft' and pp == 0 then
+        tex.sprint('\\def\\tmppage{0}') ; s = string.gsub(s, 'page=0', '')
       else
         pok = false
       end
@@ -506,56 +508,62 @@ end
 --
 
 
--- Check that subdoc \thisdoc defines front|main|back matter in agreement with main document:
-nvt.comparematter = function (s1, s2)
-  s1 = string.gsub(s1, ' ', '') ; s2 = string.gsub(s2, ' ', '')
-  s1 = string.gsub(s1, ':.*', '') ; tex.sprint('\\def\\tmpm{' .. s1 .. '}')
-  if s1 == s2 then
-    tex.sprint('\\def\\tmpreturn{1}')
-  else
-    tex.sprint('\\def\\tmpreturn{0}') ; nvt.good = false
-  end
-end
---
-
-
 -- Parse subdoc file paths:
 nvt.parsethisdoc = function (s)
-  local p, f, d, m, n ; local ok = true
+  local p, f, d, t, m, n ; local e = ''
   s = string.gsub(s, ' ', '')
-  if string.find(s, '%.%.') then ok = false end
-  if string.find(s, '\\') then ok = false end
-  if string.find(s, '//') then ok = false end
-  _, n = string.gsub(s, ':', '') ; if n ~= 1 then ok = false end
-  m = string.gsub(s, ':.*', '')
-  if m == 'frontmatter' then tex.sprint('\\def\\tmpmatter{frontmatter}')
-  elseif m == 'mainmatter' then tex.sprint('\\def\\tmpmatter{mainmatter}')
-  elseif m == 'backmatter' then tex.sprint('\\def\\tmpmatter{backmatter}')
-  elseif m == 'image' then tex.sprint('\\def\\tmpmatter{image}')
-  else tex.sprint('\\def\\tmpmatter{unknown}') ; ok = false
+  if string.find(s, '%.%.') then
+    e = 'Cannot use .. in thisdoc path.'
   end
-  s = string.gsub(s, '^' .. m .. ':', '') ; s = string.gsub(s, '^%./', '')
-  if string.find(s, '^/') then ok = false end
-  if not string.find(s, '%.tex$') then ok = false end
-  f = string.gsub(s, '^%./', '')
-  if 'link' == lfs.symlinkattributes(f, 'mode') then ok = false end
-  _, n = string.gsub(s, '/', '') ; if n > 5 then ok = false end
-  if n == 0 then d = ''
-  elseif n == 1 then d = '../'
-  elseif n == 2 then d = '../../'
-  elseif n == 3 then d = '../../../'
-  elseif n == 4 then d = '../../../../'
-  elseif n == 5 then d = '../../../../../'
-  else d = '' ; ok = false
+  if string.find(s, '\\') then
+    e = 'Cannot use backslash in thisdoc path.'
   end
-  p = string.gsub(s, '/' .. f .. '$', '')
-  if ok == true then
-    tex.sprint('\\def\\tmpthisdoc{' .. f .. '}')
+  if string.find(s, '//') then
+    e = 'Cannot double // in thisdoc path.'
+  end
+  if string.find(s, ':') then
+    e = 'Cannot use colon : in thisdoc path.'
+  end
+  m = string.gsub(s, '>.*', '')
+  if m == 'F' then tex.sprint('\\def\\tmpmatter{frontmatter}')
+  elseif m == 'M' then tex.sprint('\\def\\tmpmatter{mainmatter}')
+  elseif m == 'B' then tex.sprint('\\def\\tmpmatter{backmatter}')
+  else
+    tex.sprint('\\def\\tmpmatter{unknown}')
+    e = 'Missing F> or M> or B> at start of thisdoc path.'
+  end
+  s = string.gsub(s, '^' .. m .. '>', '') ; s = string.gsub(s, '^%./', '')
+  if string.find(s, '^/') then
+    e = 'Cannot begin thisdoc path with / (no absolute path).'
+  end
+  if not string.find(s, '%.tex$') then
+    e = 'Filename for thisdoc is missing .tex file extension.'
+  end
+  if 'link' == lfs.symlinkattributes(s, 'mode') then
+    e = 'Path to thisdoc cannot be symlink (soflink).'
+  end
+  _, n = string.gsub(s, '/', '') ; if n > 5 then
+    e = 'Too many folder leve;s for thisdoc relative to maindoc. Limit 5.'
+  end
+  if n == 0 or n > 5 then d = ''
+  elseif n == 1 then d = '..'
+  elseif n == 2 then d = '../..'
+  elseif n == 3 then d = '../../..'
+  elseif n == 4 then d = '../../../..'
+  elseif n == 5 then d = '../../../../..'
+  end
+  t = string.gsub(s, '.*/', '') ----- utf8
+  p = nvt.utf8_reverse(s)
+  m = string.match(p, '/.*') ----- utf8
+  m = nvt.utf8_reverse(m)
+  p = string.gsub(m, '/$', '') -----  utf8
+  if e == '' then
+    tex.sprint('\\def\\tmpthisdocfile{' .. t .. '}')
     tex.sprint('\\def\\tmpthisdocpath{' .. p .. '}')
     tex.sprint('\\def\\tmpmaindocpath{' .. d .. '}')
-    tex.sprint('\\def\\tmpreturn{1}')
+    tex.sprint('\\def\\tmpreturn{1}\\def\\tmpmsg{}')
   else
-    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}')
+    nvt.good = false ; tex.sprint('\\def\\tmpreturn{0}\\def\\tmpmsg{' .. e .. '}')
   end
 end
 --
@@ -1070,7 +1078,6 @@ end
 -- Count missing characters, and flag bad. Hat tip to user 'wipet'.
 -- Note that an explicit \char"FFFD does not trigger this, because all Novelette fonts have it:
 luatexbase.add_to_callback('glyph_not_found', function(id,char)
-texio.write_nl('IDDDDDDDDDDD=' .. id .. ', CHAAAAAAAAAAAAR=' .. char .. '<\n')
   local tc, tcu, tc2, tc3, sf, su, sc ; nvt.good = false
   tcu = string.format('%s U+%.4X', utf8.char(char), char) ; tc = string.gsub(tcu, '.*U%+', '')
   tc2 = string.gsub(tc,'..$','') ; tc3 = string.gsub(tc,'^..','') ; tc3 = string.gsub(tc3,'.$','')
@@ -1305,9 +1312,9 @@ function nvt.parsecomponent (s,p) -- option,bookpage
     if c == 'recto' then
       tex.sprint('\\def\\tmprecto{1}') ; s = string.gsub(s, 'class=recto', '')
     end
-    if c == 'single+recto' then
+    if c == 'singlerecto' then
       tex.sprint('\\def\\tmpsingle{1}\\def\\tmprecto{1}')
-      s = string.gsub(s, 'class=single%+recto', '')
+      s = string.gsub(s, 'class=singlerecto', '')
     end
   end
   if string.find(s, 'first=') then
