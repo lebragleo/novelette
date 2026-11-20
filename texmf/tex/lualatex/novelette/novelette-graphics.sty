@@ -107,12 +107,12 @@
 %%
 
 
-%% When the image is inline, inside \styleN or \scene:
+%% When the image is inline, inside \styleN or \scene.
 \DeclareDocumentCommand\nvt@inlineimage{m}{%%
   \ifnvt@inscene%%
-    \def\tmpimagemaxht{.3in}%% Allowed because blank lines above/below.
+    \def\tmpimagemaxht{.32in}%% Allowed because blank lines above/below.
   \else%%
-    \edef\tmpimagemaxht{\fpeval{.15in * \tmpscale}pt}%% \tmpscale provided by surrounding \styleN.
+    \edef\tmpimagemaxht{\fpeval{.16in * \tmpscale}pt}%% \tmpscale provided by \styleN.
   \fi%%
   \ifnum\tmprealimage=1\relax%% check height and width, maybe validate
     \nvt@realimage{#1}%% Creates box1.
@@ -198,14 +198,15 @@
   \fi%%
   \ifnum\tmpwhere=1\relax%%
     \ifnvt@inscene%%
-      \edef\tmpfit{\fpeval{(\ht0 > .302in) + (\wd0 > \textwidth)}}%% .004in fuzz h.
+      \edef\tmpfit{\fpeval{(\ht0 > .324in) + (\wd0 > \textwidth)}}%% .004in fuzz h.
       \ifnum\tmpfit>0\relax%%
         \nvt@warn{\string\image\space is too large. Max height=0.3in, max width=textwidth.^^J%%
           \spii File: #1}%%
         {\upshape\nvt@mainfont\char"2327}%%
       \fi%%
     \else%%
-      \edef\tmpfit{\fpeval{(\ht0 > 1.034em) + (\wd0 > \textwidth)}}%% .004in fuzz h.
+      \edef\tmpmaxfit{\fpeval{max(1.1em,0.164in)}pt}%%
+      \edef\tmpfit{\fpeval{(\ht0 > \tmpmaxfit) + (\wd0 > \textwidth)}}%%
       \ifnum\tmpfit>0\relax%%
         \nvt@warn{\string\image\space is too large. Max height=0.3in, max width=textwidth.^^J%%
           \spii File: #1}%%

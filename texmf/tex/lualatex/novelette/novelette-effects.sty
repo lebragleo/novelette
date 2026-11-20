@@ -482,6 +482,7 @@
 %% be locally changed. The [option] determines whether the styled text is accompanied by lines
 %% above and/or below it, and the style of the lines.
 %%   There is no automatic chapter numbering (see \todo command, for placeholder).
+\def\nvt@stylestrut{\rule[-4pt]{0pt}{14pt}} %% Enough height to accomodate 48px@300ppi image.
 \def\nvt@noparthere{%%
   \nvt@err{Cannot use \string\par, \noexpand\\, or \string\linebreak^^J%%
     \spii inside \string\styleN (N=0-9), or \string\scene.}%%
@@ -571,7 +572,7 @@
         }%%
       \fi%%
       \vspace{\tmpaspbelow}%%
-      \strut\tmpleft\rule{\tmpwdbelow}{\tmphtbelow}\tmpright\strut\nvt@par%%
+      \strut\nvt@stylestrut\tmpleft\rule{\tmpwdbelow}{\tmphtbelow}\tmpright\strut\nvt@par%%
       \vspace{\tmpbspbelow}%%
     \fi%%
   \fi%%
