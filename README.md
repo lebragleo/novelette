@@ -25,7 +25,9 @@ It comes with its own fonts, optimized for close agreement with the LuaLaTeX cod
 Be patient... The developer has much more material (mostly documentation) that
 has not yet been uploaded.
 
-UPDATE November 10, 2026: At this point, the LaTeX and Lua codes are functional,
+UPDATE November 19, 2026: At this point, the LaTeX and Lua codes are functional,
 and the fonts are defined. Some of the documentation is there, but it is not finished.
 Fonts do not yet have kerning tables. Lua support needs a few lines changed to
-use its utf8 library.
+use its utf8 library. Thanks to alpha-user feedback, the commands for images
+have been re-defined. The utilities support scripts (not used by *tex) will be
+improved.
